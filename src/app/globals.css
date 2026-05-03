@@ -47,15 +47,24 @@ body {
 .shimmer {
   background: linear-gradient(
     100deg,
-    rgba(212, 175, 55, 0.0) 20%,
-    rgba(212, 175, 55, 0.45) 50%,
-    rgba(212, 175, 55, 0.0) 80%
+    #E8C75A 0%,
+    #F5DC82 30%,
+    #FFFFFF 50%,
+    #F5DC82 70%,
+    #E8C75A 100%
   );
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
+  -webkit-text-fill-color: transparent;
+  color: #E8C75A;
   animation: shimmer 6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    animation: none;
+  }
 }
 
 @keyframes shimmer {

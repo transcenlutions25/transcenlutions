@@ -1,5 +1,7 @@
 import { SiteHeader } from "@/components/SiteHeader";
 import { Hero } from "@/components/Hero";
+import { FounderConsole } from "@/components/FounderConsole";
+import { Agents } from "@/components/Agents";
 import { MoneyOS } from "@/components/MoneyOS";
 import { CreatorHub } from "@/components/CreatorHub";
 import { BusinessWorkspace } from "@/components/BusinessWorkspace";
@@ -15,6 +17,8 @@ export default function Page() {
     <main>
       <SiteHeader />
       <Hero />
+      <FounderConsole />
+      <Agents />
       <MoneyOS />
       <CreatorHub />
       <BusinessWorkspace />

@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, Slack, X } from "lucide-react";
+import { Crown, Menu, Slack, X } from "lucide-react";
 import { Logo } from "./Logo";
 import { SLACK_CTA_LABEL, SLACK_INVITE_URL } from "@/lib/community";
+import { FOUNDER } from "@/lib/founder";
 
 const NAV = [
+  { href: "#founder", label: "Founder" },
+  { href: "#agents", label: "Agents" },
   { href: "#money-os", label: "Money OS" },
-  { href: "#creator", label: "Creator Hub" },
+  { href: "#creator", label: "Creator" },
   { href: "#workspace", label: "Workspace" },
   { href: "#connectors", label: "Connectors" },
-  { href: "#copilot", label: "Copilot" },
   { href: "#roadmap", label: "Roadmap" },
 ];
 
@@ -22,7 +24,7 @@ export function SiteHeader() {
         <a href="#top" className="flex items-center" data-testid="site-logo">
           <Logo />
         </a>
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-5">
           {NAV.map((n) => (
             <a
               key={n.href}
@@ -46,18 +48,19 @@ export function SiteHeader() {
             <span>Slack</span>
           </a>
           <a
-            href="#copilot"
-            className="text-sm px-3 py-1.5 rounded-md hairline hover:bg-white/5 transition"
-            data-testid="cta-sign-in"
+            href="#founder"
+            className="inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded-md gold-border bg-gold/10 text-gold hover:bg-gold/20 transition"
+            data-testid="header-founder-pill"
+            title={`${FOUNDER.name} · ${FOUNDER.email}`}
           >
-            Sign in
-          </a>
-          <a
-            href="#workspace"
-            className="text-sm px-3 py-1.5 rounded-md gold-border bg-gold/10 text-gold hover:bg-gold/20 transition"
-            data-testid="cta-launch"
-          >
-            Launch app
+            <Crown size={13} />
+            <span className="hidden lg:inline">Founder</span>
+            <span
+              className="inline-flex items-center justify-center h-5 w-5 rounded-full gold-border bg-gradient-to-br from-gold/40 to-transparent text-[10px] font-semibold text-gold"
+              aria-hidden
+            >
+              F
+            </span>
           </a>
         </div>
         <button
@@ -94,22 +97,15 @@ export function SiteHeader() {
               <Slack size={14} className="text-gold" />
               <span>{SLACK_CTA_LABEL}</span>
             </a>
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              <a
-                href="#copilot"
-                onClick={() => setOpen(false)}
-                className="text-center text-sm py-2 rounded-md hairline"
-              >
-                Sign in
-              </a>
-              <a
-                href="#workspace"
-                onClick={() => setOpen(false)}
-                className="text-center text-sm py-2 rounded-md gold-border bg-gold/10 text-gold"
-              >
-                Launch
-              </a>
-            </div>
+            <a
+              href="#founder"
+              onClick={() => setOpen(false)}
+              className="mt-1 inline-flex items-center justify-center gap-2 text-sm py-2 rounded-md gold-border bg-gold/10 text-gold"
+              data-testid="cta-founder-mobile"
+            >
+              <Crown size={14} />
+              Founder console
+            </a>
           </nav>
         </div>
       )}

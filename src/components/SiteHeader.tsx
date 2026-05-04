@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, Slack, X } from "lucide-react";
 import { Logo } from "./Logo";
+import { SLACK_CTA_LABEL, SLACK_INVITE_URL } from "@/lib/community";
 
 const NAV = [
   { href: "#money-os", label: "Money OS" },
@@ -33,6 +34,17 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
+          <a
+            href={SLACK_INVITE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md hairline hover:bg-white/5 transition"
+            data-testid="cta-slack"
+            aria-label={SLACK_CTA_LABEL}
+          >
+            <Slack size={14} className="text-gold" />
+            <span>Slack</span>
+          </a>
           <a
             href="#copilot"
             className="text-sm px-3 py-1.5 rounded-md hairline hover:bg-white/5 transition"
@@ -70,6 +82,18 @@ export function SiteHeader() {
                 {n.label}
               </a>
             ))}
+            <a
+              href={SLACK_INVITE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className="mt-1 inline-flex items-center justify-center gap-2 text-sm py-2 rounded-md hairline hover:bg-white/5"
+              data-testid="cta-slack-mobile"
+              aria-label={SLACK_CTA_LABEL}
+            >
+              <Slack size={14} className="text-gold" />
+              <span>{SLACK_CTA_LABEL}</span>
+            </a>
             <div className="grid grid-cols-2 gap-2 mt-2">
               <a
                 href="#copilot"

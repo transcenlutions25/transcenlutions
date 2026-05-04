@@ -1,4 +1,5 @@
-import { ArrowRight, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowRight, ShieldCheck, Slack, Sparkles, TrendingUp } from "lucide-react";
+import { SLACK_CTA_LABEL, SLACK_INVITE_URL } from "@/lib/community";
 
 export function Hero() {
   return (
@@ -38,6 +39,17 @@ export function Hero() {
               data-testid="hero-cta-copilot"
             >
               Talk to the copilot
+            </a>
+            <a
+              href={SLACK_INVITE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md hairline hover:bg-white/5 transition"
+              data-testid="hero-cta-slack"
+              aria-label={SLACK_CTA_LABEL}
+            >
+              <Slack size={16} className="text-gold" />
+              Join the community
             </a>
           </div>
           <ul className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl">

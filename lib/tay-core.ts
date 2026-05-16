@@ -14,6 +14,18 @@ const blockedTerms = [
 ];
 
 const vagueTerms = ["help", "do it", "make it", "fix it", "start", "thing"];
+const businessBuildTerms = [
+  "business",
+  "income",
+  "passive income",
+  "revenue",
+  "offer",
+  "funnel",
+  "lead magnet",
+  "digital product",
+  "workflow",
+  "operation",
+];
 
 export function createTayResponse(userText: string): TayResponse {
   const normalized = userText.trim().toLowerCase();
@@ -70,7 +82,8 @@ export function detectIntent(input: string): TayIntent {
     input.includes("build") ||
     input.includes("feature") ||
     input.includes("create") ||
-    input.includes("ship")
+    input.includes("ship") ||
+    businessBuildTerms.some((term) => input.includes(term))
   ) {
     return "build_feature";
   }
@@ -98,34 +111,34 @@ function getPermissionStatus(
 
 function getPermissionReason(intent: TayIntent, input: string) {
   if (intent === "unsupported_request") {
-    return "Box 1 blocks payments, deleting data, real-world automation, and hidden background work.";
+    return "Tay cannot process payments, delete records, or run background work from this screen.";
   }
 
   if (input.includes("external api") || input.includes("autonomous")) {
-    return "This is marked for future approval because Box 1 does not execute external API calls or autonomous tasks.";
+    return "This needs approval before Tay connects to outside services or works on its own.";
   }
 
-  return "This demo action stays inside the local Box 1 loop.";
+  return "This move stays inside the current Transcenlutions workspace.";
 }
 
 function createMessage(intent: TayIntent) {
   if (intent === "build_feature") {
-    return "I detected a build request. As Transcenlutions’ CEO Operator + Orchestrator, I can turn this into a structured task inside Box 1.";
+    return "I see a build request. I can turn this into a focused business task for Transcenlutions, with passive income as the priority.";
   }
 
   if (intent === "write_plan") {
-    return "I detected a planning request. I can draft a focused plan without creating external work or expanding scope.";
+    return "I see a planning request. I can draft a focused plan that protects the passive-income direction before any work begins.";
   }
 
   if (intent === "record_note") {
-    return "I detected a note request. I can log the note locally in this session.";
+    return "I see a note request. I can save it in this visible activity record.";
   }
 
   if (intent === "clarify_request") {
-    return "I need a clearer request before I suggest an allowed Box 1 action.";
+    return "I need a clearer request before I suggest a next move.";
   }
 
-  return "That request is blocked in Box 1. I will show the reason and log it instead of pretending to act.";
+  return "That request is blocked here. I will show the reason and record it instead of pretending to act.";
 }
 
 function createActionTitle(intent: TayIntent) {
@@ -138,11 +151,11 @@ function createActionTitle(intent: TayIntent) {
 
 function createActionSummary(intent: TayIntent, userText: string) {
   if (intent === "build_feature") {
-    return `Create a local task from: "${userText.trim()}".`;
+    return `Create a focused passive-income task from: "${userText.trim()}".`;
   }
 
   if (intent === "write_plan") {
-    return `Draft a structured plan from: "${userText.trim()}".`;
+    return `Draft a structured business plan from: "${userText.trim()}".`;
   }
 
   if (intent === "record_note") {
@@ -150,19 +163,19 @@ function createActionSummary(intent: TayIntent, userText: string) {
   }
 
   if (intent === "clarify_request") {
-    return "Ask for a more specific build, plan, or note request.";
+    return "Ask for a more specific business build, plan, or note request.";
   }
 
-  return "Do not execute. Explain the Box 1 boundary and record the blocked attempt.";
+  return "Do not proceed. Explain the boundary and record the stopped request.";
 }
 
 function createNextStep(intent: TayIntent) {
   if (intent === "build_feature") {
-    return "Next step: execute the allowed action to create the Box 1 task result.";
+    return "Next step: confirm the move to create the task result and connect it to passive income.";
   }
 
   if (intent === "write_plan") {
-    return "Next step: execute the allowed action to draft the plan result.";
+    return "Next step: confirm the move to draft the business plan result.";
   }
 
   if (intent === "record_note") {
@@ -170,8 +183,8 @@ function createNextStep(intent: TayIntent) {
   }
 
   if (intent === "clarify_request") {
-    return "Next step: ask for one clear outcome, such as a feature, plan, or note.";
+    return "Next step: ask for one clear business outcome, such as an offer, workflow, plan, or note.";
   }
 
-  return "Next step: choose a Box 1-safe request that does not require payments, deletion, real-world automation, or hidden work.";
+  return "Next step: choose a request that does not require payments, deletion, outside automation, or hidden work.";
 }

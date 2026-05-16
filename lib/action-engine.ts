@@ -11,7 +11,7 @@ export function executeSuggestedAction(response: TayResponse): ActionResult {
   if (action.permissionStatus === "blocked") {
     return {
       status: "failed",
-      result: "Execution blocked by Box 1 governance.",
+      result: "Tay stopped this request for safety.",
       nextStep: response.nextStep,
     };
   }
@@ -19,7 +19,7 @@ export function executeSuggestedAction(response: TayResponse): ActionResult {
   if (action.permissionStatus === "requires_approval") {
     return {
       status: "failed",
-      result: "Execution paused because this future action requires approval.",
+      result: "Tay paused this request because it needs approval first.",
       nextStep: response.nextStep,
     };
   }
@@ -28,9 +28,9 @@ export function executeSuggestedAction(response: TayResponse): ActionResult {
     return {
       status: "completed",
       result:
-        "Task created: define the first Tay feature, keep scope local, and verify the full request-to-log loop.",
+        "Task created: define the passive-income outcome, name the business asset, and confirm the request reaches a visible result.",
       nextStep:
-        "Next step: decide the smallest feature outcome Tay should structure after Box 1.",
+        "Next step: choose the smallest business asset Tay should structure next: offer, workflow, content engine, or operating task.",
     };
   }
 
@@ -38,16 +38,16 @@ export function executeSuggestedAction(response: TayResponse): ActionResult {
     return {
       status: "completed",
       result:
-        "Plan drafted: define the goal, list the next action, confirm boundaries, then execute one visible step.",
-      nextStep: "Next step: choose the first plan item to turn into a local task.",
+        "Plan drafted: define the income goal, identify the asset, list the next action, confirm boundaries, then execute one visible step.",
+      nextStep: "Next step: choose the first plan item to turn into a business task.",
     };
   }
 
   if (action.type === "log_note") {
     return {
       status: "completed",
-      result: "Note logged in the current Box 1 session.",
-      nextStep: "Next step: add another note, plan, or build request.",
+      result: "Note saved in the current activity record.",
+      nextStep: "Next step: add another note, plan, or passive-income build request.",
     };
   }
 

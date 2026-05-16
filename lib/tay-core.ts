@@ -49,15 +49,6 @@ export function detectIntent(input: string): TayIntent {
   }
 
   if (
-    input.includes("build") ||
-    input.includes("feature") ||
-    input.includes("create") ||
-    input.includes("ship")
-  ) {
-    return "build_feature";
-  }
-
-  if (
     input.includes("plan") ||
     input.includes("strategy") ||
     input.includes("outline") ||
@@ -73,6 +64,15 @@ export function detectIntent(input: string): TayIntent {
     input.includes("log")
   ) {
     return "record_note";
+  }
+
+  if (
+    input.includes("build") ||
+    input.includes("feature") ||
+    input.includes("create") ||
+    input.includes("ship")
+  ) {
+    return "build_feature";
   }
 
   return "clarify_request";

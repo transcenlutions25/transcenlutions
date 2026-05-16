@@ -1,4 +1,10 @@
 import type { ActionResult, ExecutionStatus, TayResponse } from "../lib/types";
+import {
+  actionLabels,
+  executionLabels,
+  intentLabels,
+  permissionLabels,
+} from "../lib/public-copy";
 
 interface ActionCardProps {
   response: TayResponse | null;
@@ -22,11 +28,11 @@ export function ActionCard({
   if (!response) {
     return (
       <aside className="panel action-card">
-        <p className="eyebrow">Suggested Action</p>
+        <p className="eyebrow">Next Move</p>
         <h2>Waiting for a request</h2>
         <p className="muted">
-          Tay will detect intent, suggest an action, show permission status,
-          and wait for execution.
+          Tay will review your request, propose one clear move, and wait for
+          your confirmation.
         </p>
       </aside>
     );
@@ -40,22 +46,22 @@ export function ActionCard({
 
   return (
     <aside className="panel action-card" aria-live="polite">
-      <p className="eyebrow">Suggested Action</p>
+      <p className="eyebrow">Next Move</p>
       <div className="action-card__header">
         <h2>{response.action.title}</h2>
         <span className={permissionStyles[response.action.permissionStatus]}>
-          {response.action.permissionStatus}
+          {permissionLabels[response.action.permissionStatus]}
         </span>
       </div>
 
       <dl className="facts">
         <div>
-          <dt>Detected intent</dt>
-          <dd>{response.intent}</dd>
+          <dt>Request type</dt>
+          <dd>{intentLabels[response.intent]}</dd>
         </div>
         <div>
-          <dt>Action</dt>
-          <dd>{response.action.type}</dd>
+          <dt>Move</dt>
+          <dd>{actionLabels[response.action.type]}</dd>
         </div>
       </dl>
 
@@ -71,7 +77,7 @@ export function ActionCard({
       {executionStatus === "running" ? (
         <div className="running-state">
           <span />
-          Running action...
+          {executionLabels[executionStatus]}...
         </div>
       ) : null}
 

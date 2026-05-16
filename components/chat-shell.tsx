@@ -3,6 +3,11 @@
 import { useState } from "react";
 import { executeSuggestedAction, createSessionLogEntry } from "../lib/action-engine";
 import { createTayResponse } from "../lib/tay-core";
+import {
+  actionLabels,
+  intentLabels,
+  permissionLabels,
+} from "../lib/public-copy";
 import type {
   ActionResult,
   ExecutionStatus,
@@ -20,6 +25,8 @@ interface ChatMessage {
 }
 
 const starter = "Build the first Tay feature";
+const businessFocus =
+  "Passive income systems, digital operations, and business growth";
 
 export function ChatShell() {
   const [input, setInput] = useState("");
@@ -34,7 +41,7 @@ export function ChatShell() {
     {
       id: "intro",
       role: "tay",
-      text: "I am Tay, CEO Operator + Orchestrator of Transcenlutions. Give me a Box 1-safe request and I will detect intent, suggest an action, show permission status, execute only when allowed, return a result, and log the session.",
+      text: "I am Tay for Transcenlutions. Tell me what you want to build, plan, or record, and I will turn it into one clear next move focused on passive income, business growth, and visible execution.",
     },
   ]);
 
@@ -43,7 +50,9 @@ export function ChatShell() {
     if (!trimmed) return;
 
     const response = createTayResponse(trimmed);
-    const logDetail = `${response.intent} detected. ${response.action.title}: ${response.action.permissionStatus}.`;
+    const logDetail = `${intentLabels[response.intent]} reviewed. ${
+      response.action.title
+    }: ${permissionLabels[response.action.permissionStatus]}.`;
 
     setActiveResponse(response);
     setExecutionStatus("idle");
@@ -55,7 +64,11 @@ export function ChatShell() {
       {
         id: `${response.id}-tay`,
         role: "tay",
-        text: `${response.message} Detected intent: ${response.intent}. Suggested action: ${response.action.type}. Permission status: ${response.action.permissionStatus}.`,
+        text: `${response.message} Request type: ${
+          intentLabels[response.intent]
+        }. Proposed move: ${actionLabels[response.action.type]}. Status: ${
+          permissionLabels[response.action.permissionStatus]
+        }.`,
       },
     ]);
 
@@ -95,11 +108,12 @@ export function ChatShell() {
   return (
     <div className="shell">
       <header className="hero">
-        <p className="eyebrow">Tay Engine / Box 1</p>
-        <h1>Tay runs the first approved Transcenlutions loop.</h1>
+        <p className="eyebrow">Transcenlutions</p>
+        <h1>Tay turns business ideas into clear next moves.</h1>
         <p>
-          User request, intent, action, permission, execution, result, log, and
-          next step. Nothing beyond Box 1 is active.
+          Start with a passive-income idea, business plan, or operating note.
+          Tay reviews it, proposes a safe next move, shows the result, and keeps
+          the record visible.
         </p>
       </header>
 
@@ -107,8 +121,8 @@ export function ChatShell() {
         <main className="chat-column">
           <section className="panel chat-panel">
             <div className="section-heading">
-              <p className="eyebrow">Chat System</p>
-              <span>Box 1 only</span>
+              <p className="eyebrow">Conversation</p>
+              <span>{businessFocus}</span>
             </div>
 
             <div className="message-list" aria-live="polite">

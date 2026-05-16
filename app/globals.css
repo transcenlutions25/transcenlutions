@@ -750,8 +750,52 @@ button {
 }
 
 .trust-icons span,
-.module-grid span {
+.module-card__top span {
   gap: 9px;
+}
+
+.module-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(216, 185, 87, 0.2);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 85% 12%, rgba(124, 58, 237, 0.18), transparent 8rem),
+    rgba(255, 255, 255, 0.04);
+  padding: 12px;
+}
+
+.module-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.module-card__top span {
+  display: inline-flex;
+  align-items: center;
+  color: var(--gold-soft);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.module-card__top em {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-style: normal;
+}
+
+.module-card h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.module-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
 }
 
 @keyframes pulse {

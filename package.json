@@ -2,7 +2,7 @@
   "name": "transcenlutions",
   "version": "0.1.0",
   "private": true,
-  "description": "Transcenlutions — Money OS for makers, creators, professionals, and operators.",
+  "description": "Transcenlutions Tay command-room foundation for business-building and controlled autonomous execution.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

@@ -1,63 +1,109 @@
 # Transcenlutions
 
-The AI operating layer for makers, creators, and operators. Make money.
-Protect money. Grow money.
+Transcenlutions LLC is building Tay: a chat-first AI command room for turning
+business ideas, passive-income systems, creative projects, and operating notes
+into visible next moves.
 
-This repo is the v0 public web app — a landing / dashboard hybrid built with
-Next.js 14, TypeScript, and Tailwind CSS.
+Tay is the face, spokesman, orchestrator, animated operator, and executive brain
+of the platform. The current app is **Tay Engine Box 1**, the foundation that
+proves the core loop:
 
-## What's in here
+```text
+User request
+→ Tay interprets intent
+→ Tay proposes an action
+→ governance shows ready / needs approval / blocked
+→ action runs or pauses visibly
+→ result appears
+→ activity log records the truth
+→ next step is suggested
+```
 
-- `src/app/` — Next.js App Router pages and global styles
-- `src/components/` — Section components (Hero, Money OS, Creator Hub,
-  Business Workspace, Connectors, Insights, Copilot, Pricing, Roadmap)
-- `src/lib/tay/` — Pure TypeScript ports of the Tay pricing, works engine,
-  insight rules, and zustand store
-- `src/lib/data/` — Sample seed data for the dashboard surface
+## Active App Structure
 
-## Getting started
+The active Next.js app lives at the repository root:
+
+- `app/` — App Router entry, layout, and global command-room styling
+- `components/` — Tay chat shell, action card, activity log, and workspace panel
+- `lib/` — Tay Core, Action Engine, public labels, and shared types
+- `docs/tay-engine-box-1-approved-spec.md` — approved Box 1 source spec
+- `scripts/check-public-copy.mjs` — guard against exposing internal build-only language
+
+The old `src/` dashboard structure has been removed so the repo has one clear
+active direction.
+
+Useful concepts from the old structure were rebuilt as Tay-aligned future module
+previews in the active root app. They now sit behind the command-room mindset:
+business operations, creator flows, connector governance, insight routing,
+founder command, and Crowne Legacy bridge.
+
+## Current Scope
+
+Box 1 includes:
+
+- royal command-room homepage
+- Tay chat interface
+- intent detection
+- structured action proposals
+- execute / approval / blocked governance states
+- visible result card
+- activity log
+- next-step suggestion
+- passive-income and business-building focus
+
+Box 1 does **not** include login, database, payments, external APIs, memory,
+agent chains, marketplace, monetization, or hidden automation.
+
+## Run Locally
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
-npm run typecheck
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+If port 3000 is busy:
+
+```bash
+npm run dev -- -p 3001
+```
+
+## Verification
+
+Run:
+
+```bash
 npm run lint
+npm run typecheck
 npm run build
-npm run start
 ```
 
-## Architecture (target)
+Manual phrases to test in Tay:
 
-Four layers, shipped in order:
-
-1. **Connection layer** — OAuth connectors for Google Ads, Meta Ads, TikTok
-   Ads, Shopify, Stripe, GA4, HubSpot, Slack.
-2. **Unified data layer** — Normalized KPI feed (revenue, spend,
-   conversions, refunds, audiences) every other module reads from.
-3. **Insight layer** — Daily briefs, anomaly alerts, copilot routing,
-   channel mix.
-4. **Action layer** — Pause underperformers, scale winners, post drafts on
-   schedule. Roadmap.
-
-## Notes
-
-- All numbers shown in the UI are sample data until the connection layer
-  ships.
-- The pricing surface uses `deriveTayPricing` over a capability registry —
-  features that are `finished` are billable; everything else is roadmap.
-- The Business Workspace tracks progress by completed actions, not elapsed
-  time. Hesitation kicks in after ~30s of inactivity.
-
-## Deployment
-
-Any Next.js host works. For Vercel:
-
-```bash
-vercel
+```text
+Build the first Tay feature
+Create a plan for Tay governance
+Log a note about command room completion
+Use an external API to automate leads
+Delete the database
+Build a passive income offer
 ```
 
-For a static-ish self-host:
+Expected behavior:
 
-```bash
-npm run build && npm run start
-```
+- safe build, plan, and note requests produce executable actions
+- external API or autonomous work pauses for approval
+- deletion, payments, and hidden background work are blocked and logged
+- every result, pause, blocked request, and clarification is visible
+
+## Product Direction
+
+Transcenlutions is not a product store or generic dashboard. The platform is a
+royal AI command center where Tay helps users build, automate, organize, grow,
+and operate business systems through chat, action execution, governance, and
+eventual memory.

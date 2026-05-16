@@ -22,6 +22,7 @@ import {
   intentLabels,
   permissionLabels,
 } from "../lib/public-copy";
+import { futureModules } from "../lib/future-modules";
 import type {
   ActionResult,
   ExecutionStatus,
@@ -72,15 +73,6 @@ const agentPreviews = [
   "Writer Ally",
   "Motivation Guide",
   "Creative Producer",
-];
-
-const comingModules = [
-  "Memory profile",
-  "Content command flows",
-  "Community challenges",
-  "Avatar recognition",
-  "Agent council",
-  "Crowne Legacy bridge",
 ];
 
 export function ChatShell() {
@@ -397,11 +389,18 @@ export function ChatShell() {
           <h2>Prepared for a living business-building ecosystem.</h2>
         </div>
         <div className="module-grid">
-          {comingModules.map((item) => (
-            <span key={item}>
-              <Network size={15} />
-              {item}
-            </span>
+          {futureModules.map((item) => (
+            <article className="module-card" key={item.title}>
+              <div className="module-card__top">
+                <span>
+                  <Network size={15} />
+                  {item.category}
+                </span>
+                <em>{item.status}</em>
+              </div>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
           ))}
         </div>
       </section>

@@ -1,4 +1,10 @@
 import type { SessionLogEntry } from "../lib/types";
+import {
+  actionLabels,
+  intentLabels,
+  logStatusLabels,
+  permissionLabels,
+} from "../lib/public-copy";
 
 interface SessionLogProps {
   entries: SessionLogEntry[];
@@ -8,13 +14,14 @@ export function SessionLog({ entries }: SessionLogProps) {
   return (
     <section className="panel session-log" aria-live="polite">
       <div className="section-heading">
-        <p className="eyebrow">Session Log</p>
+        <p className="eyebrow">Activity</p>
         <span>{entries.length} entries</span>
       </div>
 
       {entries.length === 0 ? (
         <p className="muted">
-          Failed, blocked, vague, unsupported, and executed actions appear here.
+          Tay will keep a visible record of completed, stopped, and unclear
+          requests here.
         </p>
       ) : (
         <ol>
@@ -22,12 +29,12 @@ export function SessionLog({ entries }: SessionLogProps) {
             <li key={entry.id}>
               <div>
                 <time>{entry.timestamp}</time>
-                <strong>{entry.status}</strong>
+                <strong>{logStatusLabels[entry.status]}</strong>
               </div>
               <p>{entry.detail}</p>
               <span>
-                {entry.intent} / {entry.actionType} /{" "}
-                {entry.permissionStatus}
+                {intentLabels[entry.intent]} / {actionLabels[entry.actionType]}{" "}
+                / {permissionLabels[entry.permissionStatus]}
               </span>
             </li>
           ))}

@@ -5,12 +5,14 @@ import {
   intentLabels,
   permissionLabels,
 } from "../lib/public-copy";
+import { CheckCircle2, Crown, Lock, Play, ShieldAlert } from "lucide-react";
 
 interface ActionCardProps {
   response: TayResponse | null;
   executionStatus: ExecutionStatus;
   result: ActionResult | null;
   onExecute: () => void;
+  onFollowNextStep: (nextStep: string) => void;
 }
 
 const permissionStyles = {
@@ -24,12 +26,18 @@ export function ActionCard({
   executionStatus,
   result,
   onExecute,
+  onFollowNextStep,
 }: ActionCardProps) {
   if (!response) {
     return (
       <aside className="panel action-card">
-        <p className="eyebrow">Next Move</p>
-        <h2>Waiting for a request</h2>
+        <div className="card-title-row">
+          <span className="icon-disc">
+            <Crown size={16} />
+          </span>
+          <p className="eyebrow">Next Move</p>
+        </div>
+        <h2>Tay is standing by</h2>
         <p className="muted">
           Tay will review your request, propose one clear move, and wait for
           your confirmation.
@@ -43,10 +51,25 @@ export function ActionCard({
     response.action.type !== "none" &&
     executionStatus !== "running" &&
     executionStatus !== "completed";
+  const canRequestApproval =
+    response.action.permissionStatus === "requires_approval" &&
+    executionStatus !== "running" &&
+    executionStatus !== "failed";
 
   return (
     <aside className="panel action-card" aria-live="polite">
-      <p className="eyebrow">Next Move</p>
+      <div className="card-title-row">
+        <span className="icon-disc">
+          {response.action.permissionStatus === "blocked" ? (
+            <ShieldAlert size={16} />
+          ) : response.action.permissionStatus === "requires_approval" ? (
+            <Lock size={16} />
+          ) : (
+            <Crown size={16} />
+          )}
+        </span>
+        <p className="eyebrow">Next Move</p>
+      </div>
       <div className="action-card__header">
         <h2>{response.action.title}</h2>
         <span className={permissionStyles[response.action.permissionStatus]}>
@@ -70,7 +93,15 @@ export function ActionCard({
 
       {canExecute ? (
         <button className="primary-button" onClick={onExecute}>
+          <Play size={16} />
           Execute
+        </button>
+      ) : null}
+
+      {canRequestApproval ? (
+        <button className="secondary-button" onClick={onExecute}>
+          <Lock size={16} />
+          Request approval
         </button>
       ) : null}
 
@@ -83,9 +114,20 @@ export function ActionCard({
 
       {result ? (
         <div className="result-box">
-          <p className="eyebrow">Result</p>
+          <div className="card-title-row">
+            <span className="icon-disc icon-disc--success">
+              <CheckCircle2 size={16} />
+            </span>
+            <p className="eyebrow">Result</p>
+          </div>
           <p>{result.result}</p>
           <p className="muted">{result.nextStep}</p>
+          <button
+            className="secondary-button"
+            onClick={() => onFollowNextStep(result.nextStep)}
+          >
+            Use next step
+          </button>
         </div>
       ) : (
         <p className="next-step">{response.nextStep}</p>

@@ -25,6 +25,10 @@ const businessBuildTerms = [
   "digital product",
   "workflow",
   "operation",
+  "automate",
+  "automation",
+  "lead",
+  "leads",
 ];
 
 export function createTayResponse(userText: string): TayResponse {

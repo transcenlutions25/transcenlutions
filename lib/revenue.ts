@@ -1,3 +1,5 @@
+import { getInvoiceRecipientEmail } from "./company";
+
 export interface RevenueOffer {
   id: string;
   name: string;
@@ -97,7 +99,7 @@ const approvedPaymentHosts = new Set([
 export const paymentCarePoints = [
   "Transcenlutions does not collect or store card numbers inside this app.",
   "Checkout links must use the exact offer price, scope, and buyer expectation before they appear as live checkout.",
-  "Manual invoice handoff is only enabled when a real contact email is configured.",
+  "Manual invoice handoff is only enabled when a real company or billing email is configured.",
   "Every revenue action stays visible through Tay's activity record.",
 ];
 
@@ -145,7 +147,7 @@ export function getOfferPaymentState(offer: RevenueOffer): OfferPaymentState {
   return {
     mode: "setup_required",
     title: "Payment setup needed",
-    description: `Add ${offer.paymentLinkEnvKey} or NEXT_PUBLIC_TRANSCENLUTIONS_CONTACT_EMAIL before taking payment for this offer.`,
+    description: `Add ${offer.paymentLinkEnvKey} or NEXT_PUBLIC_TRANSCENLUTIONS_BILLING_EMAIL before taking payment for this offer.`,
     href: "",
     label: "Payment setup needed",
     external: false,
@@ -167,7 +169,8 @@ export function isApprovedPaymentUrl(url: string) {
 }
 
 export function buildInvoiceMailto(offer: RevenueOffer) {
-  if (!contactEmail.trim()) return "";
+  const recipientEmail = getInvoiceRecipientEmail() || contactEmail.trim();
+  if (!recipientEmail) return "";
 
   const subject = `Invoice request: ${offer.name}`;
   const body = [
@@ -181,5 +184,5 @@ export function buildInvoiceMailto(offer: RevenueOffer) {
     "Please send the next payment step.",
   ].join("\n");
 
-  return `mailto:${contactEmail.trim()}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  return `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }

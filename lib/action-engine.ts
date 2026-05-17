@@ -114,7 +114,7 @@ function createRevenueOfferResult(response: TayResponse): ActionResult {
     result: `Revenue offer prepared: ${offer.name} (${offer.price}). ${offer.outcome} Payment path: ${paymentState.title.toLowerCase()}.`,
     nextStep:
       paymentState.mode === "setup_required"
-        ? `Next step: add ${offer.paymentLinkEnvKey} or NEXT_PUBLIC_TRANSCENLUTIONS_CONTACT_EMAIL before sending this offer to a buyer.`
+        ? `Next step: add ${offer.paymentLinkEnvKey} or NEXT_PUBLIC_TRANSCENLUTIONS_BILLING_EMAIL before sending this offer to a buyer.`
         : `Next step: send ${offer.name} to one real buyer through ${paymentState.mode === "checkout" ? "the approved checkout link" : "the invoice email draft"} and record the reply in Tay.`,
   };
 }
@@ -127,7 +127,7 @@ function createApprovedRevenueHandoffResult(response: TayResponse): ActionResult
     return {
       status: "failed",
       result: `Approval recorded, but ${offer.name} cannot accept payment yet because no approved checkout link or invoice email is configured.`,
-      nextStep: `Next step: set ${offer.paymentLinkEnvKey} to a real Stripe Payment Link, or set NEXT_PUBLIC_TRANSCENLUTIONS_CONTACT_EMAIL for invoice handoff.`,
+      nextStep: `Next step: set ${offer.paymentLinkEnvKey} to a real Stripe Payment Link, or set NEXT_PUBLIC_TRANSCENLUTIONS_BILLING_EMAIL for invoice handoff.`,
     };
   }
 

@@ -2,6 +2,11 @@
 
 import { Banknote, ExternalLink, Mail, ShieldCheck, Wrench } from "lucide-react";
 import {
+  companyEmailCarePoints,
+  getCompanyEmailState,
+  recommendedCompanyEmails,
+} from "../lib/company";
+import {
   getOfferPaymentState,
   paymentCarePoints,
   revenueOffers,
@@ -12,6 +17,8 @@ interface RevenuePanelProps {
 }
 
 export function RevenuePanel({ onCommand }: RevenuePanelProps) {
+  const companyEmailState = getCompanyEmailState();
+
   return (
     <section className="revenue-command" aria-label="Revenue launch">
       <div className="section-header">
@@ -108,7 +115,7 @@ export function RevenuePanel({ onCommand }: RevenuePanelProps) {
           <p>
             Live checkout appears only when an approved Stripe Payment Link is
             configured for the specific offer. Otherwise Tay uses invoice
-            handoff only when a real contact email is present.
+            handoff only when a real company or billing inbox is present.
           </p>
         </div>
         <div className="payment-care-grid">
@@ -119,6 +126,42 @@ export function RevenuePanel({ onCommand }: RevenuePanelProps) {
             </span>
           ))}
         </div>
+      </div>
+
+      <div className="revenue-handoff">
+        <div>
+          <p className="eyebrow">Company Email</p>
+          <h3>{companyEmailState.title}</h3>
+          <p>{companyEmailState.description}</p>
+          <div className="email-status-grid">
+            <span>
+              Main: {companyEmailState.primaryEmail || "setup needed"}
+            </span>
+            <span>
+              Billing: {companyEmailState.billingEmail || "setup needed"}
+            </span>
+            <span>
+              Support: {companyEmailState.supportEmail || "setup optional"}
+            </span>
+          </div>
+        </div>
+        <div className="payment-care-grid">
+          {companyEmailCarePoints.map((point) => (
+            <span key={point}>
+              <Mail size={15} />
+              {point}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="email-route-grid">
+        {recommendedCompanyEmails.map((item) => (
+          <article className="email-route-card" key={item.address}>
+            <strong>{item.address}</strong>
+            <p>{item.purpose}</p>
+          </article>
+        ))}
       </div>
     </section>
   );

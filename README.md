@@ -52,7 +52,8 @@ Box 1 includes:
 - passive-income and business-building focus
 - revenue launch handoff with paid starter offers
 - per-offer Stripe Payment Link support
-- manual invoice email fallback only when a real contact email is configured
+- manual invoice email fallback only when a real company or billing email is configured
+- company email readiness for official contact, billing, and support inboxes
 - setup-required state when payment is not configured
 
 Box 1 does **not** include login, database, direct card processing, external
@@ -74,18 +75,21 @@ NEXT_PUBLIC_STRIPE_STARTER_MAP_PAYMENT_LINK="https://buy.stripe.com/your-starter
 NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PAYMENT_LINK="https://buy.stripe.com/your-operator-sprint-link"
 ```
 
-Optional invoice recipient:
+Company email setup:
 
 ```bash
-NEXT_PUBLIC_TRANSCENLUTIONS_CONTACT_EMAIL="you@example.com"
+NEXT_PUBLIC_TRANSCENLUTIONS_COMPANY_EMAIL="hello@transcenlutions.com"
+NEXT_PUBLIC_TRANSCENLUTIONS_BILLING_EMAIL="billing@transcenlutions.com"
+NEXT_PUBLIC_TRANSCENLUTIONS_SUPPORT_EMAIL="support@transcenlutions.com"
 ```
 
-Without a valid Stripe Payment Link or invoice recipient, the offer shows a
-setup-needed state instead of a fake checkout. Card data is never collected
-inside Tay.
+Without a valid Stripe Payment Link or company billing inbox, the offer shows a
+setup-needed state instead of a fake checkout or empty invoice. Card data is
+never collected inside Tay.
 
 See [docs/revenue-payment-setup.md](docs/revenue-payment-setup.md) for the
-payment care rules.
+payment care rules, and [docs/company-email-setup.md](docs/company-email-setup.md)
+for the company inbox setup rules.
 
 ## Run Locally
 
@@ -136,7 +140,7 @@ Expected behavior:
 - approval creates a controlled handoff; decline stops the move and logs it
 - deletion, direct charging, and hidden background work are blocked and logged
 - revenue requests prepare a real offer and handoff path
-- payment buttons appear only for approved checkout links or configured invoice email
+- payment buttons appear only for approved checkout links or configured company email
 - every result, pause, blocked request, and clarification is visible
 
 ## Product Direction

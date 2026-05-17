@@ -815,6 +815,8 @@ button {
 
 .revenue-card__actions,
 .offer-meta,
+.email-route-grid,
+.email-status-grid,
 .payment-care-grid {
   display: grid;
   gap: 10px;
@@ -847,6 +849,8 @@ button {
 }
 
 .offer-meta span,
+.email-route-card,
+.email-status-grid span,
 .payment-status,
 .payment-care-grid span {
   border: 1px solid rgba(216, 185, 87, 0.22);
@@ -859,6 +863,28 @@ button {
   color: var(--muted);
   font-size: 0.82rem;
   line-height: 1.45;
+}
+
+.email-status-grid span {
+  color: var(--gold-soft);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.email-route-card {
+  display: grid;
+  gap: 5px;
+}
+
+.email-route-card strong {
+  color: var(--gold-soft);
+}
+
+.email-route-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
 }
 
 .payment-status {
@@ -1026,6 +1052,8 @@ button {
   .approval-actions,
   .offer-meta,
   .revenue-card__actions,
+  .email-route-grid,
+  .email-status-grid,
   .feature-grid,
   .agent-grid,
   .revenue-grid,

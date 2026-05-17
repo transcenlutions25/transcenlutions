@@ -15,7 +15,11 @@ import {
   Sparkles,
   Trophy,
 } from "lucide-react";
-import { executeSuggestedAction, createSessionLogEntry } from "../lib/action-engine";
+import {
+  createSessionLogEntry,
+  executeSuggestedAction,
+  resolveApproval,
+} from "../lib/action-engine";
 import { createTayResponse } from "../lib/tay-core";
 import {
   actionLabels,
@@ -25,6 +29,7 @@ import {
 import { futureModules } from "../lib/future-modules";
 import type {
   ActionResult,
+  ApprovalDecision,
   ExecutionStatus,
   SessionLogEntry,
   TayResponse,
@@ -127,28 +132,68 @@ export function ChatShell() {
         ...entries,
       ]);
     }
+
+    if (response.action.permissionStatus === "requires_approval") {
+      setLogEntries((entries) => [
+        createSessionLogEntry(response, logDetail, "approval_required"),
+        ...entries,
+      ]);
+    }
   };
 
   const executeActiveAction = () => {
     if (!activeResponse) return;
+    if (activeResponse.action.permissionStatus !== "allowed") return;
+
+    const response = activeResponse;
 
     setExecutionStatus("running");
     setResult(null);
 
     window.setTimeout(() => {
-      const actionResult = executeSuggestedAction(activeResponse);
+      const actionResult = executeSuggestedAction(response);
       setResult(actionResult);
       setExecutionStatus(actionResult.status);
       setMessages((current) => [
         ...current,
         {
-          id: `${activeResponse.id}-result`,
+          id: `${response.id}-result`,
           role: "tay",
           text: `${actionResult.result} ${actionResult.nextStep}`,
         },
       ]);
       setLogEntries((entries) => [
-        createSessionLogEntry(activeResponse, actionResult.result),
+        createSessionLogEntry(response, actionResult.result),
+        ...entries,
+      ]);
+    }, 700);
+  };
+
+  const resolveActiveApproval = (decision: ApprovalDecision) => {
+    if (!activeResponse) return;
+    if (activeResponse.action.permissionStatus !== "requires_approval") return;
+
+    const response = activeResponse;
+
+    setExecutionStatus("running");
+    setResult(null);
+
+    window.setTimeout(() => {
+      const actionResult = resolveApproval(response, decision);
+      const logStatus = decision === "approved" ? "approved" : "declined";
+
+      setResult(actionResult);
+      setExecutionStatus(actionResult.status);
+      setMessages((current) => [
+        ...current,
+        {
+          id: `${response.id}-${decision}`,
+          role: "tay",
+          text: `${actionResult.result} ${actionResult.nextStep}`,
+        },
+      ]);
+      setLogEntries((entries) => [
+        createSessionLogEntry(response, actionResult.result, logStatus),
         ...entries,
       ]);
     }, 700);
@@ -260,6 +305,8 @@ export function ChatShell() {
             executionStatus={executionStatus}
             result={result}
             onExecute={executeActiveAction}
+            onApprove={() => resolveActiveApproval("approved")}
+            onDecline={() => resolveActiveApproval("declined")}
             onFollowNextStep={submitRequest}
           />
         </main>

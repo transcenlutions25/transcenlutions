@@ -17,6 +17,8 @@ export type PermissionStatus = "allowed" | "requires_approval" | "blocked";
 
 export type ExecutionStatus = "idle" | "running" | "completed" | "failed";
 
+export type ApprovalDecision = "approved" | "declined";
+
 export interface SuggestedAction {
   type: TayActionType;
   title: string;
@@ -47,6 +49,14 @@ export interface SessionLogEntry {
   intent: TayIntent;
   actionType: TayActionType;
   permissionStatus: PermissionStatus;
-  status: "detected" | "executed" | "blocked" | "needs_clarification" | "unsupported";
+  status:
+    | "detected"
+    | "approval_required"
+    | "approved"
+    | "declined"
+    | "executed"
+    | "blocked"
+    | "needs_clarification"
+    | "unsupported";
   detail: string;
 }

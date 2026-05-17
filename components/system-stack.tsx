@@ -1,11 +1,11 @@
 const stackItems = [
   { name: "Transcenlutions", status: "Active" },
-  { name: "Tay", status: "Ready" },
-  { name: "Conversation", status: "Active" },
-  { name: "Actions", status: "Ready" },
+  { name: "Tay Core", status: "Ready" },
+  { name: "Chat System", status: "Active" },
+  { name: "Action Engine", status: "Ready" },
   { name: "Passive income focus", status: "Primary" },
-  { name: "Review", status: "Protected" },
-  { name: "More capabilities", status: "Later" },
+  { name: "Review Layer", status: "Protected" },
+  { name: "Future helpers", status: "Later" },
 ];
 
 export function SystemStack() {

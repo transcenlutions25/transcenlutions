@@ -38,6 +38,9 @@ export const executionLabels: Record<ExecutionStatus, string> = {
 
 export const logStatusLabels: Record<SessionLogEntry["status"], string> = {
   detected: "Reviewed",
+  approval_required: "Approval needed",
+  approved: "Approved",
+  declined: "Declined",
   executed: "Completed",
   blocked: "Blocked",
   needs_clarification: "Needs detail",

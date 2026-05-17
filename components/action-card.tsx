@@ -12,6 +12,8 @@ interface ActionCardProps {
   executionStatus: ExecutionStatus;
   result: ActionResult | null;
   onExecute: () => void;
+  onApprove: () => void;
+  onDecline: () => void;
   onFollowNextStep: (nextStep: string) => void;
 }
 
@@ -26,6 +28,8 @@ export function ActionCard({
   executionStatus,
   result,
   onExecute,
+  onApprove,
+  onDecline,
   onFollowNextStep,
 }: ActionCardProps) {
   if (!response) {
@@ -51,10 +55,10 @@ export function ActionCard({
     response.action.type !== "none" &&
     executionStatus !== "running" &&
     executionStatus !== "completed";
-  const canRequestApproval =
+  const canReviewApproval =
     response.action.permissionStatus === "requires_approval" &&
     executionStatus !== "running" &&
-    executionStatus !== "failed";
+    result === null;
 
   return (
     <aside className="panel action-card" aria-live="polite">
@@ -91,18 +95,29 @@ export function ActionCard({
       <p>{response.action.summary}</p>
       <p className="muted">{response.action.permissionReason}</p>
 
+      <div className="action-path" aria-label="Current action flow">
+        <span>Intent</span>
+        <span>Review</span>
+        <span>{result ? executionLabels[result.status] : "Ready"}</span>
+      </div>
+
       {canExecute ? (
-        <button className="primary-button" onClick={onExecute}>
+        <button className="primary-button" type="button" onClick={onExecute}>
           <Play size={16} />
           Execute
         </button>
       ) : null}
 
-      {canRequestApproval ? (
-        <button className="secondary-button" onClick={onExecute}>
-          <Lock size={16} />
-          Request approval
-        </button>
+      {canReviewApproval ? (
+        <div className="approval-actions">
+          <button className="primary-button" type="button" onClick={onApprove}>
+            <Lock size={16} />
+            Approve handoff
+          </button>
+          <button className="secondary-button" type="button" onClick={onDecline}>
+            Decline
+          </button>
+        </div>
       ) : null}
 
       {executionStatus === "running" ? (
@@ -115,8 +130,18 @@ export function ActionCard({
       {result ? (
         <div className="result-box">
           <div className="card-title-row">
-            <span className="icon-disc icon-disc--success">
-              <CheckCircle2 size={16} />
+            <span
+              className={`icon-disc ${
+                result.status === "completed"
+                  ? "icon-disc--success"
+                  : "icon-disc--warning"
+              }`}
+            >
+              {result.status === "completed" ? (
+                <CheckCircle2 size={16} />
+              ) : (
+                <ShieldAlert size={16} />
+              )}
             </span>
             <p className="eyebrow">Result</p>
           </div>
@@ -124,6 +149,7 @@ export function ActionCard({
           <p className="muted">{result.nextStep}</p>
           <button
             className="secondary-button"
+            type="button"
             onClick={() => onFollowNextStep(result.nextStep)}
           >
             Use next step

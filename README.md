@@ -45,7 +45,7 @@ Box 1 includes:
 - Tay chat interface
 - intent detection
 - structured action proposals
-- execute / approval / blocked governance states
+- execute / approve / decline / blocked governance states
 - visible result card
 - activity log
 - next-step suggestion
@@ -124,8 +124,9 @@ Prepare a $97 Tay Command Starter Map offer
 Expected behavior:
 
 - safe build, plan, and note requests produce executable actions
-- external API or autonomous work pauses for approval
-- deletion, payments, and hidden background work are blocked and logged
+- external API, checkout, invoice, or autonomous work pauses for approval
+- approval creates a controlled handoff; decline stops the move and logs it
+- deletion, direct charging, and hidden background work are blocked and logged
 - revenue requests prepare a real offer and handoff path
 - every result, pause, blocked request, and clarification is visible
 

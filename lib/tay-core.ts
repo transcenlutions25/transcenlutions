@@ -1,4 +1,5 @@
 import type { TayActionType, TayIntent, TayResponse } from "./types";
+import { looksLikeBuyerReply } from "./buyer-replies";
 
 const blockedTerms = [
   "charge",
@@ -76,6 +77,10 @@ export function detectIntent(input: string): TayIntent {
     return "unsupported_request";
   }
 
+  if (looksLikeBuyerReply(input)) {
+    return "handle_buyer_reply";
+  }
+
   if (
     input.includes("plan") ||
     input.includes("strategy") ||
@@ -114,6 +119,7 @@ export function detectIntent(input: string): TayIntent {
 function mapIntentToAction(intent: TayIntent): TayActionType {
   if (intent === "build_feature") return "create_task";
   if (intent === "sell_offer") return "prepare_offer";
+  if (intent === "handle_buyer_reply") return "recommend_follow_up";
   if (intent === "write_plan") return "draft_plan";
   if (intent === "record_note") return "log_note";
   return "none";
@@ -124,6 +130,7 @@ function getPermissionStatus(
   input: string,
 ): TayResponse["action"]["permissionStatus"] {
   if (intent === "unsupported_request") return "blocked";
+  if (intent === "handle_buyer_reply") return "allowed";
   if (
     input.includes("external api") ||
     input.includes("autonomous") ||
@@ -139,6 +146,10 @@ function getPermissionStatus(
 function getPermissionReason(intent: TayIntent, input: string) {
   if (intent === "unsupported_request") {
     return "Tay cannot delete records, charge cards directly, or run background work from this screen.";
+  }
+
+  if (intent === "handle_buyer_reply") {
+    return "This is a local review of a buyer reply. Tay will recommend a response, not send it automatically.";
   }
 
   if (
@@ -163,6 +174,10 @@ function createMessage(intent: TayIntent) {
     return "I see a revenue request. I can prepare a buyer-ready offer and route payment through an approved checkout or manual invoice handoff.";
   }
 
+  if (intent === "handle_buyer_reply") {
+    return "I see a buyer reply. I can read the signal, protect the sales boundary, and recommend the next response.";
+  }
+
   if (intent === "write_plan") {
     return "I see a planning request. I can draft a focused plan that protects the passive-income direction before any work begins.";
   }
@@ -181,6 +196,7 @@ function createMessage(intent: TayIntent) {
 function createActionTitle(intent: TayIntent) {
   if (intent === "build_feature") return "Create a feature task";
   if (intent === "sell_offer") return "Prepare a revenue offer";
+  if (intent === "handle_buyer_reply") return "Recommend buyer follow-up";
   if (intent === "write_plan") return "Draft a plan";
   if (intent === "record_note") return "Log a note";
   if (intent === "clarify_request") return "Clarify the request";
@@ -194,6 +210,10 @@ function createActionSummary(intent: TayIntent, userText: string) {
 
   if (intent === "sell_offer") {
     return `Prepare a paid offer and payment handoff from: "${userText.trim()}".`;
+  }
+
+  if (intent === "handle_buyer_reply") {
+    return `Review this buyer reply and recommend the next response: "${userText.trim()}".`;
   }
 
   if (intent === "write_plan") {
@@ -218,6 +238,10 @@ function createNextStep(intent: TayIntent) {
 
   if (intent === "sell_offer") {
     return "Next step: send the offer to a real buyer through an approved checkout link or manual invoice.";
+  }
+
+  if (intent === "handle_buyer_reply") {
+    return "Next step: execute the review so Tay can recommend whether to send details, qualify, pause, or stop.";
   }
 
   if (intent === "write_plan") {

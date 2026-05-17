@@ -5,6 +5,7 @@ import type {
   SuggestedAction,
   TayResponse,
 } from "./types";
+import { analyzeBuyerReply } from "./buyer-replies";
 import { findDeliveryKitForOffer } from "./delivery";
 import { findRevenueOfferForRequest, getOfferPaymentState } from "./revenue";
 import { findSalesKitForOffer } from "./sales";
@@ -40,6 +41,10 @@ export function executeSuggestedAction(response: TayResponse): ActionResult {
 
   if (action.type === "prepare_offer") {
     return createRevenueOfferResult(response);
+  }
+
+  if (action.type === "recommend_follow_up") {
+    return createBuyerReplyResult(response);
   }
 
   if (action.type === "draft_plan") {
@@ -104,6 +109,16 @@ export function resolveApproval(
       "Approval recorded. Tay converted the risky move into a visible local handoff.",
     nextStep:
       "Next step: review the handoff, then choose the smallest safe move Tay should execute next.",
+  };
+}
+
+function createBuyerReplyResult(response: TayResponse): ActionResult {
+  const guidance = analyzeBuyerReply(response.userText);
+
+  return {
+    status: guidance.outcome === "stop" ? "failed" : "completed",
+    result: `Buyer reply routed: ${guidance.title}. ${guidance.summary} Suggested response: "${guidance.suggestedResponse}"`,
+    nextStep: guidance.nextStep,
   };
 }
 

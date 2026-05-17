@@ -366,6 +366,7 @@ button {
 
 .composer,
 .quick-grid,
+.reply-command-grid,
 .facts,
 .feature-grid,
 .agent-grid,
@@ -404,6 +405,7 @@ button {
 .button-disabled,
 .starter-button,
 .quick-command,
+.reply-command,
 .composer button {
   display: inline-flex;
   align-items: center;
@@ -437,7 +439,8 @@ button {
 
 .secondary-button,
 .starter-button,
-.quick-command {
+.quick-command,
+.reply-command {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
     rgba(8, 12, 31, 0.76);
@@ -453,6 +456,7 @@ button {
 .button-disabled:hover,
 .starter-button:hover,
 .quick-command:hover,
+.reply-command:hover,
 .composer button:hover {
   border-color: rgba(255, 232, 163, 0.82);
   filter: brightness(1.08);
@@ -464,6 +468,7 @@ button {
 .button-disabled:active,
 .starter-button:active,
 .quick-command:active,
+.reply-command:active,
 .composer button:active {
   box-shadow:
     inset 0 3px 10px rgba(0, 0, 0, 0.42),
@@ -482,7 +487,8 @@ button {
   margin-top: 12px;
 }
 
-.quick-command {
+.quick-command,
+.reply-command {
   justify-content: flex-start;
   color: var(--text);
   font-size: 0.86rem;
@@ -812,7 +818,8 @@ button {
 .fulfillment-grid,
 .fulfillment-care-grid,
 .sales-grid,
-.sales-care-grid {
+.sales-care-grid,
+.reply-command-grid {
   display: grid;
   gap: 12px;
 }
@@ -904,6 +911,40 @@ button {
   flex: 0 0 auto;
   color: var(--gold-soft);
   margin-top: 2px;
+}
+
+.reply-routing {
+  display: grid;
+  gap: 13px;
+  border: 1px solid rgba(124, 58, 237, 0.26);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(18, 60, 255, 0.12), rgba(216, 185, 87, 0.05)),
+    rgba(4, 7, 20, 0.72);
+  padding: 14px;
+}
+
+.reply-routing h3 {
+  margin: 4px 0 0;
+  font-size: 1rem;
+}
+
+.reply-command {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  line-height: 1.35;
+}
+
+.reply-command span {
+  color: var(--gold-soft);
+}
+
+.reply-command em {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 700;
 }
 
 .trust-icons span,
@@ -1169,6 +1210,7 @@ button {
   }
 
   .quick-grid,
+  .reply-command-grid,
   .facts,
   .approval-actions,
   .fulfillment-grid,

@@ -9,6 +9,7 @@ import type {
 export const intentLabels: Record<TayIntent, string> = {
   build_feature: "Feature request",
   sell_offer: "Revenue request",
+  handle_buyer_reply: "Buyer reply",
   write_plan: "Planning request",
   record_note: "Session note",
   clarify_request: "Needs more detail",
@@ -18,6 +19,7 @@ export const intentLabels: Record<TayIntent, string> = {
 export const actionLabels: Record<TayActionType, string> = {
   create_task: "Create task",
   prepare_offer: "Prepare offer",
+  recommend_follow_up: "Recommend follow-up",
   draft_plan: "Draft plan",
   log_note: "Save note",
   none: "No action",

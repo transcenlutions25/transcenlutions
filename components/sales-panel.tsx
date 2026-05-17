@@ -1,6 +1,15 @@
 "use client";
 
-import { MessageSquareText, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  CornerDownRight,
+  MessageSquareText,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
+import {
+  buyerReplyCarePoints,
+  buyerReplyExamples,
+} from "../lib/buyer-replies";
 import { salesCarePoints, salesKits } from "../lib/sales";
 
 interface SalesPanelProps {
@@ -83,6 +92,39 @@ export function SalesPanel({ onCommand }: SalesPanelProps) {
             {point}
           </span>
         ))}
+      </div>
+
+      <div className="reply-routing">
+        <div className="card-title-row">
+          <span className="icon-disc">
+            <CornerDownRight size={16} />
+          </span>
+          <div>
+            <p className="eyebrow">Reply Routing</p>
+            <h3>Paste the buyer&apos;s answer back into Tay.</h3>
+          </div>
+        </div>
+        <div className="reply-command-grid">
+          {buyerReplyExamples.map((example) => (
+            <button
+              className="reply-command"
+              key={example.label}
+              type="button"
+              onClick={() => onCommand(example.prompt)}
+            >
+              <span>{example.label}</span>
+              <em>{example.prompt}</em>
+            </button>
+          ))}
+        </div>
+        <div className="sales-care-grid">
+          {buyerReplyCarePoints.map((point) => (
+            <span key={point}>
+              <ShieldCheck size={15} />
+              {point}
+            </span>
+          ))}
+        </div>
       </div>
     </section>
   );

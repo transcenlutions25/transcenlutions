@@ -1,6 +1,7 @@
 export type TayIntent =
   | "build_feature"
   | "sell_offer"
+  | "handle_buyer_reply"
   | "write_plan"
   | "record_note"
   | "clarify_request"
@@ -9,6 +10,7 @@ export type TayIntent =
 export type TayActionType =
   | "create_task"
   | "prepare_offer"
+  | "recommend_follow_up"
   | "draft_plan"
   | "log_note"
   | "none";

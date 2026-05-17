@@ -54,6 +54,8 @@ const businessFocus =
 const quickStarts = [
   "Build a passive income offer",
   "Prepare buyer outreach for the $97 Tay Command Starter Map offer",
+  "Buyer replied: yes, send me the details",
+  "Buyer replied: can you guarantee I will make money?",
   "Prepare a $97 Tay Command Starter Map offer",
   "Prepare a $497 Operator Build Sprint offer",
   "Create a plan for Tay governance",
@@ -167,7 +169,11 @@ export function ChatShell() {
         },
       ]);
       setLogEntries((entries) => [
-        createSessionLogEntry(response, actionResult.result),
+        createSessionLogEntry(
+          response,
+          actionResult.result,
+          actionResult.status === "failed" ? "blocked" : "executed",
+        ),
         ...entries,
       ]);
     }, 700);

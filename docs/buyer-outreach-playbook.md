@@ -47,3 +47,20 @@ buyer or desired outcome.
 - Qualify fit before requesting payment.
 - Keep every buyer reply visible in Tay before deciding the next move.
 
+## Buyer Reply Routing
+
+When a buyer answers, paste the reply into Tay instead of deciding silently.
+Tay should classify the reply and recommend one of four moves:
+
+- send approved details if the buyer is ready
+- ask one fit question if the signal is unclear
+- pause if price or timing is the barrier
+- stop the sale if the buyer asks for guaranteed income or poor-fit scope
+
+Example reply commands:
+
+```text
+Buyer replied: yes, send me the details
+Buyer replied: I like it, but the price feels high right now
+Buyer replied: can you guarantee I will make money?
+```

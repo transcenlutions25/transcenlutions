@@ -175,6 +175,10 @@ export function createSessionLogEntry(
     intent: response.intent,
     actionType: response.action.type,
     permissionStatus: response.action.permissionStatus,
+    governanceRuleId: response.action.governance.ruleId,
+    riskTier: response.action.governance.riskTier,
+    riskScore: response.action.governance.riskScore,
+    auditStatus: response.action.governance.auditStatus,
     status: status ?? getLogStatus(response.action),
     detail,
   };

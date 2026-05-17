@@ -41,6 +41,7 @@ import type {
 } from "../lib/types";
 import { ActionCard } from "./action-card";
 import { FulfillmentPanel } from "./fulfillment-panel";
+import { GovernancePanel } from "./governance-panel";
 import { MemoryPanel } from "./memory-panel";
 import { RevenuePanel } from "./revenue-panel";
 import { SalesPanel } from "./sales-panel";
@@ -351,6 +352,7 @@ export function ChatShell() {
 
         <aside className="side-column">
           <SystemStack />
+          <GovernancePanel />
           <MemoryPanel entries={memoryEntries} />
           <SessionLog entries={logEntries} />
         </aside>

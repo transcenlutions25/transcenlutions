@@ -4,6 +4,7 @@ import {
   executionLabels,
   intentLabels,
   permissionLabels,
+  riskTierLabels,
 } from "../lib/public-copy";
 import { CheckCircle2, Crown, Lock, Play, ShieldAlert } from "lucide-react";
 
@@ -89,6 +90,17 @@ export function ActionCard({
         <div>
           <dt>Move</dt>
           <dd>{actionLabels[response.action.type]}</dd>
+        </div>
+        <div>
+          <dt>Risk</dt>
+          <dd>
+            {riskTierLabels[response.action.governance.riskTier]} ·{" "}
+            {response.action.governance.riskScore}
+          </dd>
+        </div>
+        <div>
+          <dt>Rule</dt>
+          <dd>{response.action.governance.ruleId.replaceAll("_", " ")}</dd>
         </div>
       </dl>
 

@@ -4,6 +4,7 @@ import {
   intentLabels,
   logStatusLabels,
   permissionLabels,
+  riskTierLabels,
 } from "../lib/public-copy";
 
 interface SessionLogProps {
@@ -34,7 +35,8 @@ export function SessionLog({ entries }: SessionLogProps) {
               <p>{entry.detail}</p>
               <span>
                 {intentLabels[entry.intent]} / {actionLabels[entry.actionType]}{" "}
-                / {permissionLabels[entry.permissionStatus]}
+                / {permissionLabels[entry.permissionStatus]} /{" "}
+                {riskTierLabels[entry.riskTier]} {entry.riskScore}
               </span>
             </li>
           ))}

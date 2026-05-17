@@ -21,12 +21,39 @@ export type ExecutionStatus = "idle" | "running" | "completed" | "failed";
 
 export type ApprovalDecision = "approved" | "declined";
 
+export type GovernanceRiskTier = "none" | "low" | "medium" | "high" | "critical";
+
+export type GovernanceDomain =
+  | "local_workspace"
+  | "revenue"
+  | "communication"
+  | "external_service"
+  | "payment"
+  | "data_control";
+
+export type GovernanceAuditStatus =
+  | "ready"
+  | "approval_required"
+  | "blocked"
+  | "no_action";
+
+export interface GovernanceDecision {
+  ruleId: string;
+  domain: GovernanceDomain;
+  permissionStatus: PermissionStatus;
+  permissionReason: string;
+  riskTier: GovernanceRiskTier;
+  riskScore: number;
+  auditStatus: GovernanceAuditStatus;
+}
+
 export interface SuggestedAction {
   type: TayActionType;
   title: string;
   summary: string;
   permissionStatus: PermissionStatus;
   permissionReason: string;
+  governance: GovernanceDecision;
 }
 
 export interface TayResponse {
@@ -64,6 +91,10 @@ export interface SessionLogEntry {
   intent: TayIntent;
   actionType: TayActionType;
   permissionStatus: PermissionStatus;
+  governanceRuleId: string;
+  riskTier: GovernanceRiskTier;
+  riskScore: number;
+  auditStatus: GovernanceAuditStatus;
   status:
     | "detected"
     | "approval_required"

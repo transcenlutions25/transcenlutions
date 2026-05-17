@@ -1,5 +1,7 @@
 import type {
   ExecutionStatus,
+  GovernanceAuditStatus,
+  GovernanceRiskTier,
   PermissionStatus,
   SessionLogEntry,
   TayActionType,
@@ -36,6 +38,21 @@ export const executionLabels: Record<ExecutionStatus, string> = {
   running: "Working",
   completed: "Complete",
   failed: "Stopped",
+};
+
+export const riskTierLabels: Record<GovernanceRiskTier, string> = {
+  none: "No risk",
+  low: "Low risk",
+  medium: "Medium risk",
+  high: "High risk",
+  critical: "Critical risk",
+};
+
+export const auditStatusLabels: Record<GovernanceAuditStatus, string> = {
+  ready: "Ready",
+  approval_required: "Approval needed",
+  blocked: "Blocked",
+  no_action: "No action",
 };
 
 export const logStatusLabels: Record<SessionLogEntry["status"], string> = {

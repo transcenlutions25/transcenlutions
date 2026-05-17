@@ -5,8 +5,8 @@ business ideas, passive-income systems, creative projects, and operating notes
 into visible next moves.
 
 Tay is the face, spokesman, orchestrator, animated operator, and executive brain
-of the platform. The current app is **Tay Engine Box 1**, the foundation that
-proves the core loop:
+of the platform. **Tay Engine Box 1** is complete, and **Box 2 governance** is
+now active around the same core loop:
 
 ```text
 User request
@@ -24,9 +24,10 @@ User request
 The active Next.js app lives at the repository root:
 
 - `app/` — App Router entry, layout, and global command-room styling
-- `components/` — Tay chat shell, action card, activity log, and workspace panel
-- `lib/` — Tay Core, Action Engine, public labels, and shared types
+- `components/` — Tay chat shell, action card, governance, activity log, and workspace panels
+- `lib/` — Tay Core, Action Engine, Governance, public labels, and shared types
 - `docs/tay-engine-box-1-approved-spec.md` — approved Box 1 source spec
+- `docs/tay-engine-box-2-governance.md` — current Box 2 governance map
 - `scripts/check-public-copy.mjs` — guard against exposing internal build-only language
 
 The old `src/` dashboard structure has been removed so the repo has one clear
@@ -39,13 +40,15 @@ founder command, and Crowne Legacy bridge.
 
 ## Current Scope
 
-Box 1 includes:
+The current foundation includes:
 
 - royal command-room homepage
 - Tay chat interface
 - intent detection
 - structured action proposals
 - execute / approve / decline / blocked governance states
+- centralized governance registry
+- action risk tiers, risk scores, and audit fields
 - visible result card
 - activity log
 - next-step suggestion
@@ -61,8 +64,9 @@ Box 1 includes:
 - company email readiness for official contact, billing, and support inboxes
 - setup-required state when payment is not configured
 
-Box 1 does **not** include login, database, direct card processing, external
-APIs, memory, agent chains, marketplace, or hidden automation. Payment
+The current foundation does **not** include login, database, direct card
+processing, external APIs, persistent memory, agent chains, marketplace, or
+hidden automation. Payment
 collection is handled through an approved external payment link or manual
 invoice handoff.
 
@@ -101,6 +105,9 @@ for the first paid-offer delivery standards.
 
 See [docs/buyer-outreach-playbook.md](docs/buyer-outreach-playbook.md) for the
 first buyer-message and qualification standards.
+
+See [docs/tay-engine-box-2-governance.md](docs/tay-engine-box-2-governance.md)
+for the action registry, risk tiers, and approval/blocking rules.
 
 ## Run Locally
 
@@ -151,13 +158,15 @@ Expected behavior:
 - external API, checkout, invoice, or autonomous work pauses for approval
 - approval creates a controlled handoff; decline stops the move and logs it
 - deletion, direct charging, and hidden background work are blocked and logged
+- governance panel shows active action rules and risk tiers
+- session log entries include governance risk data
 - revenue requests prepare a real offer and handoff path
 - outreach cards show buyer-fit rules and careful first messages
 - buyer reply commands route replies into clear next steps without auto-sending
 - fulfillment cards show buyer artifacts and quality standards for paid offers
 - memory snapshot stays visible and session-only
 - prepared offers include a delivery artifact with outcome, intake, flow, and boundaries
-- `npm run smoke` verifies the main Tay request, revenue, blocked, and buyer-reply loops
+- `npm run smoke` verifies the main Tay request, governance, revenue, blocked, and buyer-reply loops
 - payment buttons appear only for approved checkout links or configured company email
 - every result, pause, blocked request, and clarification is visible
 

@@ -3,8 +3,8 @@ const stackItems = [
   { name: "Tay Core", status: "Ready" },
   { name: "Chat System", status: "Active" },
   { name: "Action Engine", status: "Ready" },
+  { name: "Governance Layer", status: "Active" },
   { name: "Passive income focus", status: "Primary" },
-  { name: "Review Layer", status: "Protected" },
   { name: "Session Memory", status: "Visible" },
   { name: "Future helpers", status: "Later" },
 ];

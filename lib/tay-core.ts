@@ -1,15 +1,6 @@
 import type { TayActionType, TayIntent, TayResponse } from "./types";
 import { looksLikeBuyerReply } from "./buyer-replies";
-
-const blockedTerms = [
-  "charge",
-  "delete",
-  "deleting",
-  "remove data",
-  "real-world automation",
-  "background automation",
-  "hidden background",
-];
+import { createGovernedAction, hasBlockedGovernanceTerm } from "./governance";
 
 const vagueTerms = ["help", "do it", "make it", "fix it", "start", "thing"];
 const businessBuildTerms = [
@@ -55,13 +46,13 @@ export function createTayResponse(userText: string): TayResponse {
     userText,
     intent,
     message: createMessage(intent),
-    action: {
-      type: actionType,
-      title: createActionTitle(intent),
-      summary: createActionSummary(intent, userText),
-      permissionStatus: getPermissionStatus(intent, normalized),
-      permissionReason: getPermissionReason(intent, normalized),
-    },
+    action: createGovernedAction(
+      intent,
+      actionType,
+      normalized,
+      createActionTitle(intent),
+      createActionSummary(intent, userText),
+    ),
     nextStep: createNextStep(intent),
     shouldLogImmediately:
       intent === "clarify_request" || intent === "unsupported_request",
@@ -73,7 +64,7 @@ export function detectIntent(input: string): TayIntent {
     return "clarify_request";
   }
 
-  if (blockedTerms.some((term) => input.includes(term))) {
+  if (hasBlockedGovernanceTerm(input)) {
     return "unsupported_request";
   }
 
@@ -123,46 +114,6 @@ function mapIntentToAction(intent: TayIntent): TayActionType {
   if (intent === "write_plan") return "draft_plan";
   if (intent === "record_note") return "log_note";
   return "none";
-}
-
-function getPermissionStatus(
-  intent: TayIntent,
-  input: string,
-): TayResponse["action"]["permissionStatus"] {
-  if (intent === "unsupported_request") return "blocked";
-  if (intent === "handle_buyer_reply") return "allowed";
-  if (
-    input.includes("external api") ||
-    input.includes("autonomous") ||
-    input.includes("payment") ||
-    input.includes("checkout") ||
-    input.includes("invoice")
-  ) {
-    return "requires_approval";
-  }
-  return "allowed";
-}
-
-function getPermissionReason(intent: TayIntent, input: string) {
-  if (intent === "unsupported_request") {
-    return "Tay cannot delete records, charge cards directly, or run background work from this screen.";
-  }
-
-  if (intent === "handle_buyer_reply") {
-    return "This is a local review of a buyer reply. Tay will recommend a response, not send it automatically.";
-  }
-
-  if (
-    input.includes("external api") ||
-    input.includes("autonomous") ||
-    input.includes("payment") ||
-    input.includes("checkout") ||
-    input.includes("invoice")
-  ) {
-    return "This needs approval before Tay connects to outside services, payment links, or independent work.";
-  }
-
-  return "This move stays inside the current Transcenlutions workspace.";
 }
 
 function createMessage(intent: TayIntent) {

@@ -28,6 +28,7 @@ const cases = [
     intent: "build_feature",
     action: "create_task",
     permission: "allowed",
+    riskTier: "low",
     resultStatus: "completed",
   },
   {
@@ -35,6 +36,7 @@ const cases = [
     intent: "write_plan",
     action: "draft_plan",
     permission: "allowed",
+    riskTier: "low",
     resultStatus: "completed",
   },
   {
@@ -42,6 +44,7 @@ const cases = [
     intent: "record_note",
     action: "log_note",
     permission: "allowed",
+    riskTier: "low",
     resultStatus: "completed",
   },
   {
@@ -49,6 +52,23 @@ const cases = [
     intent: "unsupported_request",
     action: "none",
     permission: "blocked",
+    riskTier: "critical",
+    resultStatus: "failed",
+  },
+  {
+    request: "Charge the buyer now",
+    intent: "unsupported_request",
+    action: "none",
+    permission: "blocked",
+    riskTier: "critical",
+    resultStatus: "failed",
+  },
+  {
+    request: "Send checkout details to the buyer",
+    intent: "sell_offer",
+    action: "prepare_offer",
+    permission: "requires_approval",
+    riskTier: "high",
     resultStatus: "failed",
   },
   {
@@ -56,6 +76,7 @@ const cases = [
     intent: "sell_offer",
     action: "prepare_offer",
     permission: "allowed",
+    riskTier: "medium",
     resultStatus: "completed",
     requiresArtifact: true,
   },
@@ -64,6 +85,7 @@ const cases = [
     intent: "handle_buyer_reply",
     action: "recommend_follow_up",
     permission: "allowed",
+    riskTier: "medium",
     resultStatus: "completed",
   },
   {
@@ -71,6 +93,15 @@ const cases = [
     intent: "handle_buyer_reply",
     action: "recommend_follow_up",
     permission: "allowed",
+    riskTier: "medium",
+    resultStatus: "failed",
+  },
+  {
+    request: "Use an external API to automate leads",
+    intent: "build_feature",
+    action: "create_task",
+    permission: "requires_approval",
+    riskTier: "high",
     resultStatus: "failed",
   },
 ];
@@ -85,6 +116,11 @@ for (const testCase of cases) {
     response.action.permissionStatus,
     testCase.permission,
     `${testCase.request} permission`,
+  );
+  assertEqual(
+    response.action.governance.riskTier,
+    testCase.riskTier,
+    `${testCase.request} risk`,
   );
   assertEqual(result.status, testCase.resultStatus, `${testCase.request} result`);
 

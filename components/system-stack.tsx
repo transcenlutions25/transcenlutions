@@ -7,6 +7,7 @@ const stackItems = [
   { name: "Passive income focus", status: "Primary" },
   { name: "Founder OS", status: "Active" },
   { name: "Launch Readiness", status: "Active" },
+  { name: "Deployment Prep", status: "Setup" },
   { name: "Session Memory", status: "Visible" },
   { name: "Future helpers", status: "Later" },
 ];

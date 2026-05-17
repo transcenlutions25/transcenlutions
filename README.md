@@ -6,8 +6,8 @@ into visible next moves.
 
 Tay is the face, spokesman, orchestrator, animated operator, and executive brain
 of the platform. **Box 1 foundation**, **Box 2 governance**, **Box 3 revenue
-infrastructure**, **Box 4 Founder Operating System**, and **Box 5 Launch
-Readiness** are active around the same core loop:
+infrastructure**, **Box 4 Founder Operating System**, **Box 5 Launch
+Readiness**, and **Box 6 Deployment Prep** are active around the same core loop:
 
 ```text
 User request
@@ -32,6 +32,7 @@ The active Next.js app lives at the repository root:
 - `docs/tay-engine-box-3-revenue.md` — real revenue infrastructure map
 - `docs/tay-engine-box-4-founder-os.md` — founder execution and focus map
 - `docs/tay-engine-box-5-launch-readiness.md` — launch setup and onboarding map
+- `docs/tay-engine-box-6-deployment-prep.md` — deployment readiness and external setup map
 - `scripts/check-public-copy.mjs` — guard against exposing internal build-only language
 
 The old `src/` dashboard structure has been removed so the repo has one clear
@@ -73,6 +74,8 @@ The current foundation includes:
 - safe simulated test mode for rehearsing payment flow without collecting money
 - Launch Readiness panel for domain, inbox, Stripe, policy, onboarding, and blocker truth
 - first launch use case focused on AI business guidance
+- Deployment Readiness panel for hosting, environment, legal pages, and support route setup
+- starter public pages at `/privacy`, `/terms`, `/refund`, and `/support`
 
 The current foundation does **not** include login, database, direct card
 processing, external APIs, persistent memory, agent chains, marketplace, or
@@ -129,6 +132,34 @@ What are you building?
 The first real use case is `AI business guidance`: Tay helps one user clarify an
 offer, plan revenue, and choose the next governed action.
 
+## Deployment Prep
+
+Box 6 adds the real-world launch doors without pretending they are already
+configured. The Deployment Readiness panel tracks:
+
+- production domain
+- hosting target
+- environment variables
+- Stripe live/test separation
+- company email
+- support email
+- privacy policy
+- terms of service
+- refund policy
+- contact/support route
+
+Starter public pages exist at:
+
+```text
+/privacy
+/terms
+/refund
+/support
+```
+
+These pages are marked founder-review-needed until finalized. Live payments
+remain disabled unless real Stripe and support setup are configured.
+
 ## Revenue Setup
 
 The app includes two buyer-ready starter offers:
@@ -173,6 +204,11 @@ Safe test mode:
 
 ```bash
 NEXT_PUBLIC_TAY_REVENUE_TEST_MODE="true"
+NEXT_PUBLIC_TAY_DEPLOYMENT_ENV="local"
+NEXT_PUBLIC_TAY_HOSTING_TARGET=""
+NEXT_PUBLIC_STRIPE_MODE="test"
+NEXT_PUBLIC_TRANSCENLUTIONS_LEGAL_COPY_REVIEWED="false"
+NEXT_PUBLIC_TRANSCENLUTIONS_SUPPORT_ROUTE="/support"
 ```
 
 When active, checkout is labeled simulated. No checkout opens, no card data is
@@ -199,6 +235,12 @@ for the founder command layer and focus rules.
 
 See [docs/tay-engine-box-5-launch-readiness.md](docs/tay-engine-box-5-launch-readiness.md)
 for launch readiness, onboarding, and first-use-case rules.
+
+See [docs/tay-engine-box-6-deployment-prep.md](docs/tay-engine-box-6-deployment-prep.md)
+for deployment readiness, external setup, and public info page rules.
+
+See [docs/deployment-env-setup.md](docs/deployment-env-setup.md) for the full
+environment variable setup guide.
 
 ## Run Locally
 
@@ -270,6 +312,8 @@ Expected behavior:
 - prepared offers include a delivery artifact with outcome, intake, flow, and boundaries
 - founder-focus requests produce a Founder Command Artifact
 - launch-readiness requests produce a Launch Readiness Artifact
+- deployment panel shows local/test/live mode and production blockers
+- `/privacy`, `/terms`, `/refund`, and `/support` render starter pages
 - Stripe setup visibility is allowed, but payment handoff still requires approval
 - future expansion requests are parked instead of started
 - family alignment summary states current focus, expected finish, completed boxes, and money readiness

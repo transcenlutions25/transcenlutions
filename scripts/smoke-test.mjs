@@ -4,11 +4,12 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const ts = require("typescript");
 
-require.extensions[".ts"] = function loadTypeScript(module, filename) {
+function loadTypeScript(module, filename) {
   const source = readFileSync(filename, "utf8");
   const { outputText } = ts.transpileModule(source, {
     compilerOptions: {
       esModuleInterop: true,
+      jsx: ts.JsxEmit.ReactJSX,
       module: ts.ModuleKind.CommonJS,
       moduleResolution: ts.ModuleResolutionKind.NodeJs,
       target: ts.ScriptTarget.ES2022,
@@ -17,7 +18,13 @@ require.extensions[".ts"] = function loadTypeScript(module, filename) {
   });
 
   module._compile(outputText, filename);
-};
+}
+
+require.extensions[".ts"] = loadTypeScript;
+require.extensions[".tsx"] = loadTypeScript;
+
+const React = require("react");
+const { renderToStaticMarkup } = require("react-dom/server");
 
 const {
   executeSuggestedAction,
@@ -31,6 +38,9 @@ const {
 } = require("../lib/revenue.ts");
 const { createRevenueSetupState } = require("../lib/revenue-setup.ts");
 const { createLaunchReadinessState } = require("../lib/launch-readiness.ts");
+const {
+  createDeploymentReadinessState,
+} = require("../lib/deployment-readiness.ts");
 const { createTayResponse } = require("../lib/tay-core.ts");
 
 const cases = [
@@ -262,6 +272,42 @@ assertEqual(
   "first launch use case should stay focused",
 );
 
+const missingDeployment = createDeploymentReadinessState({});
+assertEqual(
+  missingDeployment.mode,
+  "local_development",
+  "missing deployment setup should stay local development",
+);
+assertEqual(
+  missingDeployment.blockedCount > 0,
+  true,
+  "missing deployment setup should expose blocked production items",
+);
+
+const placeholderDeployment = createDeploymentReadinessState({
+  NEXT_PUBLIC_TAY_DEPLOYMENT_ENV: "live",
+  NEXT_PUBLIC_TAY_HOSTING_TARGET: "your-hosting-target",
+  NEXT_PUBLIC_TRANSCENLUTIONS_DOMAIN: "example.com",
+  NEXT_PUBLIC_STRIPE_MODE: "live",
+  NEXT_PUBLIC_STRIPE_ACCOUNT_READY: "true",
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "pk_live_key_here",
+  STRIPE_SECRET_KEY: "sk_live_key_here",
+  NEXT_PUBLIC_STRIPE_STARTER_MAP_PAYMENT_LINK:
+    "https://buy.stripe.com/your-starter-map-link",
+  NEXT_PUBLIC_TRANSCENLUTIONS_COMPANY_EMAIL: "hello@transcenlutions.com",
+  NEXT_PUBLIC_TRANSCENLUTIONS_BILLING_EMAIL: "billing@transcenlutions.com",
+  NEXT_PUBLIC_TRANSCENLUTIONS_SUPPORT_EMAIL: "support@transcenlutions.com",
+  NEXT_PUBLIC_TRANSCENLUTIONS_REFUND_COPY:
+    "Refund requests are reviewed against the paid scope.",
+  NEXT_PUBLIC_TRANSCENLUTIONS_LEGAL_COPY_REVIEWED: "true",
+  NEXT_PUBLIC_TRANSCENLUTIONS_SUPPORT_ROUTE: "/support",
+});
+assertEqual(
+  placeholderDeployment.mode,
+  "production_setup_required",
+  "placeholder production values should not be production ready",
+);
+
 const missingPayment = createOfferPaymentState(
   { ...revenueOffers[0], checkoutUrl: "", priceId: "" },
   { invoiceRecipientEmail: "", isTestMode: false },
@@ -342,8 +388,40 @@ if (
   throw new Error("missing payment setup should fail with setup-required copy");
 }
 
+const legalPages = [
+  {
+    path: "../app/privacy/page.tsx",
+    title: "Privacy Policy",
+  },
+  {
+    path: "../app/terms/page.tsx",
+    title: "Terms of Service",
+  },
+  {
+    path: "../app/refund/page.tsx",
+    title: "Refund Policy",
+  },
+  {
+    path: "../app/support/page.tsx",
+    title: "Support",
+  },
+];
+
+for (const legalPage of legalPages) {
+  const Page = require(legalPage.path).default;
+  const markup = renderToStaticMarkup(React.createElement(Page));
+
+  if (!markup.includes(legalPage.title)) {
+    throw new Error(`${legalPage.title} page should render its title`);
+  }
+
+  if (!markup.includes("Founder review needed")) {
+    throw new Error(`${legalPage.title} page should show founder review copy`);
+  }
+}
+
 console.log(
-  `Smoke tests passed: ${cases.length} Tay flows plus revenue and launch setup checks verified.`,
+  `Smoke tests passed: ${cases.length} Tay flows plus revenue, launch, deployment, and legal-page checks verified.`,
 );
 
 function assertEqual(actual, expected, label) {

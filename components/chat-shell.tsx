@@ -20,6 +20,7 @@ import {
   executeSuggestedAction,
   resolveApproval,
 } from "../lib/action-engine";
+import type { DeploymentReadinessState } from "../lib/deployment-readiness";
 import {
   addSessionMemoryEntry,
   createSessionMemoryEntry,
@@ -42,6 +43,7 @@ import type {
 } from "../lib/types";
 import type { RevenueSetupState } from "../lib/revenue-setup";
 import { ActionCard } from "./action-card";
+import { DeploymentReadinessPanel } from "./deployment-readiness-panel";
 import { FounderCommandPanel } from "./founder-command-panel";
 import { FulfillmentPanel } from "./fulfillment-panel";
 import { GovernancePanel } from "./governance-panel";
@@ -106,11 +108,16 @@ const agentPreviews = [
 ];
 
 interface ChatShellProps {
+  deploymentReadiness: DeploymentReadinessState;
   launchReadiness: LaunchReadinessState;
   revenueSetup: RevenueSetupState;
 }
 
-export function ChatShell({ launchReadiness, revenueSetup }: ChatShellProps) {
+export function ChatShell({
+  deploymentReadiness,
+  launchReadiness,
+  revenueSetup,
+}: ChatShellProps) {
   const [input, setInput] = useState("");
   const [activeResponse, setActiveResponse] = useState<TayResponse | null>(
     null,
@@ -420,6 +427,7 @@ export function ChatShell({ launchReadiness, revenueSetup }: ChatShellProps) {
         launchReadiness={launchReadiness}
         onCommand={submitRequest}
       />
+      <DeploymentReadinessPanel deploymentReadiness={deploymentReadiness} />
       <RevenuePanel onCommand={submitRequest} revenueSetup={revenueSetup} />
       <SalesPanel onCommand={submitRequest} />
       <FulfillmentPanel onCommand={submitRequest} />

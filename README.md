@@ -50,9 +50,35 @@ Box 1 includes:
 - activity log
 - next-step suggestion
 - passive-income and business-building focus
+- revenue launch handoff with paid starter offers
+- manual invoice email fallback when no approved payment link is configured
 
-Box 1 does **not** include login, database, payments, external APIs, memory,
-agent chains, marketplace, monetization, or hidden automation.
+Box 1 does **not** include login, database, direct card processing, external
+APIs, memory, agent chains, marketplace, or hidden automation. Payment
+collection is handled through an approved external payment link or manual
+invoice handoff.
+
+## Revenue Setup
+
+The app includes two buyer-ready starter offers:
+
+- `Tay Command Starter Map` — `$97`
+- `Operator Build Sprint` — `$497`
+
+To connect a real checkout button, set:
+
+```bash
+NEXT_PUBLIC_TRANSCENLUTIONS_PAYMENT_URL="https://your-approved-checkout-link"
+```
+
+Optional invoice recipient:
+
+```bash
+NEXT_PUBLIC_TRANSCENLUTIONS_CONTACT_EMAIL="you@example.com"
+```
+
+Without those values, the revenue button opens a manual invoice email draft so
+the owner can send payment instructions without fake in-app charging.
 
 ## Run Locally
 
@@ -92,6 +118,7 @@ Log a note about command room completion
 Use an external API to automate leads
 Delete the database
 Build a passive income offer
+Prepare a $97 Tay Command Starter Map offer
 ```
 
 Expected behavior:
@@ -99,6 +126,7 @@ Expected behavior:
 - safe build, plan, and note requests produce executable actions
 - external API or autonomous work pauses for approval
 - deletion, payments, and hidden background work are blocked and logged
+- revenue requests prepare a real offer and handoff path
 - every result, pause, blocked request, and clarification is visible
 
 ## Product Direction

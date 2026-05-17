@@ -30,6 +30,7 @@ import type {
   TayResponse,
 } from "../lib/types";
 import { ActionCard } from "./action-card";
+import { RevenuePanel } from "./revenue-panel";
 import { SessionLog } from "./session-log";
 import { SystemStack } from "./system-stack";
 
@@ -45,6 +46,7 @@ const businessFocus =
 
 const quickStarts = [
   "Build a passive income offer",
+  "Prepare a $97 Tay Command Starter Map offer",
   "Create a plan for Tay governance",
   "Log a note about command room completion",
   "Use an external API to automate leads",
@@ -307,6 +309,8 @@ export function ChatShell() {
           <span>Log</span>
         </div>
       </section>
+
+      <RevenuePanel onCommand={submitRequest} />
 
       <section className="section-grid" aria-label="Future agent council preview">
         <div className="section-header">

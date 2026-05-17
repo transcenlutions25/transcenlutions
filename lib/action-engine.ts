@@ -34,6 +34,16 @@ export function executeSuggestedAction(response: TayResponse): ActionResult {
     };
   }
 
+  if (action.type === "prepare_offer") {
+    return {
+      status: "completed",
+      result:
+        "Revenue offer prepared: present the Tay Command Starter Map, state the price, confirm the buyer outcome, and send the approved checkout or manual invoice step.",
+      nextStep:
+        "Next step: send the offer to one buyer now and record the reply in Tay.",
+    };
+  }
+
   if (action.type === "draft_plan") {
     return {
       status: "completed",

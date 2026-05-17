@@ -1,10 +1,7 @@
 import type { TayActionType, TayIntent, TayResponse } from "./types";
 
 const blockedTerms = [
-  "payment",
-  "payments",
   "charge",
-  "checkout",
   "delete",
   "deleting",
   "remove data",
@@ -29,6 +26,21 @@ const businessBuildTerms = [
   "automation",
   "lead",
   "leads",
+];
+const revenueTerms = [
+  "sell",
+  "sale",
+  "revenue",
+  "paid",
+  "client",
+  "buyer",
+  "offer",
+  "invoice",
+  "checkout",
+  "payment",
+  "payments",
+  "pricing",
+  "purchase",
 ];
 
 export function createTayResponse(userText: string): TayResponse {
@@ -82,6 +94,10 @@ export function detectIntent(input: string): TayIntent {
     return "record_note";
   }
 
+  if (revenueTerms.some((term) => input.includes(term))) {
+    return "sell_offer";
+  }
+
   if (
     input.includes("build") ||
     input.includes("feature") ||
@@ -97,6 +113,7 @@ export function detectIntent(input: string): TayIntent {
 
 function mapIntentToAction(intent: TayIntent): TayActionType {
   if (intent === "build_feature") return "create_task";
+  if (intent === "sell_offer") return "prepare_offer";
   if (intent === "write_plan") return "draft_plan";
   if (intent === "record_note") return "log_note";
   return "none";
@@ -107,7 +124,13 @@ function getPermissionStatus(
   input: string,
 ): TayResponse["action"]["permissionStatus"] {
   if (intent === "unsupported_request") return "blocked";
-  if (input.includes("external api") || input.includes("autonomous")) {
+  if (
+    input.includes("external api") ||
+    input.includes("autonomous") ||
+    input.includes("payment") ||
+    input.includes("checkout") ||
+    input.includes("invoice")
+  ) {
     return "requires_approval";
   }
   return "allowed";
@@ -115,11 +138,17 @@ function getPermissionStatus(
 
 function getPermissionReason(intent: TayIntent, input: string) {
   if (intent === "unsupported_request") {
-    return "Tay cannot process payments, delete records, or run background work from this screen.";
+    return "Tay cannot delete records, charge cards directly, or run background work from this screen.";
   }
 
-  if (input.includes("external api") || input.includes("autonomous")) {
-    return "This needs approval before Tay connects to outside services or works on its own.";
+  if (
+    input.includes("external api") ||
+    input.includes("autonomous") ||
+    input.includes("payment") ||
+    input.includes("checkout") ||
+    input.includes("invoice")
+  ) {
+    return "This needs approval before Tay connects to outside services, payment links, or independent work.";
   }
 
   return "This move stays inside the current Transcenlutions workspace.";
@@ -128,6 +157,10 @@ function getPermissionReason(intent: TayIntent, input: string) {
 function createMessage(intent: TayIntent) {
   if (intent === "build_feature") {
     return "I see a build request. I can turn this into a focused business task for Transcenlutions, with passive income as the priority.";
+  }
+
+  if (intent === "sell_offer") {
+    return "I see a revenue request. I can prepare a buyer-ready offer and route payment through an approved checkout or manual invoice handoff.";
   }
 
   if (intent === "write_plan") {
@@ -147,6 +180,7 @@ function createMessage(intent: TayIntent) {
 
 function createActionTitle(intent: TayIntent) {
   if (intent === "build_feature") return "Create a feature task";
+  if (intent === "sell_offer") return "Prepare a revenue offer";
   if (intent === "write_plan") return "Draft a plan";
   if (intent === "record_note") return "Log a note";
   if (intent === "clarify_request") return "Clarify the request";
@@ -156,6 +190,10 @@ function createActionTitle(intent: TayIntent) {
 function createActionSummary(intent: TayIntent, userText: string) {
   if (intent === "build_feature") {
     return `Create a focused passive-income task from: "${userText.trim()}".`;
+  }
+
+  if (intent === "sell_offer") {
+    return `Prepare a paid offer and payment handoff from: "${userText.trim()}".`;
   }
 
   if (intent === "write_plan") {
@@ -178,6 +216,10 @@ function createNextStep(intent: TayIntent) {
     return "Next step: confirm the move to create the task result and connect it to passive income.";
   }
 
+  if (intent === "sell_offer") {
+    return "Next step: send the offer to a real buyer through an approved checkout link or manual invoice.";
+  }
+
   if (intent === "write_plan") {
     return "Next step: confirm the move to draft the business plan result.";
   }
@@ -190,5 +232,5 @@ function createNextStep(intent: TayIntent) {
     return "Next step: ask for one clear business outcome, such as an offer, workflow, plan, or note.";
   }
 
-  return "Next step: choose a request that does not require payments, deletion, outside automation, or hidden work.";
+  return "Next step: choose a request that does not require deletion, outside automation, or hidden work.";
 }

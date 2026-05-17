@@ -1,11 +1,17 @@
 export type TayIntent =
   | "build_feature"
+  | "sell_offer"
   | "write_plan"
   | "record_note"
   | "clarify_request"
   | "unsupported_request";
 
-export type TayActionType = "create_task" | "draft_plan" | "log_note" | "none";
+export type TayActionType =
+  | "create_task"
+  | "prepare_offer"
+  | "draft_plan"
+  | "log_note"
+  | "none";
 
 export type PermissionStatus = "allowed" | "requires_approval" | "blocked";
 

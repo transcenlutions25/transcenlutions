@@ -5,8 +5,9 @@ business ideas, passive-income systems, creative projects, and operating notes
 into visible next moves.
 
 Tay is the face, spokesman, orchestrator, animated operator, and executive brain
-of the platform. **Tay Engine Box 1** is complete, and **Box 2 governance** is
-now active around the same core loop:
+of the platform. **Box 1 foundation**, **Box 2 governance**, **Box 3 revenue
+infrastructure**, and the **Box 4 Founder Operating System** are active around
+the same core loop:
 
 ```text
 User request
@@ -28,6 +29,8 @@ The active Next.js app lives at the repository root:
 - `lib/` — Tay Core, Action Engine, Governance, public labels, and shared types
 - `docs/tay-engine-box-1-approved-spec.md` — approved Box 1 source spec
 - `docs/tay-engine-box-2-governance.md` — current Box 2 governance map
+- `docs/tay-engine-box-3-revenue.md` — real revenue infrastructure map
+- `docs/tay-engine-box-4-founder-os.md` — founder execution and focus map
 - `scripts/check-public-copy.mjs` — guard against exposing internal build-only language
 
 The old `src/` dashboard structure has been removed so the repo has one clear
@@ -58,6 +61,8 @@ The current foundation includes:
 - buyer reply routing for follow-up, pause, and stop-sale decisions
 - client fulfillment kits for paid offer delivery
 - visible session memory for goals, offers, buyer signals, and boundaries
+- Founder Command Layer for daily priorities, weekly review, focus lanes, and family alignment
+- anti-distraction routing for NOW / NEXT / LATER / PARKED work
 - structured delivery artifacts when Tay prepares a paid offer
 - per-offer Stripe Payment Link support
 - manual invoice email fallback only when a real company or billing email is configured
@@ -71,6 +76,27 @@ processing, external APIs, persistent memory, agent chains, marketplace, or
 hidden automation. Payment
 collection is handled through an approved external payment link or manual
 invoice handoff.
+
+## Founder Operating System
+
+Box 4 keeps Transcenlutions focused on launch execution instead of expansion
+drift. Tay now routes founder-focus requests through one allowed local action:
+
+```text
+manage_focus -> route_focus
+```
+
+The Founder Command Layer shows:
+
+- today's priorities
+- one-box focus
+- revenue actions
+- weekly review prompts
+- anti-distraction backlog
+- family-visible alignment summary
+
+Expansion ideas such as the dating app, Crowne Legacy, advanced agents, full
+autonomy, or marketplaces are kept in `PARKED` until the current box is stable.
 
 ## Revenue Setup
 
@@ -132,6 +158,9 @@ for the action registry, risk tiers, and approval/blocking rules.
 See [docs/tay-engine-box-3-revenue.md](docs/tay-engine-box-3-revenue.md) for
 the real revenue infrastructure and buyer journey.
 
+See [docs/tay-engine-box-4-founder-os.md](docs/tay-engine-box-4-founder-os.md)
+for the founder command layer and focus rules.
+
 ## Run Locally
 
 ```bash
@@ -175,6 +204,9 @@ Prepare a $97 Tay Command Starter Map offer
 Prepare a $497 Operator Build Sprint offer
 Send checkout details for Tay Command Starter Map
 Buyer replied: yes, send me the details
+Show today's Box 4 priorities
+Run weekly founder review
+Park Crowne Legacy until Box 4 is complete
 ```
 
 Expected behavior:
@@ -194,7 +226,10 @@ Expected behavior:
 - fulfillment cards show buyer artifacts and quality standards for paid offers
 - memory snapshot stays visible and session-only
 - prepared offers include a delivery artifact with outcome, intake, flow, and boundaries
-- `npm run smoke` verifies the main Tay request, governance, revenue, blocked, and buyer-reply loops
+- founder-focus requests produce a Founder Command Artifact
+- future expansion requests are parked instead of started
+- family alignment summary states current focus, expected finish, completed boxes, and money readiness
+- `npm run smoke` verifies the main Tay request, governance, revenue, blocked, buyer-reply, and founder-focus loops
 - payment buttons appear only for approved checkout links or configured company email
 - every result, pause, blocked request, and clarification is visible
 

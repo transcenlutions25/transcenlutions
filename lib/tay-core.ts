@@ -1,5 +1,6 @@
 import type { TayActionType, TayIntent, TayResponse } from "./types";
 import { looksLikeBuyerReply } from "./buyer-replies";
+import { looksLikeFounderFocusRequest } from "./founder-os";
 import { createGovernedAction, hasBlockedGovernanceTerm } from "./governance";
 
 const vagueTerms = ["help", "do it", "make it", "fix it", "start", "thing"];
@@ -72,6 +73,10 @@ export function detectIntent(input: string): TayIntent {
     return "handle_buyer_reply";
   }
 
+  if (looksLikeFounderFocusRequest(input)) {
+    return "manage_focus";
+  }
+
   if (
     input.includes("plan") ||
     input.includes("strategy") ||
@@ -111,6 +116,7 @@ function mapIntentToAction(intent: TayIntent): TayActionType {
   if (intent === "build_feature") return "create_task";
   if (intent === "sell_offer") return "prepare_offer";
   if (intent === "handle_buyer_reply") return "recommend_follow_up";
+  if (intent === "manage_focus") return "route_focus";
   if (intent === "write_plan") return "draft_plan";
   if (intent === "record_note") return "log_note";
   return "none";
@@ -127,6 +133,10 @@ function createMessage(intent: TayIntent) {
 
   if (intent === "handle_buyer_reply") {
     return "I see a buyer reply. I can read the signal, protect the sales boundary, and recommend the next response.";
+  }
+
+  if (intent === "manage_focus") {
+    return "I see a founder focus request. I can protect the current box, route distractions, and prepare the next execution move.";
   }
 
   if (intent === "write_plan") {
@@ -148,6 +158,7 @@ function createActionTitle(intent: TayIntent) {
   if (intent === "build_feature") return "Create a feature task";
   if (intent === "sell_offer") return "Prepare a revenue offer";
   if (intent === "handle_buyer_reply") return "Recommend buyer follow-up";
+  if (intent === "manage_focus") return "Route founder focus";
   if (intent === "write_plan") return "Draft a plan";
   if (intent === "record_note") return "Log a note";
   if (intent === "clarify_request") return "Clarify the request";
@@ -165,6 +176,10 @@ function createActionSummary(intent: TayIntent, userText: string) {
 
   if (intent === "handle_buyer_reply") {
     return `Review this buyer reply and recommend the next response: "${userText.trim()}".`;
+  }
+
+  if (intent === "manage_focus") {
+    return `Route this founder focus request through NOW / NEXT / LATER / PARKED: "${userText.trim()}".`;
   }
 
   if (intent === "write_plan") {
@@ -193,6 +208,10 @@ function createNextStep(intent: TayIntent) {
 
   if (intent === "handle_buyer_reply") {
     return "Next step: execute the review so Tay can recommend whether to send details, qualify, pause, or stop.";
+  }
+
+  if (intent === "manage_focus") {
+    return "Next step: execute the focus route, then continue Box 4 or park the distraction.";
   }
 
   if (intent === "write_plan") {

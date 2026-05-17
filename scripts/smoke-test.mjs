@@ -86,7 +86,17 @@ const cases = [
     permission: "allowed",
     riskTier: "medium",
     resultStatus: "completed",
-    requiresArtifact: true,
+    artifactHeadings: [
+      "Offer title",
+      "Buyer problem",
+      "Promised outcome",
+      "Scope",
+      "Price",
+      "Delivery format",
+      "Timeline",
+      "Refund/support note",
+      "Next step",
+    ],
   },
   {
     request: "Buyer replied: yes, send me the details",
@@ -103,6 +113,41 @@ const cases = [
     permission: "allowed",
     riskTier: "medium",
     resultStatus: "failed",
+  },
+  {
+    request: "Show today's Box 4 priorities",
+    intent: "manage_focus",
+    action: "route_focus",
+    permission: "allowed",
+    riskTier: "low",
+    resultStatus: "completed",
+    resultIncludes: "Founder command prepared",
+    artifactHeadings: [
+      "Current focus",
+      "Daily priorities",
+      "Revenue actions",
+      "Not now backlog",
+      "Weekly review",
+      "Family alignment",
+    ],
+  },
+  {
+    request: "Run weekly founder review",
+    intent: "manage_focus",
+    action: "route_focus",
+    permission: "allowed",
+    riskTier: "low",
+    resultStatus: "completed",
+    resultIncludes: "Weekly review prepared",
+  },
+  {
+    request: "Park Crowne Legacy until Box 4 is complete",
+    intent: "manage_focus",
+    action: "route_focus",
+    permission: "allowed",
+    riskTier: "low",
+    resultStatus: "completed",
+    resultIncludes: "Current box incomplete",
   },
   {
     request: "Use an external API to automate leads",
@@ -159,25 +204,21 @@ for (const testCase of cases) {
   );
   assertEqual(result.status, testCase.resultStatus, `${testCase.request} result`);
 
-  if (testCase.requiresArtifact && !result.artifact) {
+  if (testCase.resultIncludes && !result.result.includes(testCase.resultIncludes)) {
+    throw new Error(
+      `${testCase.request} result should include ${testCase.resultIncludes}`,
+    );
+  }
+
+  if (testCase.artifactHeadings && !result.artifact) {
     throw new Error(`${testCase.request} should return a delivery artifact`);
   }
 
-  if (testCase.requiresArtifact) {
+  if (testCase.artifactHeadings) {
     const artifactHeadings = result.artifact.sections.map(
       (section) => section.heading,
     );
-    for (const requiredHeading of [
-      "Offer title",
-      "Buyer problem",
-      "Promised outcome",
-      "Scope",
-      "Price",
-      "Delivery format",
-      "Timeline",
-      "Refund/support note",
-      "Next step",
-    ]) {
+    for (const requiredHeading of testCase.artifactHeadings) {
       if (!artifactHeadings.includes(requiredHeading)) {
         throw new Error(`artifact missing ${requiredHeading}`);
       }

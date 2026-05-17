@@ -41,6 +41,7 @@ import type {
 } from "../lib/types";
 import type { RevenueSetupState } from "../lib/revenue-setup";
 import { ActionCard } from "./action-card";
+import { FounderCommandPanel } from "./founder-command-panel";
 import { FulfillmentPanel } from "./fulfillment-panel";
 import { GovernancePanel } from "./governance-panel";
 import { MemoryPanel } from "./memory-panel";
@@ -57,9 +58,12 @@ interface ChatMessage {
 
 const starter = "Build the first Tay feature";
 const businessFocus =
-  "Passive income systems, digital operations, and business growth";
+  "Founder execution, revenue readiness, and focused business growth";
 
 const quickStarts = [
+  "Show today's Box 4 priorities",
+  "Run weekly founder review",
+  "Park Crowne Legacy until Box 4 is complete",
   "Build a passive income offer",
   "Prepare buyer outreach for the $97 Tay Command Starter Map offer",
   "Buyer replied: yes, send me the details",
@@ -403,6 +407,7 @@ export function ChatShell({ revenueSetup }: ChatShellProps) {
         </div>
       </section>
 
+      <FounderCommandPanel onCommand={submitRequest} />
       <RevenuePanel onCommand={submitRequest} revenueSetup={revenueSetup} />
       <SalesPanel onCommand={submitRequest} />
       <FulfillmentPanel onCommand={submitRequest} />

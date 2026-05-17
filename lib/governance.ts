@@ -64,6 +64,17 @@ export const actionRegistry: Record<TayActionType, ActionRegistryEntry> = {
       "This reviews a buyer reply locally and recommends a response without sending it.",
     examples: ["Route a buyer reply", "Recommend the next sales response"],
   },
+  route_focus: {
+    type: "route_focus",
+    label: "Route focus",
+    domain: "local_workspace",
+    defaultPermission: "allowed",
+    defaultRiskTier: "low",
+    defaultRiskScore: 1,
+    reason:
+      "This routes founder focus, backlog, review, and alignment work inside the local command room.",
+    examples: ["Run daily priorities", "Park a distracting idea"],
+  },
   draft_plan: {
     type: "draft_plan",
     label: "Draft plan",

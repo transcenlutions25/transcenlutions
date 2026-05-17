@@ -5,6 +5,7 @@ export type MemoryCategory =
   | "offer"
   | "buyer_signal"
   | "boundary"
+  | "focus"
   | "plan"
   | "note";
 
@@ -21,6 +22,7 @@ export const memoryCategoryLabels: Record<MemoryCategory, string> = {
   offer: "Offer",
   buyer_signal: "Buyer signal",
   boundary: "Boundary",
+  focus: "Focus",
   plan: "Plan",
   note: "Note",
 };
@@ -62,6 +64,14 @@ export function createSessionMemoryEntry(
       "offer",
       "Revenue offer prepared",
       result?.nextStep ?? "A paid offer was prepared for a careful buyer handoff.",
+    );
+  }
+
+  if (response.intent === "manage_focus") {
+    return createMemoryEntry(
+      "focus",
+      "Founder focus routed",
+      result?.nextStep ?? "A focus request was routed through the founder operating system.",
     );
   }
 

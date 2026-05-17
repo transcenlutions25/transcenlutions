@@ -5,6 +5,7 @@ const stackItems = [
   { name: "Action Engine", status: "Ready" },
   { name: "Governance Layer", status: "Active" },
   { name: "Passive income focus", status: "Primary" },
+  { name: "Founder OS", status: "Active" },
   { name: "Session Memory", status: "Visible" },
   { name: "Future helpers", status: "Later" },
 ];

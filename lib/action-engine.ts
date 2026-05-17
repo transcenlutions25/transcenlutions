@@ -8,6 +8,7 @@ import type {
 import { analyzeBuyerReply } from "./buyer-replies";
 import { createOfferDeliveryArtifact } from "./artifacts";
 import { findDeliveryKitForOffer } from "./delivery";
+import { createFounderFocusResult } from "./founder-os";
 import { findRevenueOfferForRequest, getOfferPaymentState } from "./revenue";
 import { findSalesKitForOffer } from "./sales";
 
@@ -46,6 +47,10 @@ export function executeSuggestedAction(response: TayResponse): ActionResult {
 
   if (action.type === "recommend_follow_up") {
     return createBuyerReplyResult(response);
+  }
+
+  if (action.type === "route_focus") {
+    return createFounderFocusResult(response.userText);
   }
 
   if (action.type === "draft_plan") {

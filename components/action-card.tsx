@@ -180,6 +180,29 @@ export function ActionCard({
               <p className="artifact-care">{result.artifact.careNote}</p>
             </div>
           ) : null}
+          {result.handoff ? (
+            <div className="approved-handoff">
+              <div>
+                <p className="eyebrow">
+                  {result.handoff.simulated ? "Simulated Handoff" : "Approved Handoff"}
+                </p>
+                <h3>{result.handoff.title}</h3>
+                <p>{result.handoff.description}</p>
+              </div>
+              {result.handoff.href ? (
+                <a
+                  className="primary-button"
+                  href={result.handoff.href}
+                  target={result.handoff.external ? "_blank" : undefined}
+                  rel={result.handoff.external ? "noreferrer" : undefined}
+                >
+                  {result.handoff.label}
+                </a>
+              ) : (
+                <span>No live payment link opened.</span>
+              )}
+            </div>
+          ) : null}
           <p className="muted">{result.nextStep}</p>
           <button
             className="secondary-button"

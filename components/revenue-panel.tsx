@@ -1,6 +1,13 @@
 "use client";
 
-import { Banknote, ExternalLink, Mail, ShieldCheck, Wrench } from "lucide-react";
+import {
+  Banknote,
+  FlaskConical,
+  Lock,
+  Mail,
+  ShieldCheck,
+  Wrench,
+} from "lucide-react";
 import {
   companyEmailCarePoints,
   getCompanyEmailState,
@@ -11,12 +18,14 @@ import {
   paymentCarePoints,
   revenueOffers,
 } from "../lib/revenue";
+import type { RevenueSetupState } from "../lib/revenue-setup";
 
 interface RevenuePanelProps {
   onCommand: (request: string) => void;
+  revenueSetup: RevenueSetupState;
 }
 
-export function RevenuePanel({ onCommand }: RevenuePanelProps) {
+export function RevenuePanel({ onCommand, revenueSetup }: RevenuePanelProps) {
   const companyEmailState = getCompanyEmailState();
 
   return (
@@ -28,6 +37,39 @@ export function RevenuePanel({ onCommand }: RevenuePanelProps) {
           Tay can prepare buyer-ready service offers today. Payments only move
           through approved checkout links or clearly addressed invoice handoff.
         </p>
+      </div>
+
+      <div className={`revenue-setup revenue-setup--${revenueSetup.mode}`}>
+        <div>
+          <p className="eyebrow">Revenue Setup</p>
+          <h3>{revenueSetup.title}</h3>
+          <p>{revenueSetup.description}</p>
+          <div className="setup-summary">
+            <span>{revenueSetup.configuredCount} configured</span>
+            <span>{revenueSetup.missingCount} required missing</span>
+            <span>
+              {revenueSetup.isTestMode ? "test mode simulated" : "live mode"}
+            </span>
+          </div>
+        </div>
+        <div className="setup-item-grid">
+          {revenueSetup.items.map((item) => (
+            <article className={`setup-item setup-item--${item.status}`} key={item.id}>
+              <div>
+                {item.status === "simulated" ? (
+                  <FlaskConical size={15} />
+                ) : item.status === "configured" || item.status === "server_only" ? (
+                  <ShieldCheck size={15} />
+                ) : (
+                  <Wrench size={15} />
+                )}
+                <strong>{item.label}</strong>
+              </div>
+              <p>{item.detail}</p>
+              <span>{item.envKeys.join(" / ")}</span>
+            </article>
+          ))}
+        </div>
       </div>
 
       <div className="revenue-grid">
@@ -83,19 +125,23 @@ export function RevenuePanel({ onCommand }: RevenuePanelProps) {
                   Prepare in Tay
                 </button>
                 {paymentState.href ? (
-                  <a
+                  <button
                     className="primary-button"
-                    href={paymentState.href}
-                    target={paymentState.external ? "_blank" : undefined}
-                    rel={paymentState.external ? "noreferrer" : undefined}
+                    type="button"
+                    onClick={() =>
+                      onCommand(
+                        `Send ${paymentState.mode === "checkout" ? "checkout" : "invoice"} details for ${offer.name}`,
+                      )
+                    }
                   >
-                    {paymentState.mode === "checkout" ? (
-                      <ExternalLink size={17} />
-                    ) : (
-                      <Mail size={17} />
-                    )}
-                    {paymentState.label}
-                  </a>
+                    <Lock size={17} />
+                    Request handoff
+                  </button>
+                ) : paymentState.mode === "test_simulated" ? (
+                  <button className="secondary-button button-disabled" disabled type="button">
+                    <FlaskConical size={17} />
+                    Simulated only
+                  </button>
                 ) : (
                   <button className="secondary-button button-disabled" disabled type="button">
                     <Wrench size={17} />

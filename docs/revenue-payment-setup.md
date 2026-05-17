@@ -14,8 +14,18 @@ a buyer, hide payment work, or collect card details inside the app.
 ```bash
 NEXT_PUBLIC_STRIPE_STARTER_MAP_PAYMENT_LINK="https://buy.stripe.com/your-starter-map-link"
 NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PAYMENT_LINK="https://buy.stripe.com/your-operator-sprint-link"
+NEXT_PUBLIC_STRIPE_ACCOUNT_READY="false"
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_or_live_key_here"
+STRIPE_SECRET_KEY="sk_test_or_live_key_here"
+NEXT_PUBLIC_STRIPE_STARTER_MAP_PRICE_ID="price_starter_map"
+NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PRICE_ID="price_operator_sprint"
+NEXT_PUBLIC_TAY_REVENUE_TEST_MODE="false"
 NEXT_PUBLIC_TRANSCENLUTIONS_COMPANY_EMAIL="hello@transcenlutions.com"
 NEXT_PUBLIC_TRANSCENLUTIONS_BILLING_EMAIL="billing@transcenlutions.com"
+NEXT_PUBLIC_TRANSCENLUTIONS_SUPPORT_EMAIL="support@transcenlutions.com"
+NEXT_PUBLIC_TRANSCENLUTIONS_REFUND_COPY="Refund requests are reviewed against the paid scope and delivery status."
+NEXT_PUBLIC_TRANSCENLUTIONS_REVENUE_DISCLAIMER="Transcenlutions does not guarantee income; results depend on execution, market fit, and buyer response."
+NEXT_PUBLIC_DELIVERY_ARTIFACT_LOCATION="Tay result card and confirmed buyer delivery folder"
 ```
 
 `NEXT_PUBLIC_TRANSCENLUTIONS_PAYMENT_URL` is still accepted as a legacy fallback
@@ -28,6 +38,9 @@ for the starter offer, but per-offer Stripe Payment Links are the preferred path
   delivery expectation before sharing it with a buyer.
 - Do not enter card data into Tay or the Transcenlutions app.
 - Do not show a checkout button unless the URL is an approved HTTPS Stripe link.
+- Checkout and invoice handoff must go through Tay approval before the link or
+  invoice draft appears.
+- Test mode must stay labeled as simulated and must not claim real revenue.
 - Do not show invoice handoff unless a real company or billing email recipient
   is configured.
 - Keep every revenue command visible in Tay's activity record.

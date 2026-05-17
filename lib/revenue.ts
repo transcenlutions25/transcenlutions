@@ -5,17 +5,27 @@ export interface RevenueOffer {
   name: string;
   price: string;
   paymentLinkEnvKey: string;
+  priceIdEnvKey: string;
   checkoutUrl: string;
+  priceId: string;
+  buyerProblem: string;
   promise: string;
   outcome: string;
+  scope: string[];
   delivery: string;
+  timeline: string;
+  refundSupportNote: string;
   bestFor: string;
   includes: string[];
   buyerIntake: string[];
   command: string;
 }
 
-export type PaymentMode = "checkout" | "invoice" | "setup_required";
+export type PaymentMode =
+  | "checkout"
+  | "invoice"
+  | "test_simulated"
+  | "setup_required";
 
 export interface OfferPaymentState {
   mode: PaymentMode;
@@ -24,6 +34,13 @@ export interface OfferPaymentState {
   href: string;
   label: string;
   external: boolean;
+  simulated: boolean;
+  setupRequired: boolean;
+}
+
+export interface OfferPaymentContext {
+  invoiceRecipientEmail: string;
+  isTestMode: boolean;
 }
 
 const legacyCheckoutUrl =
@@ -35,14 +52,27 @@ export const revenueOffers: RevenueOffer[] = [
     name: "Tay Command Starter Map",
     price: "$97",
     paymentLinkEnvKey: "NEXT_PUBLIC_STRIPE_STARTER_MAP_PAYMENT_LINK",
+    priceIdEnvKey: "NEXT_PUBLIC_STRIPE_STARTER_MAP_PRICE_ID",
     checkoutUrl:
       process.env.NEXT_PUBLIC_STRIPE_STARTER_MAP_PAYMENT_LINK ??
       legacyCheckoutUrl,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_MAP_PRICE_ID ?? "",
+    buyerProblem:
+      "The buyer has an idea, skill, or goal but cannot see the first sellable offer clearly.",
     promise:
       "A focused passive-income command map with one offer, one workflow, and one next action.",
     outcome:
       "Buyer leaves with one clear offer, one practical execution workflow, and one governed next step.",
+    scope: [
+      "clarify the first offer",
+      "name the buyer problem",
+      "map one delivery workflow",
+      "define the next action",
+    ],
     delivery: "60-minute command session plus written starter map",
+    timeline: "Delivered after one command session and one written follow-up artifact.",
+    refundSupportNote:
+      "Refund/support policy must be confirmed before payment; buyer questions route to the configured support inbox.",
     bestFor: "Founders who need the first sellable move made clear",
     includes: [
       "60-minute command session",
@@ -63,13 +93,26 @@ export const revenueOffers: RevenueOffer[] = [
     name: "Operator Build Sprint",
     price: "$497",
     paymentLinkEnvKey: "NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PAYMENT_LINK",
+    priceIdEnvKey: "NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PRICE_ID",
     checkoutUrl:
       process.env.NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PAYMENT_LINK ?? "",
+    priceId: process.env.NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PRICE_ID ?? "",
+    buyerProblem:
+      "The buyer has direction, skill, or audience signal but needs a focused system before execution scatters.",
     promise:
       "A deeper build sprint for turning an idea into a visible business system foundation.",
     outcome:
       "Buyer leaves with a sellable offer direction, operating plan, and seven-day execution agenda.",
+    scope: [
+      "shape the offer position",
+      "map the lead or content path",
+      "define automation boundaries",
+      "prepare a seven-day execution agenda",
+    ],
     delivery: "Strategy sprint with implementation map and follow-up agenda",
+    timeline: "Delivered as a focused build sprint with a seven-day execution agenda.",
+    refundSupportNote:
+      "Refund/support policy must be confirmed before payment; buyer questions route to the configured support inbox.",
     bestFor: "Builders who need a real business system shaped quickly",
     includes: [
       "offer positioning",
@@ -98,7 +141,9 @@ const approvedPaymentHosts = new Set([
 
 export const paymentCarePoints = [
   "Transcenlutions does not collect or store card numbers inside this app.",
+  "Checkout handoff remains approval-required under governance.",
   "Checkout links must use the exact offer price, scope, and buyer expectation before they appear as live checkout.",
+  "Test mode must stay labeled as simulated and cannot claim money was collected.",
   "Manual invoice handoff is only enabled when a real company or billing email is configured.",
   "Every revenue action stays visible through Tay's activity record.",
 ];
@@ -118,6 +163,30 @@ export function findRevenueOfferForRequest(request: string) {
 }
 
 export function getOfferPaymentState(offer: RevenueOffer): OfferPaymentState {
+  return createOfferPaymentState(offer, {
+    invoiceRecipientEmail: getInvoiceRecipientEmail() || contactEmail.trim(),
+    isTestMode: isRevenueTestMode(),
+  });
+}
+
+export function createOfferPaymentState(
+  offer: RevenueOffer,
+  context: OfferPaymentContext,
+): OfferPaymentState {
+  if (context.isTestMode) {
+    return {
+      mode: "test_simulated",
+      title: "Simulated test checkout",
+      description:
+        "Test mode is active. This state is simulated only; no real checkout opens and no money is collected.",
+      href: "",
+      label: "Simulated only",
+      external: false,
+      simulated: true,
+      setupRequired: true,
+    };
+  }
+
   if (isApprovedPaymentUrl(offer.checkoutUrl)) {
     return {
       mode: "checkout",
@@ -127,10 +196,12 @@ export function getOfferPaymentState(offer: RevenueOffer): OfferPaymentState {
       href: offer.checkoutUrl.trim(),
       label: "Open checkout",
       external: true,
+      simulated: false,
+      setupRequired: false,
     };
   }
 
-  const invoiceHref = buildInvoiceMailto(offer);
+  const invoiceHref = buildInvoiceMailto(offer, context.invoiceRecipientEmail);
 
   if (invoiceHref) {
     return {
@@ -141,6 +212,8 @@ export function getOfferPaymentState(offer: RevenueOffer): OfferPaymentState {
       href: invoiceHref,
       label: "Draft invoice",
       external: false,
+      simulated: false,
+      setupRequired: false,
     };
   }
 
@@ -151,6 +224,8 @@ export function getOfferPaymentState(offer: RevenueOffer): OfferPaymentState {
     href: "",
     label: "Payment setup needed",
     external: false,
+    simulated: false,
+    setupRequired: true,
   };
 }
 
@@ -168,8 +243,10 @@ export function isApprovedPaymentUrl(url: string) {
   }
 }
 
-export function buildInvoiceMailto(offer: RevenueOffer) {
-  const recipientEmail = getInvoiceRecipientEmail() || contactEmail.trim();
+export function buildInvoiceMailto(
+  offer: RevenueOffer,
+  recipientEmail = getInvoiceRecipientEmail() || contactEmail.trim(),
+) {
   if (!recipientEmail) return "";
 
   const subject = `Invoice request: ${offer.name}`;
@@ -185,4 +262,8 @@ export function buildInvoiceMailto(offer: RevenueOffer) {
   ].join("\n");
 
   return `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+export function isRevenueTestMode() {
+  return process.env.NEXT_PUBLIC_TAY_REVENUE_TEST_MODE === "true";
 }

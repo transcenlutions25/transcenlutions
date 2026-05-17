@@ -63,6 +63,8 @@ The current foundation includes:
 - manual invoice email fallback only when a real company or billing email is configured
 - company email readiness for official contact, billing, and support inboxes
 - setup-required state when payment is not configured
+- Revenue Setup panel for email, Stripe, support, refund copy, and delivery location
+- safe simulated test mode for rehearsing payment flow without collecting money
 
 The current foundation does **not** include login, database, direct card
 processing, external APIs, persistent memory, agent chains, marketplace, or
@@ -80,7 +82,12 @@ The app includes two buyer-ready starter offers:
 To connect a real checkout button, set:
 
 ```bash
+NEXT_PUBLIC_STRIPE_ACCOUNT_READY="true"
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_live_or_test_key"
+STRIPE_SECRET_KEY="sk_live_or_test_key"
+NEXT_PUBLIC_STRIPE_STARTER_MAP_PRICE_ID="price_starter_map"
 NEXT_PUBLIC_STRIPE_STARTER_MAP_PAYMENT_LINK="https://buy.stripe.com/your-starter-map-link"
+NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PRICE_ID="price_operator_sprint"
 NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PAYMENT_LINK="https://buy.stripe.com/your-operator-sprint-link"
 ```
 
@@ -90,11 +97,24 @@ Company email setup:
 NEXT_PUBLIC_TRANSCENLUTIONS_COMPANY_EMAIL="hello@transcenlutions.com"
 NEXT_PUBLIC_TRANSCENLUTIONS_BILLING_EMAIL="billing@transcenlutions.com"
 NEXT_PUBLIC_TRANSCENLUTIONS_SUPPORT_EMAIL="support@transcenlutions.com"
+NEXT_PUBLIC_TRANSCENLUTIONS_REFUND_COPY="Refund requests are reviewed against the paid scope and delivery status."
+NEXT_PUBLIC_TRANSCENLUTIONS_REVENUE_DISCLAIMER="Transcenlutions does not guarantee income; results depend on execution, market fit, and buyer response."
+NEXT_PUBLIC_DELIVERY_ARTIFACT_LOCATION="Tay result card and confirmed buyer delivery folder"
 ```
 
 Without a valid Stripe Payment Link or company billing inbox, the offer shows a
 setup-needed state instead of a fake checkout or empty invoice. Card data is
-never collected inside Tay.
+never collected inside Tay. Checkout and invoice handoff remain
+approval-required under governance.
+
+Safe test mode:
+
+```bash
+NEXT_PUBLIC_TAY_REVENUE_TEST_MODE="true"
+```
+
+When active, checkout is labeled simulated. No checkout opens, no card data is
+collected, and no real revenue is claimed.
 
 See [docs/revenue-payment-setup.md](docs/revenue-payment-setup.md) for the
 payment care rules, and [docs/company-email-setup.md](docs/company-email-setup.md)
@@ -108,6 +128,9 @@ first buyer-message and qualification standards.
 
 See [docs/tay-engine-box-2-governance.md](docs/tay-engine-box-2-governance.md)
 for the action registry, risk tiers, and approval/blocking rules.
+
+See [docs/tay-engine-box-3-revenue.md](docs/tay-engine-box-3-revenue.md) for
+the real revenue infrastructure and buyer journey.
 
 ## Run Locally
 
@@ -150,6 +173,8 @@ Delete the database
 Build a passive income offer
 Prepare a $97 Tay Command Starter Map offer
 Prepare a $497 Operator Build Sprint offer
+Send checkout details for Tay Command Starter Map
+Buyer replied: yes, send me the details
 ```
 
 Expected behavior:
@@ -161,6 +186,9 @@ Expected behavior:
 - governance panel shows active action rules and risk tiers
 - session log entries include governance risk data
 - revenue requests prepare a real offer and handoff path
+- payment handoff requests require approval before checkout or invoice links appear
+- missing Stripe/email setup appears as setup required
+- safe test mode states clearly say simulated
 - outreach cards show buyer-fit rules and careful first messages
 - buyer reply commands route replies into clear next steps without auto-sending
 - fulfillment cards show buyer artifacts and quality standards for paid offers

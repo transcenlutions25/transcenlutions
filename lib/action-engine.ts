@@ -128,7 +128,12 @@ function createRevenueOfferResult(response: TayResponse): ActionResult {
   const deliveryKit = findDeliveryKitForOffer(offer.id);
   const paymentState = getOfferPaymentState(offer);
   const salesKit = findSalesKitForOffer(offer.id);
-  const artifact = createOfferDeliveryArtifact(offer, deliveryKit, salesKit);
+  const artifact = createOfferDeliveryArtifact(
+    offer,
+    deliveryKit,
+    salesKit,
+    paymentState,
+  );
 
   return {
     status: "completed",
@@ -145,6 +150,23 @@ function createApprovedRevenueHandoffResult(response: TayResponse): ActionResult
   const offer = findRevenueOfferForRequest(response.userText);
   const paymentState = getOfferPaymentState(offer);
 
+  if (paymentState.mode === "test_simulated") {
+    return {
+      status: "completed",
+      result: `Approval recorded for test mode. ${offer.name} payment handoff is simulated only; Tay did not open checkout and no money was collected.`,
+      nextStep:
+        "Next step: complete the setup checklist before sending any live checkout or invoice handoff to a buyer.",
+      handoff: {
+        title: paymentState.title,
+        description: paymentState.description,
+        href: "",
+        label: paymentState.label,
+        external: false,
+        simulated: true,
+      },
+    };
+  }
+
   if (paymentState.mode === "setup_required") {
     return {
       status: "failed",
@@ -157,6 +179,14 @@ function createApprovedRevenueHandoffResult(response: TayResponse): ActionResult
     status: "completed",
     result: `Approval recorded. ${offer.name} is ready for a real buyer through ${paymentState.mode === "checkout" ? "an approved Stripe checkout link" : "a manual invoice email draft"}. Tay did not collect card data inside the app.`,
     nextStep: `Next step: send the ${offer.price} offer to one buyer and log the response in Tay.`,
+    handoff: {
+      title: paymentState.title,
+      description: paymentState.description,
+      href: paymentState.href,
+      label: paymentState.label,
+      external: paymentState.external,
+      simulated: false,
+    },
   };
 }
 

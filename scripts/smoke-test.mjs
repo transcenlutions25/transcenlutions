@@ -19,7 +19,15 @@ require.extensions[".ts"] = function loadTypeScript(module, filename) {
   module._compile(outputText, filename);
 };
 
-const { executeSuggestedAction } = require("../lib/action-engine.ts");
+const {
+  executeSuggestedAction,
+  resolveApproval,
+} = require("../lib/action-engine.ts");
+const {
+  createOfferPaymentState,
+  revenueOffers,
+} = require("../lib/revenue.ts");
+const { createRevenueSetupState } = require("../lib/revenue-setup.ts");
 const { createTayResponse } = require("../lib/tay-core.ts");
 
 const cases = [
@@ -106,6 +114,33 @@ const cases = [
   },
 ];
 
+const missingSetup = createRevenueSetupState({});
+assertEqual(
+  missingSetup.mode,
+  "setup_required",
+  "missing revenue setup should require setup",
+);
+
+const missingPayment = createOfferPaymentState(
+  { ...revenueOffers[0], checkoutUrl: "", priceId: "" },
+  { invoiceRecipientEmail: "", isTestMode: false },
+);
+assertEqual(
+  missingPayment.mode,
+  "setup_required",
+  "missing Stripe should show setup required",
+);
+
+const simulatedPayment = createOfferPaymentState(revenueOffers[0], {
+  invoiceRecipientEmail: "",
+  isTestMode: true,
+});
+assertEqual(
+  simulatedPayment.mode,
+  "test_simulated",
+  "test checkout state should be simulated",
+);
+
 for (const testCase of cases) {
   const response = createTayResponse(testCase.request);
   const result = executeSuggestedAction(response);
@@ -127,9 +162,52 @@ for (const testCase of cases) {
   if (testCase.requiresArtifact && !result.artifact) {
     throw new Error(`${testCase.request} should return a delivery artifact`);
   }
+
+  if (testCase.requiresArtifact) {
+    const artifactHeadings = result.artifact.sections.map(
+      (section) => section.heading,
+    );
+    for (const requiredHeading of [
+      "Offer title",
+      "Buyer problem",
+      "Promised outcome",
+      "Scope",
+      "Price",
+      "Delivery format",
+      "Timeline",
+      "Refund/support note",
+      "Next step",
+    ]) {
+      if (!artifactHeadings.includes(requiredHeading)) {
+        throw new Error(`artifact missing ${requiredHeading}`);
+      }
+    }
+  }
 }
 
-console.log(`Smoke tests passed: ${cases.length} Tay flows verified.`);
+const handoffRequest = createTayResponse(
+  "Send checkout details for Tay Command Starter Map",
+);
+assertEqual(
+  handoffRequest.action.permissionStatus,
+  "requires_approval",
+  "payment handoff should require approval",
+);
+const handoffResult = resolveApproval(handoffRequest, "approved");
+if (handoffResult.status === "completed" && !handoffResult.handoff) {
+  throw new Error("approved payment handoff should return a handoff object");
+}
+
+if (
+  handoffResult.status === "failed" &&
+  !handoffResult.result.toLowerCase().includes("cannot accept payment yet")
+) {
+  throw new Error("missing payment setup should fail with setup-required copy");
+}
+
+console.log(
+  `Smoke tests passed: ${cases.length} Tay flows plus revenue setup checks verified.`,
+);
 
 function assertEqual(actual, expected, label) {
   if (actual !== expected) {

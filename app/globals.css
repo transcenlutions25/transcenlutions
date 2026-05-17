@@ -653,6 +653,28 @@ button {
   padding: 12px;
 }
 
+.approved-handoff {
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(52, 211, 153, 0.26);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(52, 211, 153, 0.08), rgba(216, 185, 87, 0.06)),
+    rgba(255, 255, 255, 0.035);
+  padding: 12px;
+}
+
+.approved-handoff h3 {
+  margin: 5px 0 4px;
+  font-size: 1rem;
+}
+
+.approved-handoff span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
 .artifact-preview {
   display: grid;
   gap: 12px;
@@ -1161,6 +1183,8 @@ button {
 .offer-meta,
 .email-route-grid,
 .email-status-grid,
+.setup-item-grid,
+.setup-summary,
 .payment-care-grid {
   display: grid;
   gap: 10px;
@@ -1172,6 +1196,91 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
+}
+
+.revenue-setup {
+  display: grid;
+  gap: 14px;
+  border: 1px solid rgba(216, 185, 87, 0.26);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(124, 58, 237, 0.14), transparent 16rem),
+    rgba(255, 255, 255, 0.045);
+  padding: 14px;
+}
+
+.revenue-setup--test_mode {
+  border-color: rgba(125, 211, 252, 0.34);
+}
+
+.revenue-setup--live_ready {
+  border-color: rgba(52, 211, 153, 0.34);
+}
+
+.revenue-setup h3 {
+  margin: 6px 0 7px;
+  font-size: 1.16rem;
+}
+
+.setup-summary span,
+.setup-item {
+  border: 1px solid rgba(216, 185, 87, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px;
+}
+
+.setup-summary span {
+  color: var(--gold-soft);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.setup-item {
+  display: grid;
+  gap: 7px;
+}
+
+.setup-item div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.setup-item strong {
+  color: var(--text);
+  font-size: 0.88rem;
+}
+
+.setup-item p,
+.setup-item span {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.setup-item span {
+  word-break: break-word;
+}
+
+.setup-item svg {
+  flex: 0 0 auto;
+  color: var(--gold-soft);
+}
+
+.setup-item--configured,
+.setup-item--server_only {
+  border-color: rgba(52, 211, 153, 0.24);
+}
+
+.setup-item--simulated {
+  border-color: rgba(125, 211, 252, 0.26);
+}
+
+.setup-item--missing {
+  border-color: rgba(251, 191, 36, 0.28);
 }
 
 .revenue-card__top strong {
@@ -1251,6 +1360,11 @@ button {
 .payment-status--invoice {
   border-color: rgba(216, 185, 87, 0.34);
   background: rgba(216, 185, 87, 0.08);
+}
+
+.payment-status--test_simulated {
+  border-color: rgba(125, 211, 252, 0.34);
+  background: rgba(125, 211, 252, 0.08);
 }
 
 .payment-status--setup_required {
@@ -1404,6 +1518,8 @@ button {
   .revenue-card__actions,
   .email-route-grid,
   .email-status-grid,
+  .setup-item-grid,
+  .setup-summary,
   .feature-grid,
   .agent-grid,
   .revenue-grid,

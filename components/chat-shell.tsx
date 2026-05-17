@@ -39,6 +39,7 @@ import type {
   SessionLogEntry,
   TayResponse,
 } from "../lib/types";
+import type { RevenueSetupState } from "../lib/revenue-setup";
 import { ActionCard } from "./action-card";
 import { FulfillmentPanel } from "./fulfillment-panel";
 import { GovernancePanel } from "./governance-panel";
@@ -95,7 +96,11 @@ const agentPreviews = [
   "Creative Producer",
 ];
 
-export function ChatShell() {
+interface ChatShellProps {
+  revenueSetup: RevenueSetupState;
+}
+
+export function ChatShell({ revenueSetup }: ChatShellProps) {
   const [input, setInput] = useState("");
   const [activeResponse, setActiveResponse] = useState<TayResponse | null>(
     null,
@@ -398,7 +403,7 @@ export function ChatShell() {
         </div>
       </section>
 
-      <RevenuePanel onCommand={submitRequest} />
+      <RevenuePanel onCommand={submitRequest} revenueSetup={revenueSetup} />
       <SalesPanel onCommand={submitRequest} />
       <FulfillmentPanel onCommand={submitRequest} />
 

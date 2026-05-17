@@ -71,6 +71,16 @@ export interface ActionResult {
   result: string;
   nextStep: string;
   artifact?: ActionArtifact;
+  handoff?: ActionHandoff;
+}
+
+export interface ActionHandoff {
+  title: string;
+  description: string;
+  href: string;
+  label: string;
+  external: boolean;
+  simulated: boolean;
 }
 
 export interface ActionArtifact {

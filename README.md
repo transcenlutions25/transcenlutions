@@ -128,6 +128,7 @@ Run:
 ```bash
 npm run lint
 npm run typecheck
+npm run smoke
 npm run build
 ```
 
@@ -156,6 +157,7 @@ Expected behavior:
 - fulfillment cards show buyer artifacts and quality standards for paid offers
 - memory snapshot stays visible and session-only
 - prepared offers include a delivery artifact with outcome, intake, flow, and boundaries
+- `npm run smoke` verifies the main Tay request, revenue, blocked, and buyer-reply loops
 - payment buttons appear only for approved checkout links or configured company email
 - every result, pause, blocked request, and clarification is visible
 

@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint && node scripts/check-public-copy.mjs",
+    "smoke": "node scripts/smoke-test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

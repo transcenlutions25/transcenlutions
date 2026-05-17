@@ -43,6 +43,19 @@ export interface ActionResult {
   status: ExecutionStatus;
   result: string;
   nextStep: string;
+  artifact?: ActionArtifact;
+}
+
+export interface ActionArtifact {
+  title: string;
+  subtitle: string;
+  sections: ActionArtifactSection[];
+  careNote: string;
+}
+
+export interface ActionArtifactSection {
+  heading: string;
+  items: string[];
 }
 
 export interface SessionLogEntry {

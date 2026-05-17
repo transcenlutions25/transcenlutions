@@ -55,6 +55,7 @@ Box 1 includes:
 - buyer reply routing for follow-up, pause, and stop-sale decisions
 - client fulfillment kits for paid offer delivery
 - visible session memory for goals, offers, buyer signals, and boundaries
+- structured delivery artifacts when Tay prepares a paid offer
 - per-offer Stripe Payment Link support
 - manual invoice email fallback only when a real company or billing email is configured
 - company email readiness for official contact, billing, and support inboxes
@@ -154,6 +155,7 @@ Expected behavior:
 - buyer reply commands route replies into clear next steps without auto-sending
 - fulfillment cards show buyer artifacts and quality standards for paid offers
 - memory snapshot stays visible and session-only
+- prepared offers include a delivery artifact with outcome, intake, flow, and boundaries
 - payment buttons appear only for approved checkout links or configured company email
 - every result, pause, blocked request, and clarification is visible
 

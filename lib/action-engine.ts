@@ -6,6 +6,7 @@ import type {
   TayResponse,
 } from "./types";
 import { analyzeBuyerReply } from "./buyer-replies";
+import { createOfferDeliveryArtifact } from "./artifacts";
 import { findDeliveryKitForOffer } from "./delivery";
 import { findRevenueOfferForRequest, getOfferPaymentState } from "./revenue";
 import { findSalesKitForOffer } from "./sales";
@@ -127,6 +128,7 @@ function createRevenueOfferResult(response: TayResponse): ActionResult {
   const deliveryKit = findDeliveryKitForOffer(offer.id);
   const paymentState = getOfferPaymentState(offer);
   const salesKit = findSalesKitForOffer(offer.id);
+  const artifact = createOfferDeliveryArtifact(offer, deliveryKit, salesKit);
 
   return {
     status: "completed",
@@ -135,6 +137,7 @@ function createRevenueOfferResult(response: TayResponse): ActionResult {
       paymentState.mode === "setup_required"
         ? `Next step: qualify one buyer using ${salesKit.title}, then add ${offer.paymentLinkEnvKey} or NEXT_PUBLIC_TRANSCENLUTIONS_BILLING_EMAIL before requesting payment.`
         : `Next step: send the outreach message to one real buyer, use ${paymentState.mode === "checkout" ? "the approved checkout link" : "the invoice email draft"} only after fit is clear, then deliver ${deliveryKit.artifacts[0]}.`,
+    artifact,
   };
 }
 

@@ -146,6 +146,28 @@ export function ActionCard({
             <p className="eyebrow">Result</p>
           </div>
           <p>{result.result}</p>
+          {result.artifact ? (
+            <div className="artifact-preview">
+              <div>
+                <p className="eyebrow">Delivery Artifact</p>
+                <h3>{result.artifact.title}</h3>
+                <p>{result.artifact.subtitle}</p>
+              </div>
+              <div className="artifact-section-grid">
+                {result.artifact.sections.map((section) => (
+                  <section key={section.heading}>
+                    <strong>{section.heading}</strong>
+                    <ul>
+                      {section.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+              <p className="artifact-care">{result.artifact.careNote}</p>
+            </div>
+          ) : null}
           <p className="muted">{result.nextStep}</p>
           <button
             className="secondary-button"

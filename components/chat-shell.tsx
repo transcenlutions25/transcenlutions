@@ -37,6 +37,7 @@ import type {
 import { ActionCard } from "./action-card";
 import { FulfillmentPanel } from "./fulfillment-panel";
 import { RevenuePanel } from "./revenue-panel";
+import { SalesPanel } from "./sales-panel";
 import { SessionLog } from "./session-log";
 import { SystemStack } from "./system-stack";
 
@@ -52,6 +53,7 @@ const businessFocus =
 
 const quickStarts = [
   "Build a passive income offer",
+  "Prepare buyer outreach for the $97 Tay Command Starter Map offer",
   "Prepare a $97 Tay Command Starter Map offer",
   "Prepare a $497 Operator Build Sprint offer",
   "Create a plan for Tay governance",
@@ -360,6 +362,7 @@ export function ChatShell() {
       </section>
 
       <RevenuePanel onCommand={submitRequest} />
+      <SalesPanel onCommand={submitRequest} />
       <FulfillmentPanel onCommand={submitRequest} />
 
       <section className="section-grid" aria-label="Future agent council preview">

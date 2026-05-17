@@ -7,6 +7,7 @@ import type {
 } from "./types";
 import { findDeliveryKitForOffer } from "./delivery";
 import { findRevenueOfferForRequest, getOfferPaymentState } from "./revenue";
+import { findSalesKitForOffer } from "./sales";
 
 export function executeSuggestedAction(response: TayResponse): ActionResult {
   const { action, intent } = response;
@@ -110,14 +111,15 @@ function createRevenueOfferResult(response: TayResponse): ActionResult {
   const offer = findRevenueOfferForRequest(response.userText);
   const deliveryKit = findDeliveryKitForOffer(offer.id);
   const paymentState = getOfferPaymentState(offer);
+  const salesKit = findSalesKitForOffer(offer.id);
 
   return {
     status: "completed",
-    result: `Revenue offer prepared: ${offer.name} (${offer.price}). ${offer.outcome} Delivery kit: ${deliveryKit.title}. Payment path: ${paymentState.title.toLowerCase()}.`,
+    result: `Revenue offer prepared: ${offer.name} (${offer.price}). ${offer.outcome} Outreach kit: ${salesKit.title}. Delivery kit: ${deliveryKit.title}. Payment path: ${paymentState.title.toLowerCase()}.`,
     nextStep:
       paymentState.mode === "setup_required"
-        ? `Next step: add ${offer.paymentLinkEnvKey} or NEXT_PUBLIC_TRANSCENLUTIONS_BILLING_EMAIL before sending this offer to a buyer.`
-        : `Next step: send ${offer.name} to one real buyer through ${paymentState.mode === "checkout" ? "the approved checkout link" : "the invoice email draft"}, then deliver ${deliveryKit.artifacts[0]}.`,
+        ? `Next step: qualify one buyer using ${salesKit.title}, then add ${offer.paymentLinkEnvKey} or NEXT_PUBLIC_TRANSCENLUTIONS_BILLING_EMAIL before requesting payment.`
+        : `Next step: send the outreach message to one real buyer, use ${paymentState.mode === "checkout" ? "the approved checkout link" : "the invoice email draft"} only after fit is clear, then deliver ${deliveryKit.artifacts[0]}.`,
   };
 }
 

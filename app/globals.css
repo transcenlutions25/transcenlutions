@@ -240,6 +240,7 @@ button {
 .preview-band,
 .module-cloud,
 .fulfillment-command,
+.sales-command,
 .revenue-command {
   margin-top: 18px;
 }
@@ -259,6 +260,7 @@ button {
 .preview-band,
 .module-cloud,
 .fulfillment-command,
+.sales-command,
 .revenue-command {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -281,6 +283,7 @@ button {
 .preview-band,
 .module-cloud,
 .fulfillment-command,
+.sales-command,
 .revenue-command {
   padding: 16px;
 }
@@ -797,13 +800,25 @@ button {
     var(--panel);
 }
 
+.sales-command {
+  display: grid;
+  gap: 16px;
+  background:
+    radial-gradient(circle at 78% 10%, rgba(18, 60, 255, 0.18), transparent 18rem),
+    radial-gradient(circle at 18% 82%, rgba(216, 185, 87, 0.12), transparent 16rem),
+    var(--panel);
+}
+
 .fulfillment-grid,
-.fulfillment-care-grid {
+.fulfillment-care-grid,
+.sales-grid,
+.sales-care-grid {
   display: grid;
   gap: 12px;
 }
 
-.fulfillment-card {
+.fulfillment-card,
+.sales-card {
   display: grid;
   gap: 12px;
   border: 1px solid rgba(216, 185, 87, 0.24);
@@ -814,32 +829,39 @@ button {
   padding: 14px;
 }
 
-.fulfillment-card h3 {
+.fulfillment-card h3,
+.sales-card h3 {
   margin: 0;
   font-size: 1.1rem;
 }
 
-.fulfillment-card p {
+.fulfillment-card p,
+.sales-card p {
   margin: 0;
   color: var(--muted);
   line-height: 1.58;
 }
 
 .fulfillment-card ol,
-.fulfillment-card ul {
+.fulfillment-card ul,
+.sales-card ol,
+.sales-card ul {
   display: grid;
   gap: 8px;
   margin: 0;
   padding-left: 20px;
 }
 
-.fulfillment-card li {
+.fulfillment-card li,
+.sales-card li {
   color: var(--text);
   line-height: 1.45;
 }
 
 .quality-standard,
-.fulfillment-care-grid span {
+.message-script,
+.fulfillment-care-grid span,
+.sales-care-grid span {
   border: 1px solid rgba(216, 185, 87, 0.22);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.04);
@@ -851,14 +873,24 @@ button {
   gap: 6px;
 }
 
-.quality-standard strong {
+.message-script {
+  display: grid;
+  gap: 7px;
+  background:
+    linear-gradient(145deg, rgba(216, 185, 87, 0.09), rgba(124, 58, 237, 0.06)),
+    rgba(255, 255, 255, 0.04);
+}
+
+.quality-standard strong,
+.message-script strong {
   color: var(--gold-soft);
   font-size: 0.8rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.fulfillment-care-grid span {
+.fulfillment-care-grid span,
+.sales-care-grid span {
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -867,7 +899,8 @@ button {
   line-height: 1.45;
 }
 
-.fulfillment-care-grid svg {
+.fulfillment-care-grid svg,
+.sales-care-grid svg {
   flex: 0 0 auto;
   color: var(--gold-soft);
   margin-top: 2px;
@@ -1140,6 +1173,8 @@ button {
   .approval-actions,
   .fulfillment-grid,
   .fulfillment-care-grid,
+  .sales-grid,
+  .sales-care-grid,
   .offer-meta,
   .revenue-card__actions,
   .email-route-grid,

@@ -9,10 +9,19 @@ import { analyzeBuyerReply } from "./buyer-replies";
 import { createOfferDeliveryArtifact } from "./artifacts";
 import { findDeliveryKitForOffer } from "./delivery";
 import { createFounderFocusResult } from "./founder-os";
+import { createLaunchReadinessResult } from "./launch-readiness";
+import type { LaunchReadinessState } from "./launch-readiness";
 import { findRevenueOfferForRequest, getOfferPaymentState } from "./revenue";
 import { findSalesKitForOffer } from "./sales";
 
-export function executeSuggestedAction(response: TayResponse): ActionResult {
+interface ActionExecutionContext {
+  launchReadinessState?: LaunchReadinessState;
+}
+
+export function executeSuggestedAction(
+  response: TayResponse,
+  context: ActionExecutionContext = {},
+): ActionResult {
   const { action, intent } = response;
 
   if (action.permissionStatus === "blocked") {
@@ -51,6 +60,13 @@ export function executeSuggestedAction(response: TayResponse): ActionResult {
 
   if (action.type === "route_focus") {
     return createFounderFocusResult(response.userText);
+  }
+
+  if (action.type === "route_launch_readiness") {
+    return createLaunchReadinessResult(
+      response.userText,
+      context.launchReadinessState,
+    );
   }
 
   if (action.type === "draft_plan") {

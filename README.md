@@ -6,8 +6,8 @@ into visible next moves.
 
 Tay is the face, spokesman, orchestrator, animated operator, and executive brain
 of the platform. **Box 1 foundation**, **Box 2 governance**, **Box 3 revenue
-infrastructure**, and the **Box 4 Founder Operating System** are active around
-the same core loop:
+infrastructure**, **Box 4 Founder Operating System**, and **Box 5 Launch
+Readiness** are active around the same core loop:
 
 ```text
 User request
@@ -31,6 +31,7 @@ The active Next.js app lives at the repository root:
 - `docs/tay-engine-box-2-governance.md` — current Box 2 governance map
 - `docs/tay-engine-box-3-revenue.md` — real revenue infrastructure map
 - `docs/tay-engine-box-4-founder-os.md` — founder execution and focus map
+- `docs/tay-engine-box-5-launch-readiness.md` — launch setup and onboarding map
 - `scripts/check-public-copy.mjs` — guard against exposing internal build-only language
 
 The old `src/` dashboard structure has been removed so the repo has one clear
@@ -70,6 +71,8 @@ The current foundation includes:
 - setup-required state when payment is not configured
 - Revenue Setup panel for email, Stripe, support, refund copy, and delivery location
 - safe simulated test mode for rehearsing payment flow without collecting money
+- Launch Readiness panel for domain, inbox, Stripe, policy, onboarding, and blocker truth
+- first launch use case focused on AI business guidance
 
 The current foundation does **not** include login, database, direct card
 processing, external APIs, persistent memory, agent chains, marketplace, or
@@ -98,6 +101,34 @@ The Founder Command Layer shows:
 Expansion ideas such as the dating app, Crowne Legacy, advanced agents, full
 autonomy, or marketplaces are kept in `PARKED` until the current box is stable.
 
+## Launch Readiness
+
+Box 5 keeps the launch path honest before public release. Tay routes launch
+readiness through:
+
+```text
+prepare_launch -> route_launch_readiness
+```
+
+The Launch Readiness panel shows:
+
+- current phase
+- launch readiness percent
+- revenue readiness percent
+- top priority
+- blocked setup items
+- onboarding question
+- first use case
+
+First-entry onboarding starts with:
+
+```text
+What are you building?
+```
+
+The first real use case is `AI business guidance`: Tay helps one user clarify an
+offer, plan revenue, and choose the next governed action.
+
 ## Revenue Setup
 
 The app includes two buyer-ready starter offers:
@@ -109,12 +140,12 @@ To connect a real checkout button, set:
 
 ```bash
 NEXT_PUBLIC_STRIPE_ACCOUNT_READY="true"
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_live_or_test_key"
-STRIPE_SECRET_KEY="sk_live_or_test_key"
-NEXT_PUBLIC_STRIPE_STARTER_MAP_PRICE_ID="price_starter_map"
-NEXT_PUBLIC_STRIPE_STARTER_MAP_PAYMENT_LINK="https://buy.stripe.com/your-starter-map-link"
-NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PRICE_ID="price_operator_sprint"
-NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PAYMENT_LINK="https://buy.stripe.com/your-operator-sprint-link"
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=""
+STRIPE_SECRET_KEY=""
+NEXT_PUBLIC_STRIPE_STARTER_MAP_PRICE_ID=""
+NEXT_PUBLIC_STRIPE_STARTER_MAP_PAYMENT_LINK=""
+NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PRICE_ID=""
+NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PAYMENT_LINK=""
 ```
 
 Company email setup:
@@ -126,6 +157,10 @@ NEXT_PUBLIC_TRANSCENLUTIONS_SUPPORT_EMAIL="support@transcenlutions.com"
 NEXT_PUBLIC_TRANSCENLUTIONS_REFUND_COPY="Refund requests are reviewed against the paid scope and delivery status."
 NEXT_PUBLIC_TRANSCENLUTIONS_REVENUE_DISCLAIMER="Transcenlutions does not guarantee income; results depend on execution, market fit, and buyer response."
 NEXT_PUBLIC_DELIVERY_ARTIFACT_LOCATION="Tay result card and confirmed buyer delivery folder"
+NEXT_PUBLIC_TRANSCENLUTIONS_DOMAIN=""
+NEXT_PUBLIC_TRANSCENLUTIONS_PRIVACY_POLICY_URL=""
+NEXT_PUBLIC_TRANSCENLUTIONS_TERMS_URL=""
+NEXT_PUBLIC_TRANSCENLUTIONS_ONBOARDING_COPY_READY=""
 ```
 
 Without a valid Stripe Payment Link or company billing inbox, the offer shows a
@@ -161,6 +196,9 @@ the real revenue infrastructure and buyer journey.
 
 See [docs/tay-engine-box-4-founder-os.md](docs/tay-engine-box-4-founder-os.md)
 for the founder command layer and focus rules.
+
+See [docs/tay-engine-box-5-launch-readiness.md](docs/tay-engine-box-5-launch-readiness.md)
+for launch readiness, onboarding, and first-use-case rules.
 
 ## Run Locally
 
@@ -205,6 +243,9 @@ Prepare a $97 Tay Command Starter Map offer
 Prepare a $497 Operator Build Sprint offer
 Send checkout details for Tay Command Starter Map
 Buyer replied: yes, send me the details
+Show launch readiness
+Prepare Tay onboarding question
+Prepare first use case: AI business guidance
 Show today's Box 4 priorities
 Run weekly founder review
 Park Crowne Legacy until Box 4 is complete
@@ -228,9 +269,11 @@ Expected behavior:
 - memory snapshot stays visible and session-only
 - prepared offers include a delivery artifact with outcome, intake, flow, and boundaries
 - founder-focus requests produce a Founder Command Artifact
+- launch-readiness requests produce a Launch Readiness Artifact
+- Stripe setup visibility is allowed, but payment handoff still requires approval
 - future expansion requests are parked instead of started
 - family alignment summary states current focus, expected finish, completed boxes, and money readiness
-- `npm run smoke` verifies the main Tay request, governance, revenue, blocked, buyer-reply, and founder-focus loops
+- `npm run smoke` verifies the main Tay request, governance, revenue, blocked, buyer-reply, founder-focus, and launch-readiness loops
 - payment buttons appear only for approved checkout links or configured company email
 - every result, pause, blocked request, and clarification is visible
 

@@ -3,6 +3,7 @@ export type TayIntent =
   | "sell_offer"
   | "handle_buyer_reply"
   | "manage_focus"
+  | "prepare_launch"
   | "write_plan"
   | "record_note"
   | "clarify_request"
@@ -13,6 +14,7 @@ export type TayActionType =
   | "prepare_offer"
   | "recommend_follow_up"
   | "route_focus"
+  | "route_launch_readiness"
   | "draft_plan"
   | "log_note"
   | "none";

@@ -32,6 +32,7 @@ import {
   permissionLabels,
 } from "../lib/public-copy";
 import { futureModules } from "../lib/future-modules";
+import type { LaunchReadinessState } from "../lib/launch-readiness";
 import type {
   ActionResult,
   ApprovalDecision,
@@ -44,6 +45,7 @@ import { ActionCard } from "./action-card";
 import { FounderCommandPanel } from "./founder-command-panel";
 import { FulfillmentPanel } from "./fulfillment-panel";
 import { GovernancePanel } from "./governance-panel";
+import { LaunchReadinessPanel } from "./launch-readiness-panel";
 import { MemoryPanel } from "./memory-panel";
 import { RevenuePanel } from "./revenue-panel";
 import { SalesPanel } from "./sales-panel";
@@ -61,6 +63,9 @@ const businessFocus =
   "Founder execution, revenue readiness, and focused business growth";
 
 const quickStarts = [
+  "Show launch readiness",
+  "Prepare Tay onboarding question",
+  "Prepare first use case: AI business guidance",
   "Show today's Box 4 priorities",
   "Run weekly founder review",
   "Park Crowne Legacy until Box 4 is complete",
@@ -101,10 +106,11 @@ const agentPreviews = [
 ];
 
 interface ChatShellProps {
+  launchReadiness: LaunchReadinessState;
   revenueSetup: RevenueSetupState;
 }
 
-export function ChatShell({ revenueSetup }: ChatShellProps) {
+export function ChatShell({ launchReadiness, revenueSetup }: ChatShellProps) {
   const [input, setInput] = useState("");
   const [activeResponse, setActiveResponse] = useState<TayResponse | null>(
     null,
@@ -183,7 +189,9 @@ export function ChatShell({ revenueSetup }: ChatShellProps) {
     setResult(null);
 
     window.setTimeout(() => {
-      const actionResult = executeSuggestedAction(response);
+      const actionResult = executeSuggestedAction(response, {
+        launchReadinessState: launchReadiness,
+      });
       setResult(actionResult);
       setExecutionStatus(actionResult.status);
       setMessages((current) => [
@@ -408,6 +416,10 @@ export function ChatShell({ revenueSetup }: ChatShellProps) {
       </section>
 
       <FounderCommandPanel onCommand={submitRequest} />
+      <LaunchReadinessPanel
+        launchReadiness={launchReadiness}
+        onCommand={submitRequest}
+      />
       <RevenuePanel onCommand={submitRequest} revenueSetup={revenueSetup} />
       <SalesPanel onCommand={submitRequest} />
       <FulfillmentPanel onCommand={submitRequest} />

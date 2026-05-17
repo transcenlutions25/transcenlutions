@@ -30,6 +30,7 @@ const {
   revenueOffers,
 } = require("../lib/revenue.ts");
 const { createRevenueSetupState } = require("../lib/revenue-setup.ts");
+const { createLaunchReadinessState } = require("../lib/launch-readiness.ts");
 const { createTayResponse } = require("../lib/tay-core.ts");
 
 const cases = [
@@ -134,6 +135,41 @@ const cases = [
     ],
   },
   {
+    request: "Show launch readiness",
+    intent: "prepare_launch",
+    action: "route_launch_readiness",
+    permission: "allowed",
+    riskTier: "low",
+    resultStatus: "completed",
+    resultIncludes: "Launch readiness reviewed",
+    artifactHeadings: [
+      "Current phase",
+      "Top priority",
+      "Blocked items",
+      "Onboarding question",
+      "First use case",
+      "External setup",
+    ],
+  },
+  {
+    request: "Prepare Tay onboarding question",
+    intent: "prepare_launch",
+    action: "route_launch_readiness",
+    permission: "allowed",
+    riskTier: "low",
+    resultStatus: "completed",
+    resultIncludes: "Launch onboarding prepared",
+  },
+  {
+    request: "Show Stripe setup readiness",
+    intent: "prepare_launch",
+    action: "route_launch_readiness",
+    permission: "allowed",
+    riskTier: "low",
+    resultStatus: "completed",
+    resultIncludes: "Launch readiness reviewed",
+  },
+  {
     request: "Run weekly founder review",
     intent: "manage_focus",
     action: "route_focus",
@@ -212,6 +248,18 @@ assertEqual(
   isConfiguredStripePriceId("price_1ABCdef2345678"),
   true,
   "real-looking Stripe price ID should be accepted",
+);
+
+const missingLaunch = createLaunchReadinessState({});
+assertEqual(
+  missingLaunch.launchReadinessPercent,
+  0,
+  "missing launch setup should be 0 percent ready",
+);
+assertEqual(
+  missingLaunch.firstUseCase,
+  "AI business guidance",
+  "first launch use case should stay focused",
 );
 
 const missingPayment = createOfferPaymentState(
@@ -295,7 +343,7 @@ if (
 }
 
 console.log(
-  `Smoke tests passed: ${cases.length} Tay flows plus revenue setup checks verified.`,
+  `Smoke tests passed: ${cases.length} Tay flows plus revenue and launch setup checks verified.`,
 );
 
 function assertEqual(actual, expected, label) {

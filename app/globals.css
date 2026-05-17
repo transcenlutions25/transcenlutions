@@ -240,6 +240,7 @@ button {
 .preview-band,
 .module-cloud,
 .founder-command,
+.launch-command,
 .fulfillment-command,
 .sales-command,
 .revenue-command {
@@ -261,6 +262,7 @@ button {
 .preview-band,
 .module-cloud,
 .founder-command,
+.launch-command,
 .fulfillment-command,
 .sales-command,
 .revenue-command {
@@ -287,6 +289,7 @@ button {
 .preview-band,
 .module-cloud,
 .founder-command,
+.launch-command,
 .fulfillment-command,
 .sales-command,
 .revenue-command {
@@ -1143,6 +1146,140 @@ button {
   text-align: left;
 }
 
+.launch-command {
+  display: grid;
+  gap: 16px;
+  background:
+    radial-gradient(circle at 82% 8%, rgba(18, 60, 255, 0.2), transparent 18rem),
+    radial-gradient(circle at 12% 76%, rgba(216, 185, 87, 0.14), transparent 16rem),
+    var(--panel);
+}
+
+.launch-truth-grid,
+.launch-setup-grid,
+.launch-path-grid,
+.launch-command-actions,
+.launch-pill-list,
+.launch-metrics {
+  display: grid;
+  gap: 12px;
+}
+
+.launch-card,
+.launch-setup-item,
+.launch-onboarding,
+.launch-blockers {
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(216, 185, 87, 0.24);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.02)),
+    rgba(4, 7, 20, 0.72);
+  padding: 14px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 18px 42px rgba(0, 0, 0, 0.24);
+}
+
+.launch-card--primary {
+  border-color: rgba(255, 232, 163, 0.36);
+  background:
+    radial-gradient(circle at 85% 12%, rgba(216, 185, 87, 0.16), transparent 12rem),
+    linear-gradient(145deg, rgba(18, 60, 255, 0.15), rgba(124, 58, 237, 0.1)),
+    rgba(4, 7, 20, 0.76);
+}
+
+.launch-card h3,
+.launch-onboarding h3 {
+  margin: 0;
+  color: var(--gold-soft);
+  font-size: 1.08rem;
+  line-height: 1.25;
+}
+
+.launch-card p,
+.launch-onboarding p,
+.launch-setup-item p,
+.launch-path-grid p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.launch-metrics {
+  margin: 0;
+}
+
+.launch-metrics div,
+.launch-path-grid article,
+.launch-pill-list span {
+  border: 1px solid rgba(216, 185, 87, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px;
+}
+
+.launch-metrics dt {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.launch-metrics dd {
+  margin: 4px 0 0;
+  color: var(--gold-soft);
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.launch-setup-item div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.launch-setup-item strong,
+.launch-path-grid strong {
+  color: var(--gold-soft);
+}
+
+.launch-setup-item svg {
+  flex: 0 0 auto;
+}
+
+.launch-setup-item--configured svg {
+  color: #b7f7dc;
+}
+
+.launch-setup-item--missing svg {
+  color: #fde68a;
+}
+
+.launch-setup-item span {
+  width: fit-content;
+  border: 1px solid rgba(216, 185, 87, 0.22);
+  border-radius: 999px;
+  color: var(--gold-soft);
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 5px 9px;
+  text-transform: uppercase;
+}
+
+.launch-pill-list span {
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.launch-command-actions button {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+}
+
 .fulfillment-command {
   display: grid;
   gap: 16px;
@@ -1656,6 +1793,10 @@ button {
   .founder-review-grid,
   .focus-lane-grid,
   .founder-command-actions,
+  .launch-truth-grid,
+  .launch-setup-grid,
+  .launch-path-grid,
+  .launch-command-actions,
   .fulfillment-grid,
   .fulfillment-care-grid,
   .sales-grid,
@@ -1680,6 +1821,10 @@ button {
   }
 
   .founder-card--primary {
+    grid-column: 1 / -1;
+  }
+
+  .launch-card--primary {
     grid-column: 1 / -1;
   }
 }
@@ -1719,7 +1864,16 @@ button {
   }
 
   .focus-lane-grid,
-  .founder-command-actions {
+  .founder-command-actions,
+  .launch-command-actions {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .launch-truth-grid {
+    grid-template-columns: 1.1fr 0.95fr 0.95fr;
+  }
+
+  .launch-card--primary {
+    grid-column: auto;
   }
 }

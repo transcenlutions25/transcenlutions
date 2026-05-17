@@ -75,6 +75,17 @@ export const actionRegistry: Record<TayActionType, ActionRegistryEntry> = {
       "This routes founder focus, backlog, review, and alignment work inside the local command room.",
     examples: ["Run daily priorities", "Park a distracting idea"],
   },
+  route_launch_readiness: {
+    type: "route_launch_readiness",
+    label: "Route launch readiness",
+    domain: "local_workspace",
+    defaultPermission: "allowed",
+    defaultRiskTier: "low",
+    defaultRiskScore: 1,
+    reason:
+      "This reviews launch setup, onboarding, blocked items, and first-use-case readiness locally.",
+    examples: ["Show launch readiness", "Prepare onboarding question"],
+  },
   draft_plan: {
     type: "draft_plan",
     label: "Draft plan",
@@ -225,6 +236,20 @@ export function evaluateGovernance(
 
   const blockedRule = matchRule(normalized, "blocked");
   if (blockedRule) return toDecision(blockedRule);
+
+  if (actionType === "route_launch_readiness") {
+    const entry = actionRegistry[actionType];
+
+    return {
+      ruleId: `registry_${entry.type}`,
+      domain: entry.domain,
+      permissionStatus: entry.defaultPermission,
+      permissionReason: entry.reason,
+      riskTier: entry.defaultRiskTier,
+      riskScore: entry.defaultRiskScore,
+      auditStatus: "ready",
+    };
+  }
 
   const approvalRule = matchRule(normalized, "requires_approval");
   if (approvalRule) return toDecision(approvalRule);

@@ -6,6 +6,7 @@ export type MemoryCategory =
   | "buyer_signal"
   | "boundary"
   | "focus"
+  | "launch"
   | "plan"
   | "note";
 
@@ -23,6 +24,7 @@ export const memoryCategoryLabels: Record<MemoryCategory, string> = {
   buyer_signal: "Buyer signal",
   boundary: "Boundary",
   focus: "Focus",
+  launch: "Launch",
   plan: "Plan",
   note: "Note",
 };
@@ -72,6 +74,14 @@ export function createSessionMemoryEntry(
       "focus",
       "Founder focus routed",
       result?.nextStep ?? "A focus request was routed through the founder operating system.",
+    );
+  }
+
+  if (response.intent === "prepare_launch") {
+    return createMemoryEntry(
+      "launch",
+      "Launch readiness routed",
+      result?.nextStep ?? "A launch readiness request was routed through Tay.",
     );
   }
 

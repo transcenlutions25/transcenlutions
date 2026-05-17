@@ -1,6 +1,7 @@
 import type { TayActionType, TayIntent, TayResponse } from "./types";
 import { looksLikeBuyerReply } from "./buyer-replies";
 import { looksLikeFounderFocusRequest } from "./founder-os";
+import { looksLikeLaunchReadinessRequest } from "./launch-readiness";
 import { createGovernedAction, hasBlockedGovernanceTerm } from "./governance";
 
 const vagueTerms = ["help", "do it", "make it", "fix it", "start", "thing"];
@@ -73,6 +74,10 @@ export function detectIntent(input: string): TayIntent {
     return "handle_buyer_reply";
   }
 
+  if (looksLikeLaunchReadinessRequest(input)) {
+    return "prepare_launch";
+  }
+
   if (looksLikeFounderFocusRequest(input)) {
     return "manage_focus";
   }
@@ -117,6 +122,7 @@ function mapIntentToAction(intent: TayIntent): TayActionType {
   if (intent === "sell_offer") return "prepare_offer";
   if (intent === "handle_buyer_reply") return "recommend_follow_up";
   if (intent === "manage_focus") return "route_focus";
+  if (intent === "prepare_launch") return "route_launch_readiness";
   if (intent === "write_plan") return "draft_plan";
   if (intent === "record_note") return "log_note";
   return "none";
@@ -139,6 +145,10 @@ function createMessage(intent: TayIntent) {
     return "I see a founder focus request. I can protect the current box, route distractions, and prepare the next execution move.";
   }
 
+  if (intent === "prepare_launch") {
+    return "I see a launch readiness request. I can show what is ready, what is blocked, and what must be completed before public launch.";
+  }
+
   if (intent === "write_plan") {
     return "I see a planning request. I can draft a focused plan that protects the passive-income direction before any work begins.";
   }
@@ -159,6 +169,7 @@ function createActionTitle(intent: TayIntent) {
   if (intent === "sell_offer") return "Prepare a revenue offer";
   if (intent === "handle_buyer_reply") return "Recommend buyer follow-up";
   if (intent === "manage_focus") return "Route founder focus";
+  if (intent === "prepare_launch") return "Route launch readiness";
   if (intent === "write_plan") return "Draft a plan";
   if (intent === "record_note") return "Log a note";
   if (intent === "clarify_request") return "Clarify the request";
@@ -180,6 +191,10 @@ function createActionSummary(intent: TayIntent, userText: string) {
 
   if (intent === "manage_focus") {
     return `Route this founder focus request through NOW / NEXT / LATER / PARKED: "${userText.trim()}".`;
+  }
+
+  if (intent === "prepare_launch") {
+    return `Review launch readiness, onboarding, blocked items, and first-use-case status from: "${userText.trim()}".`;
   }
 
   if (intent === "write_plan") {
@@ -212,6 +227,10 @@ function createNextStep(intent: TayIntent) {
 
   if (intent === "manage_focus") {
     return "Next step: execute the focus route, then continue Box 4 or park the distraction.";
+  }
+
+  if (intent === "prepare_launch") {
+    return "Next step: execute the launch readiness route, then clear the top blocked setup item.";
   }
 
   if (intent === "write_plan") {

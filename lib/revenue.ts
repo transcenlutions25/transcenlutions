@@ -232,6 +232,7 @@ export function createOfferPaymentState(
 export function isApprovedPaymentUrl(url: string) {
   const trimmed = url.trim();
   if (!trimmed) return false;
+  if (looksLikePlaceholderValue(trimmed)) return false;
 
   try {
     const parsed = new URL(trimmed);
@@ -241,6 +242,13 @@ export function isApprovedPaymentUrl(url: string) {
   } catch {
     return false;
   }
+}
+
+export function isConfiguredStripePriceId(value: string) {
+  const trimmed = value.trim();
+  if (looksLikePlaceholderValue(trimmed)) return false;
+
+  return /^price_[A-Za-z0-9]{8,}$/.test(trimmed);
 }
 
 export function buildInvoiceMailto(
@@ -266,4 +274,17 @@ export function buildInvoiceMailto(
 
 export function isRevenueTestMode() {
   return process.env.NEXT_PUBLIC_TAY_REVENUE_TEST_MODE === "true";
+}
+
+function looksLikePlaceholderValue(value: string) {
+  const normalized = value.toLowerCase();
+
+  return (
+    normalized.includes("your-") ||
+    normalized.includes("_here") ||
+    normalized.includes("placeholder") ||
+    normalized.includes("example") ||
+    normalized.includes("starter_map") ||
+    normalized.includes("operator_sprint")
+  );
 }

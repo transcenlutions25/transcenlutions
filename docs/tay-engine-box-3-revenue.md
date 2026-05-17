@@ -54,6 +54,8 @@ no card data is collected, and no money is claimed as collected.
 - Direct charging, card collection, wallet movement, and fake payment success
   are blocked.
 - Live checkout links must be approved Stripe URLs.
+- Placeholder Stripe keys, price IDs, and payment links are rejected as setup
+  required.
 - Invoice handoff requires a configured company or billing inbox.
 
 ## Definition Of Done

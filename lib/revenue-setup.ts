@@ -1,5 +1,9 @@
 import { billingEmail, companyEmail, supportEmail } from "./company";
-import { isApprovedPaymentUrl, revenueOffers } from "./revenue";
+import {
+  isApprovedPaymentUrl,
+  isConfiguredStripePriceId,
+  revenueOffers,
+} from "./revenue";
 
 export type RevenueSetupItemStatus =
   | "configured"
@@ -218,18 +222,18 @@ function isEmailConfigured(value: string | undefined) {
 
 function isStripePublishableKey(value: string | undefined) {
   const trimmed = value?.trim() ?? "";
-  return trimmed.startsWith("pk_");
+  return /^pk_(live|test)_[A-Za-z0-9]{8,}$/.test(trimmed);
 }
 
 function isStripeSecretKey(value: string | undefined) {
   const trimmed = value?.trim() ?? "";
-  return trimmed.startsWith("sk_");
+  return /^sk_(live|test)_[A-Za-z0-9]{8,}$/.test(trimmed);
 }
 
 function hasAnyConfiguredPaymentPath(env: Record<string, string | undefined>) {
   return revenueOffers.some((offer) => {
     const paymentLink = env[offer.paymentLinkEnvKey] ?? offer.checkoutUrl;
     const priceId = env[offer.priceIdEnvKey] ?? offer.priceId;
-    return isApprovedPaymentUrl(paymentLink) || priceId.trim().startsWith("price_");
+    return isApprovedPaymentUrl(paymentLink) || isConfiguredStripePriceId(priceId);
   });
 }

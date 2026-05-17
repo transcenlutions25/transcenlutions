@@ -131,7 +131,8 @@ NEXT_PUBLIC_DELIVERY_ARTIFACT_LOCATION="Tay result card and confirmed buyer deli
 Without a valid Stripe Payment Link or company billing inbox, the offer shows a
 setup-needed state instead of a fake checkout or empty invoice. Card data is
 never collected inside Tay. Checkout and invoice handoff remain
-approval-required under governance.
+approval-required under governance. Placeholder-looking Stripe keys, price IDs,
+and Payment Links stay setup-required until replaced with real account values.
 
 Safe test mode:
 

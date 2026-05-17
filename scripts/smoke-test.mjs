@@ -25,6 +25,8 @@ const {
 } = require("../lib/action-engine.ts");
 const {
   createOfferPaymentState,
+  isApprovedPaymentUrl,
+  isConfiguredStripePriceId,
   revenueOffers,
 } = require("../lib/revenue.ts");
 const { createRevenueSetupState } = require("../lib/revenue-setup.ts");
@@ -164,6 +166,52 @@ assertEqual(
   missingSetup.mode,
   "setup_required",
   "missing revenue setup should require setup",
+);
+
+const placeholderSetup = createRevenueSetupState({
+  NEXT_PUBLIC_STRIPE_ACCOUNT_READY: "true",
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "pk_test_or_live_key_here",
+  STRIPE_SECRET_KEY: "sk_test_or_live_key_here",
+  NEXT_PUBLIC_STRIPE_STARTER_MAP_PRICE_ID: "price_starter_map",
+  NEXT_PUBLIC_STRIPE_STARTER_MAP_PAYMENT_LINK:
+    "https://buy.stripe.com/your-starter-map-link",
+  NEXT_PUBLIC_TRANSCENLUTIONS_COMPANY_EMAIL: "hello@transcenlutions.com",
+  NEXT_PUBLIC_TRANSCENLUTIONS_BILLING_EMAIL: "billing@transcenlutions.com",
+  NEXT_PUBLIC_TRANSCENLUTIONS_SUPPORT_EMAIL: "support@transcenlutions.com",
+  NEXT_PUBLIC_TRANSCENLUTIONS_REFUND_COPY:
+    "Refund requests are reviewed against the paid scope.",
+  NEXT_PUBLIC_TRANSCENLUTIONS_REVENUE_DISCLAIMER:
+    "Income is not guaranteed.",
+  NEXT_PUBLIC_DELIVERY_ARTIFACT_LOCATION: "Confirmed buyer delivery folder",
+});
+assertEqual(
+  placeholderSetup.mode,
+  "setup_required",
+  "placeholder Stripe values should not show live ready",
+);
+
+assertEqual(
+  isApprovedPaymentUrl("https://buy.stripe.com/your-starter-map-link"),
+  false,
+  "placeholder Stripe payment link should be rejected",
+);
+
+assertEqual(
+  isApprovedPaymentUrl("https://buy.stripe.com/test_1234567890"),
+  true,
+  "real-looking Stripe payment link should be accepted",
+);
+
+assertEqual(
+  isConfiguredStripePriceId("price_starter_map"),
+  false,
+  "placeholder Stripe price ID should be rejected",
+);
+
+assertEqual(
+  isConfiguredStripePriceId("price_1ABCdef2345678"),
+  true,
+  "real-looking Stripe price ID should be accepted",
 );
 
 const missingPayment = createOfferPaymentState(

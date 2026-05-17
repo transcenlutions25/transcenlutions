@@ -51,7 +51,9 @@ Box 1 includes:
 - next-step suggestion
 - passive-income and business-building focus
 - revenue launch handoff with paid starter offers
-- manual invoice email fallback when no approved payment link is configured
+- per-offer Stripe Payment Link support
+- manual invoice email fallback only when a real contact email is configured
+- setup-required state when payment is not configured
 
 Box 1 does **not** include login, database, direct card processing, external
 APIs, memory, agent chains, marketplace, or hidden automation. Payment
@@ -68,7 +70,8 @@ The app includes two buyer-ready starter offers:
 To connect a real checkout button, set:
 
 ```bash
-NEXT_PUBLIC_TRANSCENLUTIONS_PAYMENT_URL="https://your-approved-checkout-link"
+NEXT_PUBLIC_STRIPE_STARTER_MAP_PAYMENT_LINK="https://buy.stripe.com/your-starter-map-link"
+NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PAYMENT_LINK="https://buy.stripe.com/your-operator-sprint-link"
 ```
 
 Optional invoice recipient:
@@ -77,8 +80,12 @@ Optional invoice recipient:
 NEXT_PUBLIC_TRANSCENLUTIONS_CONTACT_EMAIL="you@example.com"
 ```
 
-Without those values, the revenue button opens a manual invoice email draft so
-the owner can send payment instructions without fake in-app charging.
+Without a valid Stripe Payment Link or invoice recipient, the offer shows a
+setup-needed state instead of a fake checkout. Card data is never collected
+inside Tay.
+
+See [docs/revenue-payment-setup.md](docs/revenue-payment-setup.md) for the
+payment care rules.
 
 ## Run Locally
 
@@ -119,6 +126,7 @@ Use an external API to automate leads
 Delete the database
 Build a passive income offer
 Prepare a $97 Tay Command Starter Map offer
+Prepare a $497 Operator Build Sprint offer
 ```
 
 Expected behavior:
@@ -128,6 +136,7 @@ Expected behavior:
 - approval creates a controlled handoff; decline stops the move and logs it
 - deletion, direct charging, and hidden background work are blocked and logged
 - revenue requests prepare a real offer and handoff path
+- payment buttons appear only for approved checkout links or configured invoice email
 - every result, pause, blocked request, and clarification is visible
 
 ## Product Direction

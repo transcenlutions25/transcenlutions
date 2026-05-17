@@ -395,6 +395,7 @@ button {
 
 .primary-button,
 .secondary-button,
+.button-disabled,
 .starter-button,
 .quick-command,
 .composer button {
@@ -443,6 +444,7 @@ button {
 
 .primary-button:hover,
 .secondary-button:hover,
+.button-disabled:hover,
 .starter-button:hover,
 .quick-command:hover,
 .composer button:hover {
@@ -453,6 +455,7 @@ button {
 
 .primary-button:active,
 .secondary-button:active,
+.button-disabled:active,
 .starter-button:active,
 .quick-command:active,
 .composer button:active {
@@ -810,6 +813,13 @@ button {
     0 18px 42px rgba(0, 0, 0, 0.24);
 }
 
+.revenue-card__actions,
+.offer-meta,
+.payment-care-grid {
+  display: grid;
+  gap: 10px;
+}
+
 .revenue-card__top,
 .revenue-handoff {
   display: flex;
@@ -836,6 +846,57 @@ button {
   line-height: 1.6;
 }
 
+.offer-meta span,
+.payment-status,
+.payment-care-grid span {
+  border: 1px solid rgba(216, 185, 87, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px;
+}
+
+.offer-meta span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.payment-status {
+  display: grid;
+  gap: 5px;
+}
+
+.payment-status strong {
+  color: var(--gold-soft);
+  font-size: 0.84rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.payment-status--checkout {
+  border-color: rgba(52, 211, 153, 0.32);
+  background: rgba(52, 211, 153, 0.08);
+}
+
+.payment-status--invoice {
+  border-color: rgba(216, 185, 87, 0.34);
+  background: rgba(216, 185, 87, 0.08);
+}
+
+.payment-status--setup_required {
+  border-color: rgba(251, 191, 36, 0.34);
+  background: rgba(251, 191, 36, 0.08);
+}
+
+.mini-heading {
+  margin: 0 0 9px;
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .revenue-card ul {
   display: grid;
   gap: 8px;
@@ -856,12 +917,39 @@ button {
   color: var(--gold-soft);
 }
 
+.button-disabled,
+.button-disabled:hover,
+.button-disabled:active {
+  cursor: not-allowed;
+  opacity: 0.64;
+  transform: none;
+}
+
 .revenue-handoff {
   flex-wrap: wrap;
   border: 1px solid rgba(216, 185, 87, 0.26);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.045);
   padding: 14px;
+}
+
+.payment-care-grid {
+  min-width: min(100%, 420px);
+}
+
+.payment-care-grid span {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--text);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.payment-care-grid svg {
+  flex: 0 0 auto;
+  color: var(--gold-soft);
+  margin-top: 2px;
 }
 
 .module-card {
@@ -936,6 +1024,8 @@ button {
   .quick-grid,
   .facts,
   .approval-actions,
+  .offer-meta,
+  .revenue-card__actions,
   .feature-grid,
   .agent-grid,
   .revenue-grid,

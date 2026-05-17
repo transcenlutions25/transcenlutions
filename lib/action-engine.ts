@@ -5,6 +5,7 @@ import type {
   SuggestedAction,
   TayResponse,
 } from "./types";
+import { findRevenueOfferForRequest, getOfferPaymentState } from "./revenue";
 
 export function executeSuggestedAction(response: TayResponse): ActionResult {
   const { action, intent } = response;
@@ -36,13 +37,7 @@ export function executeSuggestedAction(response: TayResponse): ActionResult {
   }
 
   if (action.type === "prepare_offer") {
-    return {
-      status: "completed",
-      result:
-        "Revenue offer prepared: present the Tay Command Starter Map, state the price, confirm the buyer outcome, and send the approved checkout or manual invoice step.",
-      nextStep:
-        "Next step: send the offer to one buyer now and record the reply in Tay.",
-    };
+    return createRevenueOfferResult(response);
   }
 
   if (action.type === "draft_plan") {
@@ -88,13 +83,7 @@ export function resolveApproval(
   }
 
   if (response.action.type === "prepare_offer") {
-    return {
-      status: "completed",
-      result:
-        "Approval recorded. Tay prepared the revenue handoff while keeping payment processing outside this app until an approved link or manual invoice is used.",
-      nextStep:
-        "Next step: send the approved checkout link or invoice email to one buyer and log the reply.",
-    };
+    return createApprovedRevenueHandoffResult(response);
   }
 
   if (response.action.type === "create_task") {
@@ -113,6 +102,39 @@ export function resolveApproval(
       "Approval recorded. Tay converted the risky move into a visible local handoff.",
     nextStep:
       "Next step: review the handoff, then choose the smallest safe move Tay should execute next.",
+  };
+}
+
+function createRevenueOfferResult(response: TayResponse): ActionResult {
+  const offer = findRevenueOfferForRequest(response.userText);
+  const paymentState = getOfferPaymentState(offer);
+
+  return {
+    status: "completed",
+    result: `Revenue offer prepared: ${offer.name} (${offer.price}). ${offer.outcome} Payment path: ${paymentState.title.toLowerCase()}.`,
+    nextStep:
+      paymentState.mode === "setup_required"
+        ? `Next step: add ${offer.paymentLinkEnvKey} or NEXT_PUBLIC_TRANSCENLUTIONS_CONTACT_EMAIL before sending this offer to a buyer.`
+        : `Next step: send ${offer.name} to one real buyer through ${paymentState.mode === "checkout" ? "the approved checkout link" : "the invoice email draft"} and record the reply in Tay.`,
+  };
+}
+
+function createApprovedRevenueHandoffResult(response: TayResponse): ActionResult {
+  const offer = findRevenueOfferForRequest(response.userText);
+  const paymentState = getOfferPaymentState(offer);
+
+  if (paymentState.mode === "setup_required") {
+    return {
+      status: "failed",
+      result: `Approval recorded, but ${offer.name} cannot accept payment yet because no approved checkout link or invoice email is configured.`,
+      nextStep: `Next step: set ${offer.paymentLinkEnvKey} to a real Stripe Payment Link, or set NEXT_PUBLIC_TRANSCENLUTIONS_CONTACT_EMAIL for invoice handoff.`,
+    };
+  }
+
+  return {
+    status: "completed",
+    result: `Approval recorded. ${offer.name} is ready for a real buyer through ${paymentState.mode === "checkout" ? "an approved Stripe checkout link" : "a manual invoice email draft"}. Tay did not collect card data inside the app.`,
+    nextStep: `Next step: send the ${offer.price} offer to one buyer and log the response in Tay.`,
   };
 }
 

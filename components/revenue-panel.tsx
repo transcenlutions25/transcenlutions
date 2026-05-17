@@ -1,9 +1,9 @@
 "use client";
 
-import { Banknote, ExternalLink, Mail, ShieldCheck } from "lucide-react";
+import { Banknote, ExternalLink, Mail, ShieldCheck, Wrench } from "lucide-react";
 import {
-  buildInvoiceMailto,
-  checkoutUrl,
+  getOfferPaymentState,
+  paymentCarePoints,
   revenueOffers,
 } from "../lib/revenue";
 
@@ -12,72 +12,113 @@ interface RevenuePanelProps {
 }
 
 export function RevenuePanel({ onCommand }: RevenuePanelProps) {
-  const primaryOffer = revenueOffers[0];
-  const paymentReady = checkoutUrl.length > 0;
-  const paymentHref = paymentReady
-    ? checkoutUrl
-    : buildInvoiceMailto(primaryOffer);
-
   return (
     <section className="revenue-command" aria-label="Revenue launch">
       <div className="section-header">
         <p className="eyebrow">Revenue Launch</p>
-        <h2>Sell the first command-room offer.</h2>
+        <h2>Real offers. Real payment care.</h2>
         <p>
-          Tay can prepare a buyer-ready offer today. Direct payment processing
-          stays outside the app until an approved payment link is connected.
+          Tay can prepare buyer-ready service offers today. Payments only move
+          through approved checkout links or clearly addressed invoice handoff.
         </p>
       </div>
 
       <div className="revenue-grid">
-        {revenueOffers.map((offer) => (
-          <article className="revenue-card" key={offer.id}>
-            <div className="revenue-card__top">
-              <span className="icon-disc">
-                <Banknote size={18} />
-              </span>
-              <strong>{offer.price}</strong>
-            </div>
-            <h3>{offer.name}</h3>
-            <p>{offer.promise}</p>
-            <ul>
-              {offer.includes.map((item) => (
-                <li key={item}>
-                  <ShieldCheck size={15} />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <button
-              className="secondary-button"
-              type="button"
-              onClick={() => onCommand(offer.command)}
-            >
-              Prepare in Tay
-            </button>
-          </article>
-        ))}
+        {revenueOffers.map((offer) => {
+          const paymentState = getOfferPaymentState(offer);
+
+          return (
+            <article className="revenue-card" key={offer.id}>
+              <div className="revenue-card__top">
+                <span className="icon-disc">
+                  <Banknote size={18} />
+                </span>
+                <strong>{offer.price}</strong>
+              </div>
+              <h3>{offer.name}</h3>
+              <p>{offer.promise}</p>
+              <div className="offer-meta">
+                <span>{offer.delivery}</span>
+                <span>{offer.bestFor}</span>
+              </div>
+              <div className={`payment-status payment-status--${paymentState.mode}`}>
+                <strong>{paymentState.title}</strong>
+                <p>{paymentState.description}</p>
+              </div>
+              <div>
+                <p className="mini-heading">Buyer receives</p>
+                <ul>
+                  {offer.includes.map((item) => (
+                    <li key={item}>
+                      <ShieldCheck size={15} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p className="mini-heading">Intake captures</p>
+                <ul>
+                  {offer.buyerIntake.map((item) => (
+                    <li key={item}>
+                      <ShieldCheck size={15} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="revenue-card__actions">
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={() => onCommand(offer.command)}
+                >
+                  Prepare in Tay
+                </button>
+                {paymentState.href ? (
+                  <a
+                    className="primary-button"
+                    href={paymentState.href}
+                    target={paymentState.external ? "_blank" : undefined}
+                    rel={paymentState.external ? "noreferrer" : undefined}
+                  >
+                    {paymentState.mode === "checkout" ? (
+                      <ExternalLink size={17} />
+                    ) : (
+                      <Mail size={17} />
+                    )}
+                    {paymentState.label}
+                  </a>
+                ) : (
+                  <button className="secondary-button button-disabled" disabled type="button">
+                    <Wrench size={17} />
+                    {paymentState.label}
+                  </button>
+                )}
+              </div>
+            </article>
+          );
+        })}
       </div>
 
       <div className="revenue-handoff">
         <div>
-          <p className="eyebrow">Payment Handoff</p>
-          <h3>{paymentReady ? "Checkout link connected" : "Manual invoice mode"}</h3>
+          <p className="eyebrow">Payment Standard</p>
+          <h3>Income is handled as real from the first dollar.</h3>
           <p>
-            {paymentReady
-              ? "The primary revenue button opens the approved checkout link."
-              : "No payment URL is configured yet. The button drafts an invoice email so a real buyer can be sent payment instructions manually."}
+            Live checkout appears only when an approved Stripe Payment Link is
+            configured for the specific offer. Otherwise Tay uses invoice
+            handoff only when a real contact email is present.
           </p>
         </div>
-        <a
-          className="primary-button"
-          href={paymentHref}
-          target={paymentReady ? "_blank" : undefined}
-          rel={paymentReady ? "noreferrer" : undefined}
-        >
-          {paymentReady ? <ExternalLink size={17} /> : <Mail size={17} />}
-          {paymentReady ? "Open checkout" : "Draft invoice email"}
-        </a>
+        <div className="payment-care-grid">
+          {paymentCarePoints.map((point) => (
+            <span key={point}>
+              <ShieldCheck size={15} />
+              {point}
+            </span>
+          ))}
+        </div>
       </div>
     </section>
   );

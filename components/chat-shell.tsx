@@ -20,6 +20,11 @@ import {
   executeSuggestedAction,
   resolveApproval,
 } from "../lib/action-engine";
+import {
+  addSessionMemoryEntry,
+  createSessionMemoryEntry,
+} from "../lib/memory";
+import type { MemoryEntry } from "../lib/memory";
 import { createTayResponse } from "../lib/tay-core";
 import {
   actionLabels,
@@ -36,6 +41,7 @@ import type {
 } from "../lib/types";
 import { ActionCard } from "./action-card";
 import { FulfillmentPanel } from "./fulfillment-panel";
+import { MemoryPanel } from "./memory-panel";
 import { RevenuePanel } from "./revenue-panel";
 import { SalesPanel } from "./sales-panel";
 import { SessionLog } from "./session-log";
@@ -97,6 +103,7 @@ export function ChatShell() {
     useState<ExecutionStatus>("idle");
   const [result, setResult] = useState<ActionResult | null>(null);
   const [logEntries, setLogEntries] = useState<SessionLogEntry[]>([]);
+  const [memoryEntries, setMemoryEntries] = useState<MemoryEntry[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "intro",
@@ -144,6 +151,15 @@ export function ChatShell() {
         createSessionLogEntry(response, logDetail, "approval_required"),
         ...entries,
       ]);
+      setMemoryEntries((entries) =>
+        addSessionMemoryEntry(entries, createSessionMemoryEntry(response)),
+      );
+    }
+
+    if (response.action.permissionStatus === "blocked") {
+      setMemoryEntries((entries) =>
+        addSessionMemoryEntry(entries, createSessionMemoryEntry(response)),
+      );
     }
   };
 
@@ -176,6 +192,12 @@ export function ChatShell() {
         ),
         ...entries,
       ]);
+      setMemoryEntries((entries) =>
+        addSessionMemoryEntry(
+          entries,
+          createSessionMemoryEntry(response, actionResult),
+        ),
+      );
     }, 700);
   };
 
@@ -206,6 +228,12 @@ export function ChatShell() {
         createSessionLogEntry(response, actionResult.result, logStatus),
         ...entries,
       ]);
+      setMemoryEntries((entries) =>
+        addSessionMemoryEntry(
+          entries,
+          createSessionMemoryEntry(response, actionResult),
+        ),
+      );
     }, 700);
   };
 
@@ -323,6 +351,7 @@ export function ChatShell() {
 
         <aside className="side-column">
           <SystemStack />
+          <MemoryPanel entries={memoryEntries} />
           <SessionLog entries={logEntries} />
         </aside>
       </div>

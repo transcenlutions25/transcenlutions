@@ -5,6 +5,7 @@ const stackItems = [
   { name: "Action Engine", status: "Ready" },
   { name: "Passive income focus", status: "Primary" },
   { name: "Review Layer", status: "Protected" },
+  { name: "Session Memory", status: "Visible" },
   { name: "Future helpers", status: "Later" },
 ];
 

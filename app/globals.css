@@ -239,6 +239,7 @@ button {
 .split-panels,
 .preview-band,
 .module-cloud,
+.fulfillment-command,
 .revenue-command {
   margin-top: 18px;
 }
@@ -257,6 +258,7 @@ button {
 .vision-panel,
 .preview-band,
 .module-cloud,
+.fulfillment-command,
 .revenue-command {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -278,6 +280,7 @@ button {
 .vision-panel,
 .preview-band,
 .module-cloud,
+.fulfillment-command,
 .revenue-command {
   padding: 16px;
 }
@@ -785,6 +788,91 @@ button {
   grid-template-columns: 1fr;
 }
 
+.fulfillment-command {
+  display: grid;
+  gap: 16px;
+  background:
+    radial-gradient(circle at 15% 8%, rgba(124, 58, 237, 0.2), transparent 18rem),
+    radial-gradient(circle at 88% 80%, rgba(216, 185, 87, 0.12), transparent 16rem),
+    var(--panel);
+}
+
+.fulfillment-grid,
+.fulfillment-care-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.fulfillment-card {
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(216, 185, 87, 0.24);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.02)),
+    rgba(4, 7, 20, 0.72);
+  padding: 14px;
+}
+
+.fulfillment-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.fulfillment-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.58;
+}
+
+.fulfillment-card ol,
+.fulfillment-card ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.fulfillment-card li {
+  color: var(--text);
+  line-height: 1.45;
+}
+
+.quality-standard,
+.fulfillment-care-grid span {
+  border: 1px solid rgba(216, 185, 87, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px;
+}
+
+.quality-standard {
+  display: grid;
+  gap: 6px;
+}
+
+.quality-standard strong {
+  color: var(--gold-soft);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fulfillment-care-grid span {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--text);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.fulfillment-care-grid svg {
+  flex: 0 0 auto;
+  color: var(--gold-soft);
+  margin-top: 2px;
+}
+
 .trust-icons span,
 .module-card__top span {
   gap: 9px;
@@ -1050,6 +1138,8 @@ button {
   .quick-grid,
   .facts,
   .approval-actions,
+  .fulfillment-grid,
+  .fulfillment-care-grid,
   .offer-meta,
   .revenue-card__actions,
   .email-route-grid,

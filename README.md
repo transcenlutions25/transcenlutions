@@ -51,6 +51,7 @@ Box 1 includes:
 - next-step suggestion
 - passive-income and business-building focus
 - revenue launch handoff with paid starter offers
+- client fulfillment kits for paid offer delivery
 - per-offer Stripe Payment Link support
 - manual invoice email fallback only when a real company or billing email is configured
 - company email readiness for official contact, billing, and support inboxes
@@ -90,6 +91,9 @@ never collected inside Tay.
 See [docs/revenue-payment-setup.md](docs/revenue-payment-setup.md) for the
 payment care rules, and [docs/company-email-setup.md](docs/company-email-setup.md)
 for the company inbox setup rules.
+
+See [docs/client-fulfillment-playbook.md](docs/client-fulfillment-playbook.md)
+for the first paid-offer delivery standards.
 
 ## Run Locally
 
@@ -140,6 +144,7 @@ Expected behavior:
 - approval creates a controlled handoff; decline stops the move and logs it
 - deletion, direct charging, and hidden background work are blocked and logged
 - revenue requests prepare a real offer and handoff path
+- fulfillment cards show buyer artifacts and quality standards for paid offers
 - payment buttons appear only for approved checkout links or configured company email
 - every result, pause, blocked request, and clarification is visible
 

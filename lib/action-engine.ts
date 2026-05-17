@@ -5,6 +5,7 @@ import type {
   SuggestedAction,
   TayResponse,
 } from "./types";
+import { findDeliveryKitForOffer } from "./delivery";
 import { findRevenueOfferForRequest, getOfferPaymentState } from "./revenue";
 
 export function executeSuggestedAction(response: TayResponse): ActionResult {
@@ -107,15 +108,16 @@ export function resolveApproval(
 
 function createRevenueOfferResult(response: TayResponse): ActionResult {
   const offer = findRevenueOfferForRequest(response.userText);
+  const deliveryKit = findDeliveryKitForOffer(offer.id);
   const paymentState = getOfferPaymentState(offer);
 
   return {
     status: "completed",
-    result: `Revenue offer prepared: ${offer.name} (${offer.price}). ${offer.outcome} Payment path: ${paymentState.title.toLowerCase()}.`,
+    result: `Revenue offer prepared: ${offer.name} (${offer.price}). ${offer.outcome} Delivery kit: ${deliveryKit.title}. Payment path: ${paymentState.title.toLowerCase()}.`,
     nextStep:
       paymentState.mode === "setup_required"
         ? `Next step: add ${offer.paymentLinkEnvKey} or NEXT_PUBLIC_TRANSCENLUTIONS_BILLING_EMAIL before sending this offer to a buyer.`
-        : `Next step: send ${offer.name} to one real buyer through ${paymentState.mode === "checkout" ? "the approved checkout link" : "the invoice email draft"} and record the reply in Tay.`,
+        : `Next step: send ${offer.name} to one real buyer through ${paymentState.mode === "checkout" ? "the approved checkout link" : "the invoice email draft"}, then deliver ${deliveryKit.artifacts[0]}.`,
   };
 }
 

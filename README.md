@@ -36,6 +36,7 @@ The active Next.js app lives at the repository root:
 - `docs/tay-engine-box-6-deployment-prep.md` — deployment readiness and external setup map
 - `docs/tay-engine-box-6-private-alpha-readiness.md` — first-tester onboarding and usefulness map
 - `docs/tay-learning-feedback-engine.md` — frictionless learning and feedback rules
+- `docs/vercel-deployment-checklist.md` — private alpha Vercel deployment checklist
 - `scripts/check-public-copy.mjs` — guard against exposing internal build-only language
 
 The old `src/` dashboard structure has been removed so the repo has one clear
@@ -307,6 +308,10 @@ for private alpha onboarding, first-session success, and tester feedback rules.
 
 See [docs/deployment-env-setup.md](docs/deployment-env-setup.md) for the full
 environment variable setup guide.
+
+See [docs/vercel-deployment-checklist.md](docs/vercel-deployment-checklist.md)
+for first Vercel deployment settings, environment variable classification,
+Stripe readiness, private alpha limitations, and post-deploy tests.
 
 See [docs/tay-learning-feedback-engine.md](docs/tay-learning-feedback-engine.md)
 for frictionless feedback, signal strength, and protected-boundary rules.

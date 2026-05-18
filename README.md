@@ -6,8 +6,9 @@ into visible next moves.
 
 Tay is the face, spokesman, orchestrator, animated operator, and executive brain
 of the platform. **Box 1 foundation**, **Box 2 governance**, **Box 3 revenue
-infrastructure**, **Box 4 Founder Operating System**, **Box 5 Launch
-Readiness**, and **Box 6 Deployment Prep** are active around the same core loop:
+infrastructure**, **Box 4 Founder Operating System**, launch/deployment prep,
+the feedback layer, and **Box 6 Private Alpha Readiness** are active around the
+same core loop:
 
 ```text
 User request
@@ -33,6 +34,8 @@ The active Next.js app lives at the repository root:
 - `docs/tay-engine-box-4-founder-os.md` — founder execution and focus map
 - `docs/tay-engine-box-5-launch-readiness.md` — launch setup and onboarding map
 - `docs/tay-engine-box-6-deployment-prep.md` — deployment readiness and external setup map
+- `docs/tay-engine-box-6-private-alpha-readiness.md` — first-tester onboarding and usefulness map
+- `docs/tay-learning-feedback-engine.md` — frictionless learning and feedback rules
 - `scripts/check-public-copy.mjs` — guard against exposing internal build-only language
 
 The old `src/` dashboard structure has been removed so the repo has one clear
@@ -76,12 +79,69 @@ The current foundation includes:
 - first launch use case focused on AI business guidance
 - Deployment Readiness panel for hosting, environment, legal pages, and support route setup
 - starter public pages at `/privacy`, `/terms`, `/refund`, and `/support`
+- one-tap feedback after Tay results
+- natural conversation feedback detection
+- session-only learning signal panel with weekly check-in
+- private alpha onboarding with one clear first-time promise
+- first-session paths for Business, Focus & Productivity, Revenue, Planning, Content, and Personal Growth
+- first 10-minute win flow for overwhelm, too many ideas, stuck points, and disorganization
+- Founders Circle support for 5 testers, free for 6 months, with lightweight feedback
 
 The current foundation does **not** include login, database, direct card
 processing, external APIs, persistent memory, agent chains, marketplace, or
 hidden automation. Payment
 collection is handled through an approved external payment link or manual
 invoice handoff.
+
+## Learning Feedback
+
+Tay now collects feedback without turning it into homework:
+
+- one-tap result feedback
+- short friction reason buttons when a result is mixed or unhelpful
+- optional note field
+- natural chat feedback detection
+- weekly usefulness check-in
+- insight cards for confusion, requests, praise, and frustration
+- helpful / kinda / not-helpful counts
+- suggested improvement label: auto-allowed, approval-required, or blocked/protected
+
+Feedback can improve wording, clarity, onboarding, help text, UX friction, and
+minor layout polish. It cannot directly change mission, values, product
+direction, governance rules, payment handling, privacy, security, legal copy,
+user data handling, or memory architecture.
+
+## Private Alpha Readiness
+
+Box 6 makes Tay useful for the first five humans before the platform expands.
+The promise is:
+
+```text
+Tay helps overwhelmed builders stop spinning and start executing.
+```
+
+First-time users are asked:
+
+```text
+What are you trying to improve or build?
+```
+
+They can choose:
+
+- Business
+- Focus & Productivity
+- Revenue
+- Planning
+- Content
+- Personal Growth
+
+Tay then routes the choice through the normal chat, governance, result, log, and
+feedback loop. Fast-relief prompts help testers who feel overwhelmed, stuck,
+disorganized, or buried under too many ideas.
+
+The private alpha stage is `Private Alpha Preparation`. Founders Circle support
+is session-only: first 5 testers, free for 6 months, with short feedback after
+useful sessions. No database or external invite system has been added.
 
 ## Founder Operating System
 
@@ -242,8 +302,14 @@ for launch readiness, onboarding, and first-use-case rules.
 See [docs/tay-engine-box-6-deployment-prep.md](docs/tay-engine-box-6-deployment-prep.md)
 for deployment readiness, external setup, and public info page rules.
 
+See [docs/tay-engine-box-6-private-alpha-readiness.md](docs/tay-engine-box-6-private-alpha-readiness.md)
+for private alpha onboarding, first-session success, and tester feedback rules.
+
 See [docs/deployment-env-setup.md](docs/deployment-env-setup.md) for the full
 environment variable setup guide.
+
+See [docs/tay-learning-feedback-engine.md](docs/tay-learning-feedback-engine.md)
+for frictionless feedback, signal strength, and protected-boundary rules.
 
 ## Run Locally
 
@@ -291,6 +357,10 @@ Buyer replied: yes, send me the details
 Show launch readiness
 Prepare Tay onboarding question
 Prepare first use case: AI business guidance
+Show private alpha readiness
+I have too many ideas and need help choosing what to do first.
+I feel overwhelmed and need one clear next step.
+Prepare Founders Circle tester invite
 Show today's Box 4 priorities
 Run weekly founder review
 Park Crowne Legacy until Box 4 is complete
@@ -317,6 +387,12 @@ Expected behavior:
 - launch-readiness requests produce a Launch Readiness Artifact
 - deployment panel shows local/test/live mode and production blockers
 - `/privacy`, `/terms`, `/refund`, and `/support` render starter pages
+- completed results show one-tap feedback controls
+- natural feedback such as "This confused me" is captured as a learning signal
+- learning signal panel protects mission, values, governance, payments, privacy, and data handling
+- private alpha onboarding shows one clear promise and six starting paths
+- overwhelmed / too-many-ideas / stuck / disorganized prompts return a first 10-minute win
+- Founders Circle support stays lightweight, session-only, and feedback-driven
 - Stripe setup visibility is allowed, but payment handoff still requires approval
 - future expansion requests are parked instead of started
 - family alignment summary states current focus, expected finish, completed boxes, and money readiness

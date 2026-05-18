@@ -9,6 +9,8 @@ const stackItems = [
   { name: "Launch Readiness", status: "Active" },
   { name: "Deployment Prep", status: "Setup" },
   { name: "Session Memory", status: "Visible" },
+  { name: "Learning Signals", status: "Active" },
+  { name: "Private Alpha", status: "Preparing" },
   { name: "Future helpers", status: "Later" },
 ];
 

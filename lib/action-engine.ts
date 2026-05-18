@@ -11,6 +11,7 @@ import { findDeliveryKitForOffer } from "./delivery";
 import { createFounderFocusResult } from "./founder-os";
 import { createLaunchReadinessResult } from "./launch-readiness";
 import type { LaunchReadinessState } from "./launch-readiness";
+import { createPrivateAlphaResult } from "./private-alpha";
 import { findRevenueOfferForRequest, getOfferPaymentState } from "./revenue";
 import { findSalesKitForOffer } from "./sales";
 
@@ -67,6 +68,10 @@ export function executeSuggestedAction(
       response.userText,
       context.launchReadinessState,
     );
+  }
+
+  if (action.type === "route_private_alpha") {
+    return createPrivateAlphaResult(response.userText);
   }
 
   if (action.type === "draft_plan") {

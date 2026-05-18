@@ -1,4 +1,9 @@
 import type { ActionResult, ExecutionStatus, TayResponse } from "../lib/types";
+import type {
+  FeedbackCategory,
+  FeedbackDraft,
+  FeedbackRating,
+} from "../lib/feedback";
 import {
   actionLabels,
   executionLabels,
@@ -7,15 +12,20 @@ import {
   riskTierLabels,
 } from "../lib/public-copy";
 import { CheckCircle2, Crown, Lock, Play, ShieldAlert } from "lucide-react";
+import { FeedbackStrip } from "./feedback-strip";
 
 interface ActionCardProps {
   response: TayResponse | null;
   executionStatus: ExecutionStatus;
   result: ActionResult | null;
+  feedbackDraft: FeedbackDraft | null;
   onExecute: () => void;
   onApprove: () => void;
   onDecline: () => void;
   onFollowNextStep: (nextStep: string) => void;
+  onRateResult: (rating: FeedbackRating) => void;
+  onChooseFeedbackCategory: (category: FeedbackCategory) => void;
+  onFeedbackNoteChange: (note: string) => void;
 }
 
 const permissionStyles = {
@@ -28,10 +38,14 @@ export function ActionCard({
   response,
   executionStatus,
   result,
+  feedbackDraft,
   onExecute,
   onApprove,
   onDecline,
   onFollowNextStep,
+  onRateResult,
+  onChooseFeedbackCategory,
+  onFeedbackNoteChange,
 }: ActionCardProps) {
   if (!response) {
     return (
@@ -211,6 +225,12 @@ export function ActionCard({
           >
             Use next step
           </button>
+          <FeedbackStrip
+            draft={feedbackDraft}
+            onRate={onRateResult}
+            onChooseCategory={onChooseFeedbackCategory}
+            onNoteChange={onFeedbackNoteChange}
+          />
         </div>
       ) : (
         <p className="next-step">{response.nextStep}</p>

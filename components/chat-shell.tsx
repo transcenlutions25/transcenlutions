@@ -33,6 +33,27 @@ import {
   permissionLabels,
 } from "../lib/public-copy";
 import { futureModules } from "../lib/future-modules";
+import {
+  createFeedbackDraft,
+  createFeedbackInsights,
+  createNaturalFeedbackEntry,
+  createOneTapFeedbackEntry,
+  createWeeklyCheckInEntry,
+  isFeedbackOnlyInput,
+  upsertFeedbackEntry,
+} from "../lib/feedback";
+import type {
+  FeedbackCategory,
+  FeedbackDraft,
+  FeedbackEntry,
+  FeedbackRating,
+} from "../lib/feedback";
+import {
+  createAlphaAhaCommand,
+  createAlphaOnboardingCommand,
+  privateAlphaState,
+} from "../lib/private-alpha";
+import type { AlphaPathId } from "../lib/private-alpha";
 import type { LaunchReadinessState } from "../lib/launch-readiness";
 import type {
   ActionResult,
@@ -44,11 +65,16 @@ import type {
 import type { RevenueSetupState } from "../lib/revenue-setup";
 import { ActionCard } from "./action-card";
 import { DeploymentReadinessPanel } from "./deployment-readiness-panel";
+import {
+  FeedbackInsightsPanel,
+  type WeeklyCheckInDraft,
+} from "./feedback-insights-panel";
 import { FounderCommandPanel } from "./founder-command-panel";
 import { FulfillmentPanel } from "./fulfillment-panel";
 import { GovernancePanel } from "./governance-panel";
 import { LaunchReadinessPanel } from "./launch-readiness-panel";
 import { MemoryPanel } from "./memory-panel";
+import { PrivateAlphaPanel } from "./private-alpha-panel";
 import { RevenuePanel } from "./revenue-panel";
 import { SalesPanel } from "./sales-panel";
 import { SessionLog } from "./session-log";
@@ -62,24 +88,20 @@ interface ChatMessage {
 
 const starter = "Build the first Tay feature";
 const businessFocus =
-  "Founder execution, revenue readiness, and focused business growth";
+  "Stop spinning, choose one move, and execute visibly";
 
 const quickStarts = [
-  "Show launch readiness",
-  "Prepare Tay onboarding question",
-  "Prepare first use case: AI business guidance",
-  "Show today's Box 4 priorities",
-  "Run weekly founder review",
-  "Park Crowne Legacy until Box 4 is complete",
-  "Build a passive income offer",
+  "Show private alpha readiness",
+  "I have too many ideas and need help choosing what to do first.",
+  "I feel overwhelmed and need one clear next step.",
+  "I am stuck and need a simple action plan.",
+  "I feel disorganized and need structure.",
+  "Prepare Founders Circle tester invite",
+  "Show today's priorities",
   "Prepare buyer outreach for the $97 Tay Command Starter Map offer",
   "Buyer replied: yes, send me the details",
   "Buyer replied: can you guarantee I will make money?",
-  "Prepare a $97 Tay Command Starter Map offer",
-  "Prepare a $497 Operator Build Sprint offer",
   "Create a plan for Tay governance",
-  "Log a note about command room completion",
-  "Use an external API to automate leads",
 ];
 
 const tayCapabilities = [
@@ -127,17 +149,56 @@ export function ChatShell({
   const [result, setResult] = useState<ActionResult | null>(null);
   const [logEntries, setLogEntries] = useState<SessionLogEntry[]>([]);
   const [memoryEntries, setMemoryEntries] = useState<MemoryEntry[]>([]);
+  const [feedbackEntries, setFeedbackEntries] = useState<FeedbackEntry[]>([]);
+  const [feedbackDraft, setFeedbackDraft] = useState<FeedbackDraft | null>(
+    null,
+  );
+  const [selectedAlphaPath, setSelectedAlphaPath] =
+    useState<AlphaPathId | null>(null);
+  const [weeklyCheckIn, setWeeklyCheckIn] = useState<WeeklyCheckInDraft>({
+    score: 8,
+    helpedMost: "",
+    frustrated: "",
+    improveNext: "",
+    submitted: false,
+  });
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "intro",
       role: "tay",
-      text: "I am Tay for Transcenlutions. Tell me what you want to build, plan, or record, and I will turn it into one clear next move focused on passive income, business growth, and visible execution.",
+      text: `${privateAlphaState.promise} Choose a path or tell me where you feel stuck. I will turn it into one clear next move with visible execution and feedback.`,
     },
   ]);
+  const feedbackInsights = createFeedbackInsights(feedbackEntries);
 
   const submitRequest = (request: string) => {
     const trimmed = request.trim();
     if (!trimmed) return;
+
+    const naturalFeedback = createNaturalFeedbackEntry(trimmed);
+    if (naturalFeedback) {
+      setFeedbackEntries((entries) =>
+        upsertFeedbackEntry(entries, naturalFeedback),
+      );
+    }
+
+    if (naturalFeedback && isFeedbackOnlyInput(trimmed)) {
+      setActiveResponse(null);
+      setExecutionStatus("idle");
+      setResult(null);
+      setFeedbackDraft(null);
+      setInput("");
+      setMessages((current) => [
+        ...current,
+        { id: `${naturalFeedback.id}-user`, role: "user", text: trimmed },
+        {
+          id: `${naturalFeedback.id}-tay`,
+          role: "tay",
+          text: "Feedback captured. Tay will use this signal to improve clarity and usefulness while mission, values, governance, payments, privacy, security, legal copy, user data, and memory architecture stay protected.",
+        },
+      ]);
+      return;
+    }
 
     const response = createTayResponse(trimmed);
     const logDetail = `${intentLabels[response.intent]} reviewed. ${
@@ -147,6 +208,7 @@ export function ChatShell({
     setActiveResponse(response);
     setExecutionStatus("idle");
     setResult(null);
+    setFeedbackDraft(null);
     setInput("");
     setMessages((current) => [
       ...current,
@@ -200,6 +262,7 @@ export function ChatShell({
         launchReadinessState: launchReadiness,
       });
       setResult(actionResult);
+      setFeedbackDraft(createFeedbackDraft(response.id));
       setExecutionStatus(actionResult.status);
       setMessages((current) => [
         ...current,
@@ -240,6 +303,7 @@ export function ChatShell({
       const logStatus = decision === "approved" ? "approved" : "declined";
 
       setResult(actionResult);
+      setFeedbackDraft(createFeedbackDraft(response.id));
       setExecutionStatus(actionResult.status);
       setMessages((current) => [
         ...current,
@@ -260,6 +324,67 @@ export function ChatShell({
         ),
       );
     }, 700);
+  };
+
+  const saveFeedbackDraft = (draft: FeedbackDraft) => {
+    setFeedbackDraft(draft);
+
+    if (!activeResponse || !result || !draft.rating) return;
+
+    const entry = createOneTapFeedbackEntry({
+      response: activeResponse,
+      result,
+      rating: draft.rating,
+      category: draft.category,
+      note: draft.note,
+    });
+
+    setFeedbackEntries((entries) => upsertFeedbackEntry(entries, entry));
+  };
+
+  const rateResult = (rating: FeedbackRating) => {
+    if (!activeResponse) return;
+
+    saveFeedbackDraft({
+      relatedActionId: activeResponse.id,
+      rating,
+      category:
+        rating === "helped"
+          ? "praise"
+          : feedbackDraft?.rating === rating
+            ? feedbackDraft.category
+            : undefined,
+      note: feedbackDraft?.note ?? "",
+    });
+  };
+
+  const chooseFeedbackCategory = (category: FeedbackCategory) => {
+    if (!activeResponse || !feedbackDraft?.rating) return;
+
+    saveFeedbackDraft({
+      ...feedbackDraft,
+      relatedActionId: activeResponse.id,
+      category,
+    });
+  };
+
+  const updateFeedbackNote = (note: string) => {
+    if (!activeResponse || !feedbackDraft?.rating) return;
+
+    saveFeedbackDraft({
+      ...feedbackDraft,
+      relatedActionId: activeResponse.id,
+      note,
+    });
+  };
+
+  const submitWeeklyCheckIn = () => {
+    const entry = createWeeklyCheckInEntry(weeklyCheckIn);
+    setFeedbackEntries((entries) => upsertFeedbackEntry(entries, entry));
+    setWeeklyCheckIn((current) => ({
+      ...current,
+      submitted: true,
+    }));
   };
 
   return (
@@ -312,6 +437,64 @@ export function ChatShell({
               <p className="eyebrow">Tay Command Chat</p>
               <span>{businessFocus}</span>
             </div>
+
+            <section
+              className="alpha-onboarding-card"
+              aria-label="First-time Tay onboarding"
+            >
+              <div>
+                <p className="eyebrow">One Clear Promise</p>
+                <h2>{privateAlphaState.promise}</h2>
+                <p>
+                  Start with one path. Tay will help you get a useful first win
+                  in the first 10 minutes, then capture feedback without making
+                  it homework.
+                </p>
+              </div>
+              <div>
+                <h3>What are you trying to improve or build?</h3>
+                <div className="alpha-path-grid">
+                  {privateAlphaState.paths.map((path) => (
+                    <button
+                      className={`alpha-path-button ${
+                        selectedAlphaPath === path.id
+                          ? "alpha-path-button--active"
+                          : ""
+                      }`}
+                      key={path.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedAlphaPath(path.id);
+                        submitRequest(createAlphaOnboardingCommand(path.id));
+                      }}
+                    >
+                      <strong>{path.label}</strong>
+                      <span>{path.firstWin}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="alpha-aha-card">
+                <div>
+                  <p className="eyebrow">First 10-Minute Win</p>
+                  <h3>Feeling stuck?</h3>
+                </div>
+                <div className="alpha-aha-grid">
+                  {privateAlphaState.ahaMoments.map((moment) => (
+                    <button
+                      className="secondary-button"
+                      key={moment.id}
+                      type="button"
+                      onClick={() =>
+                        submitRequest(createAlphaAhaCommand(moment.id))
+                      }
+                    >
+                      {moment.trigger}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
 
             <div className="message-list" aria-live="polite">
               {messages.map((message) => (
@@ -367,17 +550,32 @@ export function ChatShell({
             response={activeResponse}
             executionStatus={executionStatus}
             result={result}
+            feedbackDraft={feedbackDraft}
             onExecute={executeActiveAction}
             onApprove={() => resolveActiveApproval("approved")}
             onDecline={() => resolveActiveApproval("declined")}
             onFollowNextStep={submitRequest}
+            onRateResult={rateResult}
+            onChooseFeedbackCategory={chooseFeedbackCategory}
+            onFeedbackNoteChange={updateFeedbackNote}
           />
         </main>
 
         <aside className="side-column">
           <SystemStack />
+          <PrivateAlphaPanel
+            alphaState={privateAlphaState}
+            selectedPathId={selectedAlphaPath}
+            onCommand={submitRequest}
+          />
           <GovernancePanel />
           <MemoryPanel entries={memoryEntries} />
+          <FeedbackInsightsPanel
+            insights={feedbackInsights}
+            weeklyCheckIn={weeklyCheckIn}
+            onWeeklyChange={setWeeklyCheckIn}
+            onSubmitWeeklyCheckIn={submitWeeklyCheckIn}
+          />
           <SessionLog entries={logEntries} />
         </aside>
       </div>

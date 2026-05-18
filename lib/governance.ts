@@ -86,6 +86,17 @@ export const actionRegistry: Record<TayActionType, ActionRegistryEntry> = {
       "This reviews launch setup, onboarding, blocked items, and first-use-case readiness locally.",
     examples: ["Show launch readiness", "Prepare onboarding question"],
   },
+  route_private_alpha: {
+    type: "route_private_alpha",
+    label: "Route private alpha start",
+    domain: "local_workspace",
+    defaultPermission: "allowed",
+    defaultRiskTier: "low",
+    defaultRiskScore: 1,
+    reason:
+      "This guides first-time users, tester flow, and fast clarity wins inside the local command room.",
+    examples: ["Choose an alpha path", "Prepare a first 10-minute win"],
+  },
   draft_plan: {
     type: "draft_plan",
     label: "Draft plan",
@@ -242,7 +253,10 @@ export function evaluateGovernance(
   const blockedRule = matchRule(normalized, "blocked");
   if (blockedRule) return toDecision(blockedRule);
 
-  if (actionType === "route_launch_readiness") {
+  if (
+    actionType === "route_launch_readiness" ||
+    actionType === "route_private_alpha"
+  ) {
     const entry = actionRegistry[actionType];
 
     return {

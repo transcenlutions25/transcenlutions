@@ -41,6 +41,19 @@ const { createLaunchReadinessState } = require("../lib/launch-readiness.ts");
 const {
   createDeploymentReadinessState,
 } = require("../lib/deployment-readiness.ts");
+const {
+  createAlphaAhaCommand,
+  createAlphaOnboardingCommand,
+  createPrivateAlphaState,
+} = require("../lib/private-alpha.ts");
+const {
+  classifyFeedbackImprovement,
+  createFeedbackInsights,
+  createNaturalFeedbackEntry,
+  createOneTapFeedbackEntry,
+  createWeeklyCheckInEntry,
+  isFeedbackOnlyInput,
+} = require("../lib/feedback.ts");
 const { createTayResponse } = require("../lib/tay-core.ts");
 
 const cases = [
@@ -169,6 +182,50 @@ const cases = [
     riskTier: "low",
     resultStatus: "completed",
     resultIncludes: "Launch onboarding prepared",
+  },
+  {
+    request: "Show private alpha readiness",
+    intent: "prepare_alpha",
+    action: "route_private_alpha",
+    permission: "allowed",
+    riskTier: "low",
+    resultStatus: "completed",
+    resultIncludes: "Private alpha readiness reviewed",
+    artifactHeadings: [
+      "One clear promise",
+      "Current stage",
+      "Selected path",
+      "First 10-minute win",
+      "Tester invite support",
+      "Feedback loop",
+    ],
+  },
+  {
+    request: "Private alpha path: Business. Help me choose one business move to execute first.",
+    intent: "prepare_alpha",
+    action: "route_private_alpha",
+    permission: "allowed",
+    riskTier: "low",
+    resultStatus: "completed",
+    resultIncludes: "Business path prepared",
+  },
+  {
+    request: "I have too many ideas and need help choosing what to do first.",
+    intent: "prepare_alpha",
+    action: "route_private_alpha",
+    permission: "allowed",
+    riskTier: "low",
+    resultStatus: "completed",
+    resultIncludes: "Aha moment prepared",
+  },
+  {
+    request: "Prepare Founders Circle tester invite",
+    intent: "prepare_alpha",
+    action: "route_private_alpha",
+    permission: "allowed",
+    riskTier: "low",
+    resultStatus: "completed",
+    resultIncludes: "Founders Circle invite prepared",
   },
   {
     request: "Show Stripe setup readiness",
@@ -330,6 +387,172 @@ assertEqual(
   "placeholder production values should not be production ready",
 );
 
+const alphaState = createPrivateAlphaState();
+assertEqual(
+  alphaState.stage,
+  "Private Alpha Preparation",
+  "private alpha should show the current stage",
+);
+assertEqual(
+  alphaState.paths.length,
+  6,
+  "private alpha onboarding should expose six starting paths",
+);
+assertEqual(
+  alphaState.testerSlots.length,
+  5,
+  "Founders Circle should prepare five tester slots",
+);
+assertEqual(
+  createAlphaOnboardingCommand("business").includes("Private alpha path: Business"),
+  true,
+  "business onboarding command should route through private alpha",
+);
+assertEqual(
+  createAlphaAhaCommand("too_many_ideas").includes("too many ideas"),
+  true,
+  "aha command should support too-many-ideas flow",
+);
+
+const naturalFeedback = createNaturalFeedbackEntry("This confused me.");
+assertEqual(
+  naturalFeedback.category,
+  "confusion",
+  "natural feedback should detect confusion",
+);
+assertEqual(
+  isFeedbackOnlyInput("This confused me."),
+  true,
+  "pure feedback should be captured without becoming a build request",
+);
+assertEqual(
+  isFeedbackOnlyInput("Build a plan but this is confusing"),
+  false,
+  "mixed feedback plus command should still allow Tay routing",
+);
+
+const feedbackResponse = createTayResponse("Build the first Tay feature");
+const feedbackResult = executeSuggestedAction(feedbackResponse);
+const oneTapFeedback = createOneTapFeedbackEntry({
+  response: feedbackResponse,
+  result: feedbackResult,
+  rating: "helped",
+});
+assertEqual(
+  oneTapFeedback.category,
+  "praise",
+  "helped one-tap feedback should map to praise",
+);
+
+const negativeFeedback = createOneTapFeedbackEntry({
+  response: feedbackResponse,
+  result: feedbackResult,
+  rating: "didnt_help",
+  category: "bug",
+  note: "The button did not do what I expected.",
+});
+assertEqual(
+  negativeFeedback.category,
+  "bug",
+  "negative feedback reason should be captured",
+);
+assertEqual(
+  negativeFeedback.note,
+  "The button did not do what I expected.",
+  "optional feedback note should be preserved",
+);
+
+const helpedNaturalFeedback = createNaturalFeedbackEntry("This helped.");
+assertEqual(
+  helpedNaturalFeedback.category,
+  "praise",
+  "natural feedback should detect praise",
+);
+const wrongNaturalFeedback = createNaturalFeedbackEntry("This is wrong.");
+assertEqual(
+  wrongNaturalFeedback.category,
+  "wrong_answer",
+  "natural feedback should detect wrong answers",
+);
+const featureNaturalFeedback = createNaturalFeedbackEntry("I wish it did exports.");
+assertEqual(
+  featureNaturalFeedback.category,
+  "missing_feature",
+  "natural feedback should detect missing features",
+);
+
+const weeklyFeedback = createWeeklyCheckInEntry({
+  score: 4,
+  helpedMost: "clearer steps",
+  frustrated: "too much text",
+  improveNext: "shorter answers",
+});
+assertEqual(
+  weeklyFeedback.category,
+  "didnt_solve",
+  "low weekly score should become a problem signal",
+);
+
+const highConfusionInsights = createFeedbackInsights(
+  [
+    oneTapFeedback,
+    negativeFeedback,
+    helpedNaturalFeedback,
+    wrongNaturalFeedback,
+    featureNaturalFeedback,
+    weeklyFeedback,
+    ...Array.from({ length: 7 }, (_, index) => ({
+    ...naturalFeedback,
+    id: `feedback-confusion-${index}`,
+    })),
+  ],
+);
+assertEqual(
+  highConfusionInsights.signalStrength,
+  "high",
+  "seven matching signals should become high signal",
+);
+assertEqual(
+  highConfusionInsights.topConfusion.value,
+  "Confusion",
+  "insights should surface top confusion",
+);
+assertEqual(
+  highConfusionInsights.ratingCounts.helped,
+  1,
+  "insights should count helpful one-tap feedback",
+);
+assertEqual(
+  highConfusionInsights.ratingCounts.didntHelp,
+  1,
+  "insights should count not-helpful one-tap feedback",
+);
+assertEqual(
+  highConfusionInsights.naturalSignalCount,
+  10,
+  "insights should count natural feedback signals",
+);
+assertEqual(
+  highConfusionInsights.improvementPolicy.status,
+  "auto_allowed",
+  "confusion improvement should stay in auto-allowed clarity lane",
+);
+
+const protectedImprovement = classifyFeedbackImprovement(
+  "Change payment handling and privacy rules",
+);
+assertEqual(
+  protectedImprovement.status,
+  "blocked_protected",
+  "protected boundary classification should block payment and privacy changes",
+);
+const featureImprovement = classifyFeedbackImprovement("missing_feature");
+assertEqual(
+  featureImprovement.status,
+  "approval_required",
+  "missing feature improvement should require approval",
+);
+
 const missingPayment = createOfferPaymentState(
   { ...revenueOffers[0], checkoutUrl: "", priceId: "" },
   { invoiceRecipientEmail: "", isTestMode: false },
@@ -443,7 +666,7 @@ for (const legalPage of legalPages) {
 }
 
 console.log(
-  `Smoke tests passed: ${cases.length} Tay flows plus revenue, launch, deployment, and legal-page checks verified.`,
+  `Smoke tests passed: ${cases.length} Tay flows plus revenue, launch, deployment, feedback, and legal-page checks verified.`,
 );
 
 function assertEqual(actual, expected, label) {

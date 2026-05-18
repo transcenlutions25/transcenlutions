@@ -1754,7 +1754,8 @@ button {
 }
 
 .setup-item--configured,
-.setup-item--server_only {
+.setup-item--server_only,
+.setup-item--not_required {
   border-color: rgba(52, 211, 153, 0.24);
 }
 

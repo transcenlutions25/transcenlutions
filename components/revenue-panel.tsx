@@ -58,7 +58,9 @@ export function RevenuePanel({ onCommand, revenueSetup }: RevenuePanelProps) {
               <div>
                 {item.status === "simulated" ? (
                   <FlaskConical size={15} />
-                ) : item.status === "configured" || item.status === "server_only" ? (
+                ) : item.status === "configured" ||
+                  item.status === "server_only" ||
+                  item.status === "not_required" ? (
                   <ShieldCheck size={15} />
                 ) : (
                   <Wrench size={15} />

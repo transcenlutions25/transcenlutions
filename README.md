@@ -199,6 +199,9 @@ setup-needed state instead of a fake checkout or empty invoice. Card data is
 never collected inside Tay. Checkout and invoice handoff remain
 approval-required under governance. Placeholder-looking Stripe keys, price IDs,
 and Payment Links stay setup-required until replaced with real account values.
+Stripe-hosted Payment Links can satisfy the current live checkout handoff path
+without app-side Stripe API keys; custom checkout still requires server-side
+Stripe keys.
 
 Safe test mode:
 

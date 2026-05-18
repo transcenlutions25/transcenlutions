@@ -1,6 +1,7 @@
 import type { ActionArtifact, ActionResult } from "./types";
 import {
   createRevenueSetupState,
+  isStripePaymentSetupReady,
   type RevenueSetupState,
 } from "./revenue-setup";
 
@@ -121,7 +122,7 @@ export function createLaunchReadinessState(
     {
       id: "stripe",
       label: "Stripe",
-      status: revenueSetup.mode === "live_ready" ? "configured" : "missing",
+      status: isStripePaymentSetupReady(revenueSetup) ? "configured" : "missing",
       detail:
         "Stripe must be live-ready before any buyer sees a checkout handoff.",
       envKeys: [

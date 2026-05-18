@@ -236,6 +236,28 @@ assertEqual(
   "placeholder Stripe values should not show live ready",
 );
 
+const livePaymentLinkSetup = createRevenueSetupState({
+  NEXT_PUBLIC_TAY_REVENUE_TEST_MODE: "false",
+  NEXT_PUBLIC_STRIPE_ACCOUNT_READY: "true",
+  NEXT_PUBLIC_STRIPE_STARTER_MAP_PAYMENT_LINK:
+    "https://buy.stripe.com/test_starter123",
+  NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PAYMENT_LINK:
+    "https://buy.stripe.com/test_operator123",
+  NEXT_PUBLIC_TRANSCENLUTIONS_COMPANY_EMAIL: "hello@transcenlutions.com",
+  NEXT_PUBLIC_TRANSCENLUTIONS_BILLING_EMAIL: "billing@transcenlutions.com",
+  NEXT_PUBLIC_TRANSCENLUTIONS_SUPPORT_EMAIL: "support@transcenlutions.com",
+  NEXT_PUBLIC_TRANSCENLUTIONS_REFUND_COPY:
+    "Refund requests are reviewed against the paid scope.",
+  NEXT_PUBLIC_TRANSCENLUTIONS_REVENUE_DISCLAIMER:
+    "Income is not guaranteed.",
+  NEXT_PUBLIC_DELIVERY_ARTIFACT_LOCATION: "Confirmed buyer delivery folder",
+});
+assertEqual(
+  livePaymentLinkSetup.mode,
+  "live_ready",
+  "approved Stripe Payment Links should allow live-ready revenue setup without API keys",
+);
+
 assertEqual(
   isApprovedPaymentUrl("https://buy.stripe.com/your-starter-map-link"),
   false,

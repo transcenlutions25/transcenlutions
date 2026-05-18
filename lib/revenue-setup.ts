@@ -8,6 +8,7 @@ import {
 export type RevenueSetupItemStatus =
   | "configured"
   | "missing"
+  | "not_required"
   | "simulated"
   | "server_only";
 
@@ -34,6 +35,24 @@ export function getRevenueSetupState() {
   return createRevenueSetupState(process.env);
 }
 
+export function isStripePaymentSetupReady(state: RevenueSetupState) {
+  const stripeAccount = state.items.find((item) => item.id === "stripe_account");
+  const paymentPath = state.items.find(
+    (item) => item.id === "price_ids_or_payment_links",
+  );
+  const publishableKey = state.items.find(
+    (item) => item.id === "stripe_publishable_key",
+  );
+  const secretKey = state.items.find((item) => item.id === "stripe_secret_key");
+
+  return (
+    stripeAccount?.status === "configured" &&
+    paymentPath?.status === "configured" &&
+    publishableKey?.status !== "missing" &&
+    secretKey?.status !== "missing"
+  );
+}
+
 export function createRevenueSetupState(
   env: Record<string, string | undefined>,
 ): RevenueSetupState {
@@ -51,7 +70,9 @@ export function createRevenueSetupState(
     env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
   );
   const hasSecretKey = isStripeSecretKey(env.STRIPE_SECRET_KEY);
-  const hasPaymentPath = hasAnyConfiguredPaymentPath(env);
+  const hasLivePaymentLinks = hasEveryOfferPaymentLink(env);
+  const hasPaymentPath = hasEveryOfferPaymentPath(env);
+  const stripeApiKeysRequired = !hasLivePaymentLinks;
   const hasRefundCopy = Boolean(
     env.NEXT_PUBLIC_TRANSCENLUTIONS_REFUND_COPY?.trim(),
   );
@@ -94,29 +115,41 @@ export function createRevenueSetupState(
     {
       id: "stripe_publishable_key",
       label: "Stripe publishable key",
-      status: hasPublishableKey ? "configured" : "missing",
+      status: hasPublishableKey
+        ? "configured"
+        : stripeApiKeysRequired
+          ? "missing"
+          : "not_required",
       detail: hasPublishableKey
         ? "Publishable key format is present."
-        : "Set a Stripe publishable key beginning with pk_.",
+        : stripeApiKeysRequired
+          ? "Set a Stripe publishable key beginning with pk_ for API checkout."
+          : "Stripe-hosted Payment Links are configured, so a browser publishable key is not required for the current checkout path.",
       envKeys: ["NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"],
-      required: true,
+      required: stripeApiKeysRequired,
     },
     {
       id: "stripe_secret_key",
       label: "Stripe secret key",
-      status: hasSecretKey ? "server_only" : "missing",
+      status: hasSecretKey
+        ? "server_only"
+        : stripeApiKeysRequired
+          ? "missing"
+          : "not_required",
       detail: hasSecretKey
         ? "Secret key is present server-side and not exposed to the browser."
-        : "Set STRIPE_SECRET_KEY server-side only; never use NEXT_PUBLIC for it.",
+        : stripeApiKeysRequired
+          ? "Set STRIPE_SECRET_KEY server-side only; never use NEXT_PUBLIC for it."
+          : "Stripe-hosted Payment Links handle checkout outside the app, so a server secret key is not required for the current handoff.",
       envKeys: ["STRIPE_SECRET_KEY"],
-      required: true,
+      required: stripeApiKeysRequired,
     },
     {
       id: "price_ids_or_payment_links",
       label: "Stripe price IDs or payment links",
       status: hasPaymentPath ? "configured" : "missing",
       detail: hasPaymentPath
-        ? "At least one offer has a Stripe price ID or approved Payment Link."
+        ? "Every current offer has a Stripe price ID or approved Payment Link."
         : "Set per-offer Stripe price IDs or approved Payment Links.",
       envKeys: revenueOffers.flatMap((offer) => [
         offer.priceIdEnvKey,
@@ -174,7 +207,11 @@ export function createRevenueSetupState(
     (item) => item.required && item.status === "missing",
   ).length;
   const configuredCount = items.filter((item) => {
-    return item.status === "configured" || item.status === "server_only";
+    return (
+      item.status === "configured" ||
+      item.status === "server_only" ||
+      item.status === "not_required"
+    );
   }).length;
 
   if (isTestMode) {
@@ -230,10 +267,17 @@ function isStripeSecretKey(value: string | undefined) {
   return /^sk_(live|test)_[A-Za-z0-9]{8,}$/.test(trimmed);
 }
 
-function hasAnyConfiguredPaymentPath(env: Record<string, string | undefined>) {
-  return revenueOffers.some((offer) => {
+function hasEveryOfferPaymentPath(env: Record<string, string | undefined>) {
+  return revenueOffers.every((offer) => {
     const paymentLink = env[offer.paymentLinkEnvKey] ?? offer.checkoutUrl;
     const priceId = env[offer.priceIdEnvKey] ?? offer.priceId;
     return isApprovedPaymentUrl(paymentLink) || isConfiguredStripePriceId(priceId);
+  });
+}
+
+function hasEveryOfferPaymentLink(env: Record<string, string | undefined>) {
+  return revenueOffers.every((offer) => {
+    const paymentLink = env[offer.paymentLinkEnvKey] ?? offer.checkoutUrl;
+    return isApprovedPaymentUrl(paymentLink);
   });
 }

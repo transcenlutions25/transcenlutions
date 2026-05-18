@@ -6,8 +6,9 @@ a buyer, hide payment work, or collect card details inside the app.
 ## Supported Phase 1 Payment Paths
 
 1. Approved Stripe Payment Links per offer.
-2. Manual invoice email handoff when a real company or billing email is configured.
-3. Setup-required state when neither path is configured.
+2. Stripe API checkout keys plus price IDs when custom checkout is added later.
+3. Manual invoice email handoff when a real company or billing email is configured.
+4. Setup-required state when no approved payment path is configured.
 
 ## Environment Variables
 
@@ -30,6 +31,9 @@ NEXT_PUBLIC_DELIVERY_ARTIFACT_LOCATION="Tay result card and confirmed buyer deli
 
 `NEXT_PUBLIC_TRANSCENLUTIONS_PAYMENT_URL` is still accepted as a legacy fallback
 for the starter offer, but per-offer Stripe Payment Links are the preferred path.
+When every current offer has an approved Stripe-hosted Payment Link, the app does
+not require Stripe API keys for checkout handoff because Stripe hosts the payment
+page outside Tay.
 
 ## Care Rules
 

@@ -1,5 +1,9 @@
 import { createLaunchReadinessState } from "./launch-readiness";
-import { createRevenueSetupState } from "./revenue-setup";
+import {
+  createRevenueSetupState,
+  isStripePaymentSetupReady,
+  type RevenueSetupState,
+} from "./revenue-setup";
 
 export type DeploymentEnvironment = "local" | "test" | "live";
 export type DeploymentChecklistStatus =
@@ -84,7 +88,11 @@ export function createDeploymentReadinessState(
     {
       id: "stripe_mode",
       label: "Stripe live/test separation",
-      status: getStripeSeparationStatus(environment, stripeMode, revenueSetup.mode),
+      status: getStripeSeparationStatus(
+        environment,
+        stripeMode,
+        revenueSetup,
+      ),
       detail:
         "Live deployment must use live Stripe mode and real approved payment handoff values. Local/test remains clearly test-only.",
       envKeys: [
@@ -216,15 +224,15 @@ export function createDeploymentReadinessState(
 function getStripeSeparationStatus(
   environment: DeploymentEnvironment,
   stripeMode: "missing" | "test" | "live",
-  revenueMode: "live_ready" | "test_mode" | "setup_required",
+  revenueSetup: RevenueSetupState,
 ): DeploymentChecklistStatus {
   if (environment === "live") {
-    return stripeMode === "live" && revenueMode === "live_ready"
+    return stripeMode === "live" && isStripePaymentSetupReady(revenueSetup)
       ? "configured"
       : "missing";
   }
 
-  if (stripeMode === "test" || revenueMode === "test_mode") {
+  if (stripeMode === "test" || revenueSetup.mode === "test_mode") {
     return "test_only";
   }
 

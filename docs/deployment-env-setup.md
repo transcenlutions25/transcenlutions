@@ -42,6 +42,11 @@ NEXT_PUBLIC_STRIPE_OPERATOR_SPRINT_PAYMENT_LINK=""
 Live deployment requires live Stripe mode and real approved Stripe values.
 Placeholder-looking values remain setup-required.
 
+For the current Box 3 revenue path, Stripe-hosted Payment Links are enough for
+live checkout handoff when each active offer has its own approved link. Stripe
+API keys are still needed later for custom checkout, subscriptions, customer
+portal workflows, or server-side Stripe automation.
+
 ## Legal Values
 
 ```bash

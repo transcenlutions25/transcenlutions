@@ -36,6 +36,7 @@ The active Next.js app lives at the repository root:
 - `docs/tay-engine-box-6-deployment-prep.md` — deployment readiness and external setup map
 - `docs/tay-engine-box-6-private-alpha-readiness.md` — first-tester onboarding and usefulness map
 - `docs/tay-learning-feedback-engine.md` — frictionless learning and feedback rules
+- `docs/free-private-alpha-deployment.md` — Netlify-first free private alpha deployment guide
 - `docs/vercel-deployment-checklist.md` — private alpha Vercel deployment checklist
 - `scripts/check-public-copy.mjs` — guard against exposing internal build-only language
 
@@ -305,6 +306,10 @@ for deployment readiness, external setup, and public info page rules.
 
 See [docs/tay-engine-box-6-private-alpha-readiness.md](docs/tay-engine-box-6-private-alpha-readiness.md)
 for private alpha onboarding, first-session success, and tester feedback rules.
+
+See [docs/free-private-alpha-deployment.md](docs/free-private-alpha-deployment.md)
+for Netlify-first free private alpha deployment instructions and Cloudflare Pages
+fallback settings. Use this path when Vercel asks for payment.
 
 See [docs/deployment-env-setup.md](docs/deployment-env-setup.md) for the full
 environment variable setup guide.

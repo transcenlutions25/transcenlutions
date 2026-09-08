@@ -11,6 +11,10 @@ import { findDeliveryKitForOffer } from "./delivery";
 import { createFounderFocusResult } from "./founder-os";
 import { createLaunchReadinessResult } from "./launch-readiness";
 import type { LaunchReadinessState } from "./launch-readiness";
+import {
+  createOperatingGraphEventFromLog,
+  recordOperatingGraphEvent,
+} from "./operating-graph-client";
 import { createPrivateAlphaResult } from "./private-alpha";
 import { findRevenueOfferForRequest, getOfferPaymentState } from "./revenue";
 import { findSalesKitForOffer } from "./sales";
@@ -221,7 +225,7 @@ export function createSessionLogEntry(
   detail: string,
   status?: SessionLogEntry["status"],
 ): SessionLogEntry {
-  return {
+  const entry: SessionLogEntry = {
     id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${response.intent}`,
     timestamp: new Date().toLocaleTimeString([], {
       hour: "2-digit",
@@ -238,6 +242,15 @@ export function createSessionLogEntry(
     status: status ?? getLogStatus(response.action),
     detail,
   };
+
+  // Evidence capture is best-effort and never blocks the user's action path.
+  // The API refuses production ingest until authenticated tenant routing is configured,
+  // preventing a public client from polluting Transcenlutions' internal evidence graph.
+  void recordOperatingGraphEvent(
+    createOperatingGraphEventFromLog(response, entry),
+  );
+
+  return entry;
 }
 
 function getLogStatus(action: SuggestedAction): SessionLogEntry["status"] {

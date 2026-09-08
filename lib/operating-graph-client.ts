@@ -28,9 +28,7 @@ export function eventTypeForLogStatus(
   if (status === "approval_required") return "policy_decision";
   if (status === "approved" || status === "declined") return "approval";
   if (status === "executed" || status === "blocked") return "result";
-  if (status === "needs_clarification" || status === "unsupported") {
-    return "result";
-  }
+  if (status === "needs_clarification" || status === "unsupported") return "result";
   return "intent";
 }
 
@@ -38,23 +36,25 @@ export function createOperatingGraphEventFromLog(
   response: TayResponse,
   entry: SessionLogEntry,
 ): ClientOperatingGraphEvent {
-  const eventType = eventTypeForLogStatus(entry.status);
+  const isInitialReview = entry.status === "executed" && /reviewed\./i.test(entry.detail);
+  const effectiveStatus: SessionLogEntry["status"] = isInitialReview ? "detected" : entry.status;
+  const eventType = eventTypeForLogStatus(effectiveStatus);
   const outcomeStatus =
-    entry.status === "executed" || entry.status === "approved"
+    effectiveStatus === "executed" || effectiveStatus === "approved"
       ? "completed"
-      : entry.status === "blocked" || entry.status === "declined"
+      : effectiveStatus === "blocked" || effectiveStatus === "declined"
         ? "failed"
-        : entry.status;
+        : effectiveStatus;
 
   return {
-    eventKey: `${response.id}:${entry.status}:${response.action.type}`,
+    eventKey: `${response.id}:${effectiveStatus}:${response.action.type}`,
     eventType,
     correlationId: response.id,
     intent: response.intent,
     actionType: response.action.type,
     permissionStatus:
-      entry.status === "approved" || entry.status === "declined"
-        ? entry.status
+      effectiveStatus === "approved" || effectiveStatus === "declined"
+        ? effectiveStatus
         : response.action.permissionStatus,
     governanceRuleId: response.action.governance.ruleId,
     riskTier: response.action.governance.riskTier,
@@ -63,13 +63,13 @@ export function createOperatingGraphEventFromLog(
     executionStatus: outcomeStatus,
     resultSummary: entry.detail.slice(0, 1000),
     humanInterventionCount:
-      entry.status === "approved" || entry.status === "declined" ? 1 : 0,
+      effectiveStatus === "approved" || effectiveStatus === "declined" ? 1 : 0,
     failureCode:
-      entry.status === "blocked"
+      effectiveStatus === "blocked"
         ? "governance_blocked"
-        : entry.status === "declined"
+        : effectiveStatus === "declined"
           ? "approval_declined"
-          : entry.status === "unsupported"
+          : effectiveStatus === "unsupported"
             ? "unsupported_action"
             : null,
     metadata: {
@@ -78,6 +78,7 @@ export function createOperatingGraphEventFromLog(
       permissionReason: response.action.permissionReason,
       nextStep: response.nextStep,
       localTimestamp: entry.timestamp,
+      sourceLogStatus: entry.status,
     },
   };
 }

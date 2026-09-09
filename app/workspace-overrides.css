@@ -1,0 +1,130 @@
+/* Work continuation: action-first Tay workspace.
+   This intentionally overrides the earlier marketing/dashboard proportions without
+   replacing Tay Core, Action Engine, Governance, or any operating modules. */
+
+.shell {
+  width: min(1440px, 100%);
+  padding-top: 12px;
+}
+
+/* The old 84vh hero buried the actual governed action loop. Keep identity, but
+   make Tay's working surface visible immediately. */
+.hero {
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr);
+  min-height: 0;
+  padding: 18px 0 20px;
+  gap: 18px;
+}
+
+.hero-copy {
+  gap: 10px;
+}
+
+.hero h1 {
+  max-width: 820px;
+  font-size: clamp(2.25rem, 7vw, 5.1rem);
+  line-height: .9;
+}
+
+.hero p {
+  max-width: 720px;
+  line-height: 1.55;
+}
+
+.tay-visual {
+  min-height: 230px;
+}
+
+.sacred-ring--outer {
+  width: 190px;
+  height: 190px;
+}
+
+.sacred-ring--inner {
+  width: 118px;
+  height: 118px;
+}
+
+.tay-orb {
+  width: 96px;
+  height: 96px;
+}
+
+/* The command surface is the product. Keep it visually dominant. */
+.workspace {
+  align-items: start;
+}
+
+.chat-column {
+  min-width: 0;
+}
+
+.chat-panel {
+  border-color: rgba(216, 185, 87, .42);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .35), 0 0 50px rgba(18, 60, 255, .12);
+}
+
+/* Secondary operating panels remain available, but no longer compete with the
+   Ask -> Govern -> Act -> Report loop on first entry. */
+.workspace > aside,
+.workspace > .side-column {
+  opacity: .9;
+}
+
+@media (max-width: 900px) {
+  .shell {
+    padding: 8px 10px 36px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 10px;
+  }
+
+  .hero-copy {
+    order: 1;
+  }
+
+  .tay-visual {
+    order: 2;
+    min-height: 150px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.25rem, 13vw, 4rem);
+  }
+
+  .hero p {
+    font-size: .96rem;
+  }
+
+  .sacred-ring--outer {
+    width: 126px;
+    height: 126px;
+  }
+
+  .sacred-ring--inner {
+    width: 84px;
+    height: 84px;
+  }
+
+  .tay-orb {
+    width: 72px;
+    height: 72px;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hero-actions button {
+    justify-content: center;
+  }
+
+  .tay-visual {
+    min-height: 124px;
+  }
+}

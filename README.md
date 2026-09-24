@@ -88,10 +88,13 @@ The current foundation includes:
 - first-session paths for Business, Focus & Productivity, Revenue, Planning, Content, and Personal Growth
 - first 10-minute win flow for overwhelm, too many ideas, stuck points, and disorganization
 - Founders Circle support for 5 testers, free for 6 months, with lightweight feedback
+- server-side agent capability checks before local execution or approved handoffs
 
-The current foundation does **not** include login, database, direct card
-processing, external APIs, persistent memory, agent chains, marketplace, or
-hidden automation. Payment
+The current foundation does **not** include login, authenticated tenant
+identity, database-backed user memory, direct card processing, external APIs,
+persistent memory, agent chains, marketplace, or hidden automation. The server
+agent policy endpoint evaluates shared capabilities but does not authenticate a
+user or execute an outside action. Payment
 collection is handled through an approved external payment link or manual
 invoice handoff.
 

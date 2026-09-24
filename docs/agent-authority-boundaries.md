@@ -18,6 +18,12 @@ to be consumed by later server-side action and model adapters so an agent's
 identity, authority, approval state, session, and audit event can be checked in
 one place.
 
-This slice does not add model providers, authenticated memory, parent controls,
-content filtering, or external workforce actions. Those remain launch blockers
-and must be implemented and verified separately.
+The chat now asks `/api/agent/policy` to re-check the selected capability before
+local execution or an approved handoff. The endpoint returns the shared policy
+decision and never executes an outside action.
+
+This slice still does not add model providers, authenticated memory, tenant
+identity, parent controls, content filtering, or external workforce actions.
+The endpoint is a server-side policy boundary, not proof of authenticated
+authorization. Those remain launch blockers and must be implemented and
+verified separately.

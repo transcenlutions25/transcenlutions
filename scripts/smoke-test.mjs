@@ -698,6 +698,14 @@ assert.throws(() => runtimeApi.selectRuntimeAgent(runtimeState, "unknown"));
 assert.equal(foundationApi.canPerform("tay", "payment"), false);
 assert.equal(foundationApi.canPerform("tay", "payment", true), true);
 assert.equal(foundationApi.canPerform("dawn", "draft_content"), true);
+assert.equal(
+  foundationApi.getAgentActionPolicy("rory", "payment").allowed,
+  false,
+);
+assert.equal(
+  foundationApi.getAgentActionPolicy("tay", "payment").requiresApproval,
+  true,
+);
 assert.equal(foundationApi.canPerform("dawn", "payment", true), false);
 assert.equal(foundationApi.canPerform("rory", "external_commitment", true), false);
 assert.equal(foundationApi.canPerform("rory", "sensitive_content", true), false);

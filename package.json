@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "next lint && node scripts/check-public-copy.mjs",
     "smoke": "node scripts/smoke-test.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:identity": "node --experimental-strip-types scripts/check-platform-identity.mjs"
   },
   "dependencies": {
     "next": "14.2.15",

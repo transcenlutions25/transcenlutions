@@ -30,6 +30,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      - run: npm run test:identity
       - run: npm run lint
       - run: npm run smoke
       - run: npm run build

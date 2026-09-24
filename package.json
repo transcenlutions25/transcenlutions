@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "next lint && node scripts/check-public-copy.mjs",
     "smoke": "node scripts/smoke-test.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:identity": "npx tsc lib/platform-identity.ts scripts/check-platform-identity.ts --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .identity-test && node .identity-test/scripts/check-platform-identity.js && node -e \"require('fs').rmSync('.identity-test',{recursive:true,force:true})\""
   },
   "dependencies": {
     "next": "14.2.15",

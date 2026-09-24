@@ -6,6 +6,7 @@ Implemented:
 - Explicit agent selection persists through ordinary follow-ups.
 - Specialist-to-specialist handoffs record both legs through Tay.
 - Historical Tay Core messages retain Tay attribution.
+- Transcript messages now show when Tay is acting in Dawn or Rory context without claiming a specialist model reply.
 - Agent capabilities now use an explicit allowlist; unknown actions deny by default.
 - Payment, external commitments, workforce changes, and sensitive content remain approval-gated for agents that are allowed to prepare them.
 - Dawn is limited to planning, content, and follow-up preparation; Rory is limited to context, planning, content, and notes.

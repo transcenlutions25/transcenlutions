@@ -6,7 +6,7 @@ function request(headers: Record<string, string> = {}) {
 const previousNodeEnv = process.env.NODE_ENV;
 const previousAllow = process.env.TAY_ALLOW_DEV_IDENTITY;
 function setNodeEnv(value: string) {
-  Object.defineProperty(process.env, "NODE_ENV", { value, configurable: true, writable: true });
+  process.env.NODE_ENV = value;
 }
 function restore() {
   setNodeEnv(previousNodeEnv ?? "test");

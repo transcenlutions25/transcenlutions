@@ -30,6 +30,7 @@ import { createTayResponse } from "../lib/tay-core";
 import {
   activeAgentName,
   createAgentRuntime,
+  governResponseForAgent,
   routeRuntimeInput,
   selectRuntimeAgent,
   setRuntimeChannel,
@@ -235,7 +236,10 @@ export function ChatShell({
       return;
     }
 
-    const response = createTayResponse(trimmed);
+    const response = governResponseForAgent(
+      routedRuntime.session.activeAgentId,
+      createTayResponse(trimmed),
+    );
     const logDetail = `${intentLabels[response.intent]} reviewed. ${
       response.action.title
     }: ${permissionLabels[response.action.permissionStatus]}.`;

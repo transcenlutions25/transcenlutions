@@ -3,11 +3,14 @@ import {
   appendMessage,
   createConversationSession,
   delegate,
+  getAgentActionPolicy,
   type AgentId,
+  type AgentAction,
   type Channel,
   type ConversationSession,
   type GraphTrace,
 } from "./agent-foundation";
+import type { TayActionType, TayResponse } from "./types";
 
 export interface AgentRuntimeState {
   session: ConversationSession;
@@ -49,4 +52,54 @@ export function selectRuntimeAgent(runtime: AgentRuntimeState, agentId: AgentId)
 
 export function activeAgentName(runtime: AgentRuntimeState): string {
   return agentRegistry[runtime.session.activeAgentId].name;
+}
+
+export function capabilityForTayAction(actionType: TayActionType): AgentAction {
+  switch (actionType) {
+    case "create_task":
+      return "execute_local_task";
+    case "prepare_offer":
+      return "prepare_offer";
+    case "recommend_follow_up":
+      return "recommend_follow_up";
+    case "route_focus":
+      return "route_focus";
+    case "route_launch_readiness":
+      return "route_launch_readiness";
+    case "route_private_alpha":
+      return "route_private_alpha";
+    case "draft_plan":
+      return "plan";
+    case "log_note":
+      return "log_note";
+    case "none":
+      return "read_context";
+  }
+}
+
+export function governResponseForAgent(
+  agentId: AgentId,
+  response: TayResponse,
+): TayResponse {
+  const capability = capabilityForTayAction(response.action.type);
+  const policy = getAgentActionPolicy(agentId, capability);
+  if (policy.allowed) return response;
+
+  return {
+    ...response,
+    message: `${response.message} ${policy.reason}`,
+    action: {
+      ...response.action,
+      permissionStatus: "blocked",
+      permissionReason: policy.reason,
+      governance: {
+        ...response.action.governance,
+        permissionStatus: "blocked",
+        permissionReason: policy.reason,
+        auditStatus: "blocked",
+      },
+    },
+    nextStep: `Switch to Tay for this move, or choose an action within ${agentRegistry[agentId].name}'s authority.`,
+    shouldLogImmediately: true,
+  };
 }

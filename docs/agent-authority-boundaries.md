@@ -10,7 +10,7 @@ enforce it yet.
 | Agent | Allowed preparation/runtime capabilities | Explicit boundary |
 | --- | --- | --- |
 | Tay | Context, plans, content, follow-ups, focus and launch routing, private-alpha routing, notes, local tasks, external commitments, payments, workforce changes, sensitive-content handling | External commitments, payments, workforce changes, and sensitive-content handling require explicit approval. |
-| Dawn | Context, plans, content, follow-up recommendations | Cannot perform payments, external commitments, workforce changes, or sensitive-content handling. |
+| Dawn | Context, plans, content, offer drafts, follow-up recommendations | Cannot perform payments, external commitments, workforce changes, or sensitive-content handling. |
 | Rory | Context, plans, content, notes | Cannot perform payments, external commitments, workforce changes, or sensitive-content handling. This contract does not establish child safety. |
 
 Unknown action names are denied by default. The shared policy helper is intended

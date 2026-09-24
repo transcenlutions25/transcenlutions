@@ -7,6 +7,7 @@ export type AgentAction =
   | "read_context"
   | "plan"
   | "draft_content"
+  | "prepare_offer"
   | "recommend_follow_up"
   | "route_focus"
   | "route_launch_readiness"
@@ -70,6 +71,7 @@ export const agentRegistry: Record<AgentId, AgentDefinition> = {
       "read_context",
       "plan",
       "draft_content",
+      "prepare_offer",
       "recommend_follow_up",
       "route_focus",
       "route_launch_readiness",
@@ -90,7 +92,7 @@ export const agentRegistry: Record<AgentId, AgentDefinition> = {
     authority: "specialist",
     constitution,
     allowedDelegates: [],
-    allowedActions: ["read_context", "plan", "draft_content", "recommend_follow_up"],
+    allowedActions: ["read_context", "plan", "draft_content", "prepare_offer", "recommend_follow_up"],
   },
   rory: {
     id: "rory",
@@ -124,6 +126,7 @@ function normalizeAction(action: string): AgentAction | null {
     "read_context",
     "plan",
     "draft_content",
+    "prepare_offer",
     "recommend_follow_up",
     "route_focus",
     "route_launch_readiness",

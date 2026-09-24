@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Bot,
   BrainCircuit,
@@ -27,6 +27,16 @@ import {
 } from "../lib/memory";
 import type { MemoryEntry } from "../lib/memory";
 import { createTayResponse } from "../lib/tay-core";
+import {
+  activeAgentName,
+  createAgentRuntime,
+  routeRuntimeInput,
+  selectRuntimeAgent,
+  setRuntimeChannel,
+} from "../lib/agent-runtime";
+import { VoiceControls } from "./voice-controls";
+import { recordOperatingGraphEvent } from "../lib/operating-graph-client";
+import { appendMessage, agentRegistry, type AgentId } from "../lib/agent-foundation";
 import {
   actionLabels,
   intentLabels,
@@ -141,6 +151,7 @@ export function ChatShell({
   revenueSetup,
 }: ChatShellProps) {
   const [input, setInput] = useState("");
+  const [agentRuntime, setAgentRuntime] = useState(() => createAgentRuntime());
   const [activeResponse, setActiveResponse] = useState<TayResponse | null>(
     null,
   );
@@ -169,11 +180,35 @@ export function ChatShell({
       text: `${privateAlphaState.promise} Choose a path or tell me where you feel stuck. I will turn it into one clear next move with visible execution and feedback.`,
     },
   ]);
+  const traced = useRef(0);
+  const mirrored = useRef(0);
+  useEffect(() => {
+    for (const trace of agentRuntime.traces.slice(traced.current)) {
+      void recordOperatingGraphEvent({
+        eventKey: `${trace.sessionId}:handoff:${traced.current++}`,
+        eventType: "plan", correlationId: trace.sessionId,
+        resultSummary: `${trace.from} → ${trace.to}: ${trace.reason}`,
+        metadata: { kind: "agent_handoff", from: trace.from, to: trace.to },
+      });
+    }
+  }, [agentRuntime]);
+  useEffect(() => {
+    const replies = messages.slice(mirrored.current).filter((message) => message.role === "tay");
+    mirrored.current = messages.length;
+    if (replies.length) setAgentRuntime((runtime) => ({ ...runtime,
+      session: replies.reduce((session, message) => appendMessage(session, {
+        role: "agent", agentId: "tay", text: message.text,
+      }), runtime.session),
+    }));
+  }, [messages]);
   const feedbackInsights = createFeedbackInsights(feedbackEntries);
 
   const submitRequest = (request: string) => {
     const trimmed = request.trim();
     if (!trimmed) return;
+
+    const routedRuntime = routeRuntimeInput(agentRuntime, trimmed);
+    setAgentRuntime(routedRuntime);
 
     const naturalFeedback = createNaturalFeedbackEntry(trimmed);
     if (naturalFeedback) {
@@ -438,6 +473,29 @@ export function ChatShell({
               <span>{businessFocus}</span>
             </div>
 
+            <div className="agent-runtime-bar" aria-label="Agent session controls">
+              <div className="agent-runtime-status">
+                <span className="agent-runtime-dot" aria-hidden="true" />
+                <span><strong>{activeAgentName(agentRuntime)}</strong> active · {agentRuntime.session.channel} session</span>
+              </div>
+              <div className="agent-runtime-switches" role="group" aria-label="Switch active agent">
+                {(Object.keys(agentRegistry) as AgentId[]).map((agentId) => (
+                  <button
+                    className={agentRuntime.session.activeAgentId === agentId ? "agent-switch agent-switch--active" : "agent-switch"}
+                    key={agentId}
+                    type="button"
+                    onClick={() => {
+                      setAgentRuntime((runtime) => selectRuntimeAgent(runtime, agentId));
+                    }}
+                    aria-pressed={agentRuntime.session.activeAgentId === agentId}
+                  >
+                    {agentRegistry[agentId].name}
+                  </button>
+                ))}
+
+              </div>
+            </div>
+
             <section
               className="alpha-onboarding-card"
               aria-label="First-time Tay onboarding"
@@ -508,6 +566,15 @@ export function ChatShell({
               ))}
             </div>
 
+            <p className="agent-runtime-note" role="status">
+              {agentRuntime.traces.length ? `Handoff: ${agentRuntime.traces.at(-1)?.from} to ${agentRuntime.traces.at(-1)?.to}. ` : ""}
+              Tay Core currently handles requests for the selected agent. Specialist model responses are not connected yet.
+            </p>
+            <VoiceControls
+              reply={messages.filter((message) => message.role === "tay").at(-1)?.text ?? ""}
+              onTranscript={submitRequest}
+              onListening={(listening) => setAgentRuntime((runtime) => setRuntimeChannel(runtime, listening ? "voice" : "chat"))}
+            />
             <form
               className="composer"
               onSubmit={(event) => {

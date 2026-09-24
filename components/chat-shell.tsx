@@ -29,12 +29,14 @@ import type { MemoryEntry } from "../lib/memory";
 import { createTayResponse } from "../lib/tay-core";
 import {
   activeAgentName,
+  capabilityForTayAction,
   createAgentRuntime,
   governResponseForAgent,
   routeRuntimeInput,
   selectRuntimeAgent,
   setRuntimeChannel,
 } from "../lib/agent-runtime";
+import { requestAgentActionPolicy } from "../lib/agent-policy-client";
 import { VoiceControls } from "./voice-controls";
 import { recordOperatingGraphEvent } from "../lib/operating-graph-client";
 import { appendMessage, agentRegistry, type AgentId } from "../lib/agent-foundation";
@@ -309,14 +311,71 @@ export function ChatShell({
     }
   };
 
-  const executeActiveAction = () => {
+  const recordAuthorityFailure = (response: TayResponse, reason: string) => {
+    const actionResult: ActionResult = {
+      status: "failed",
+      result:
+        "Tay stopped this request because the server authority check did not allow the selected agent action.",
+      nextStep: reason,
+    };
+
+    setResult(actionResult);
+    setFeedbackDraft(createFeedbackDraft(response.id));
+    setExecutionStatus("failed");
+    setMessages((current) => [
+      ...current,
+      {
+        id: `${response.id}-authority-failure`,
+        role: "tay",
+        agentId: "tay",
+        contextAgentId: activeResponseAgentId,
+        text: `${actionResult.result} ${actionResult.nextStep}`,
+      },
+    ]);
+    setLogEntries((entries) => [
+      createSessionLogEntry(
+        response,
+        `${actionResult.result} ${reason}`,
+        "blocked",
+      ),
+      ...entries,
+    ]);
+    setMemoryEntries((entries) =>
+      addSessionMemoryEntry(
+        entries,
+        createSessionMemoryEntry(response, actionResult),
+      ),
+    );
+  };
+
+  const executeActiveAction = async () => {
     if (!activeResponse) return;
     if (activeResponse.action.permissionStatus !== "allowed") return;
 
     const response = activeResponse;
+    const responseAgentId = activeResponseAgentId;
 
     setExecutionStatus("running");
     setResult(null);
+
+    try {
+      const policy = await requestAgentActionPolicy(
+        responseAgentId,
+        capabilityForTayAction(response.action.type),
+      );
+      if (!policy.allowed) {
+        recordAuthorityFailure(response, policy.reason);
+        return;
+      }
+    } catch (error) {
+      recordAuthorityFailure(
+        response,
+        error instanceof Error
+          ? error.message
+          : "The server authority check is unavailable. No action was executed.",
+      );
+      return;
+    }
 
     window.setTimeout(() => {
       const actionResult = executeSuggestedAction(response, {
@@ -352,14 +411,37 @@ export function ChatShell({
     }, 700);
   };
 
-  const resolveActiveApproval = (decision: ApprovalDecision) => {
+  const resolveActiveApproval = async (decision: ApprovalDecision) => {
     if (!activeResponse) return;
     if (activeResponse.action.permissionStatus !== "requires_approval") return;
 
     const response = activeResponse;
+    const responseAgentId = activeResponseAgentId;
 
     setExecutionStatus("running");
     setResult(null);
+
+    if (decision === "approved") {
+      try {
+        const policy = await requestAgentActionPolicy(
+          responseAgentId,
+          capabilityForTayAction(response.action.type),
+          true,
+        );
+        if (!policy.allowed) {
+          recordAuthorityFailure(response, policy.reason);
+          return;
+        }
+      } catch (error) {
+        recordAuthorityFailure(
+          response,
+          error instanceof Error
+            ? error.message
+            : "The server authority check is unavailable. No approved handoff was created.",
+        );
+        return;
+      }
+    }
 
     window.setTimeout(() => {
       const actionResult = resolveApproval(response, decision);

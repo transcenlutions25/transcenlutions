@@ -95,6 +95,8 @@ interface ChatMessage {
   id: string;
   role: "user" | "tay";
   text: string;
+  agentId?: AgentId;
+  contextAgentId?: AgentId;
 }
 
 const starter = "Build the first Tay feature";
@@ -156,6 +158,8 @@ export function ChatShell({
   const [activeResponse, setActiveResponse] = useState<TayResponse | null>(
     null,
   );
+  const [activeResponseAgentId, setActiveResponseAgentId] =
+    useState<AgentId>("tay");
   const [executionStatus, setExecutionStatus] =
     useState<ExecutionStatus>("idle");
   const [result, setResult] = useState<ActionResult | null>(null);
@@ -178,6 +182,8 @@ export function ChatShell({
     {
       id: "intro",
       role: "tay",
+      agentId: "tay",
+      contextAgentId: "tay",
       text: `${privateAlphaState.promise} Choose a path or tell me where you feel stuck. I will turn it into one clear next move with visible execution and feedback.`,
     },
   ]);
@@ -220,16 +226,24 @@ export function ChatShell({
 
     if (naturalFeedback && isFeedbackOnlyInput(trimmed)) {
       setActiveResponse(null);
+      setActiveResponseAgentId(routedRuntime.session.activeAgentId);
       setExecutionStatus("idle");
       setResult(null);
       setFeedbackDraft(null);
       setInput("");
       setMessages((current) => [
         ...current,
-        { id: `${naturalFeedback.id}-user`, role: "user", text: trimmed },
+        {
+          id: `${naturalFeedback.id}-user`,
+          role: "user",
+          text: trimmed,
+          contextAgentId: routedRuntime.session.activeAgentId,
+        },
         {
           id: `${naturalFeedback.id}-tay`,
           role: "tay",
+          agentId: "tay",
+          contextAgentId: routedRuntime.session.activeAgentId,
           text: "Feedback captured. Tay will use this signal to improve clarity and usefulness while mission, values, governance, payments, privacy, security, legal copy, user data, and memory architecture stay protected.",
         },
       ]);
@@ -245,16 +259,24 @@ export function ChatShell({
     }: ${permissionLabels[response.action.permissionStatus]}.`;
 
     setActiveResponse(response);
+    setActiveResponseAgentId(routedRuntime.session.activeAgentId);
     setExecutionStatus("idle");
     setResult(null);
     setFeedbackDraft(null);
     setInput("");
     setMessages((current) => [
       ...current,
-      { id: `${response.id}-user`, role: "user", text: trimmed },
+      {
+        id: `${response.id}-user`,
+        role: "user",
+        text: trimmed,
+        contextAgentId: routedRuntime.session.activeAgentId,
+      },
       {
         id: `${response.id}-tay`,
         role: "tay",
+        agentId: "tay",
+        contextAgentId: routedRuntime.session.activeAgentId,
         text: `${response.message} Request type: ${
           intentLabels[response.intent]
         }. Proposed move: ${actionLabels[response.action.type]}. Status: ${
@@ -308,6 +330,8 @@ export function ChatShell({
         {
           id: `${response.id}-result`,
           role: "tay",
+          agentId: "tay",
+          contextAgentId: activeResponseAgentId,
           text: `${actionResult.result} ${actionResult.nextStep}`,
         },
       ]);
@@ -349,6 +373,8 @@ export function ChatShell({
         {
           id: `${response.id}-${decision}`,
           role: "tay",
+          agentId: "tay",
+          contextAgentId: activeResponseAgentId,
           text: `${actionResult.result} ${actionResult.nextStep}`,
         },
       ]);
@@ -564,7 +590,13 @@ export function ChatShell({
                   key={message.id}
                   className={`message message--${message.role}`}
                 >
-                  <span>{message.role === "tay" ? "Tay" : "You"}</span>
+                  <span>
+                    {message.role === "user"
+                      ? "You"
+                      : message.contextAgentId && message.contextAgentId !== "tay"
+                        ? `Tay · ${agentRegistry[message.contextAgentId].name} lane`
+                        : "Tay"}
+                  </span>
                   <p>{message.text}</p>
                 </article>
               ))}

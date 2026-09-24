@@ -706,5 +706,18 @@ assert.equal(
   foundationApi.getAgentActionPolicy("rory", "payment").requiresApproval,
   true,
 );
+assert.equal(runtimeApi.capabilityForTayAction("prepare_offer"), "prepare_offer");
+assert.equal(
+  runtimeApi.governResponseForAgent("dawn", createTayResponse("Build the first Tay feature")).action.permissionStatus,
+  "blocked",
+);
+assert.equal(
+  runtimeApi.governResponseForAgent("rory", createTayResponse("Create a plan for Tay governance")).action.permissionStatus,
+  "allowed",
+);
+assert.equal(
+  runtimeApi.governResponseForAgent("rory", createTayResponse("Prepare a revenue offer")).action.permissionStatus,
+  "blocked",
+);
 console.log("Agent session regressions passed: sticky selection, explicit routing, traced handoffs, shared channel session, invalid agent rejection.");
-console.log("Agent authority regressions passed: scoped capabilities, approval gates, child-safe boundary, unknown-action denial.");
+console.log("Agent authority regressions passed: scoped capabilities, approval gates, child-safe boundary, unknown-action denial, chat gating.");

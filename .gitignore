@@ -11,3 +11,6 @@ dist
 next-env.d.ts
 tsconfig.tsbuildinfo
 *.zip
+__pycache__/
+*.py[cod]
+integrations/tay-desktop/runtime-state/

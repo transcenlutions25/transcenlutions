@@ -678,6 +678,7 @@ function assertEqual(actual, expected, label) {
 // Session routing regressions: follow-ups, explicit selection, full handoff chain.
 const assert = require("node:assert/strict");
 const runtimeApi = require("../lib/agent-runtime.ts");
+const foundationApi = require("../lib/agent-foundation.ts");
 let runtimeState = runtimeApi.createAgentRuntime();
 assert.equal(runtimeState.session.activeAgentId, "tay");
 runtimeState = runtimeApi.selectRuntimeAgent(runtimeState, "dawn");
@@ -694,4 +695,37 @@ assert.equal(runtimeState.session.id, priorSession.id);
 assert.equal(runtimeState.session.messages, priorSession.messages);
 assert.equal(runtimeState.session.activeAgentId, "rory");
 assert.throws(() => runtimeApi.selectRuntimeAgent(runtimeState, "unknown"));
+assert.equal(foundationApi.canPerform("tay", "payment"), false);
+assert.equal(foundationApi.canPerform("tay", "payment", true), true);
+assert.equal(foundationApi.canPerform("dawn", "draft_content"), true);
+assert.equal(
+  foundationApi.getAgentActionPolicy("rory", "payment").allowed,
+  false,
+);
+assert.equal(
+  foundationApi.getAgentActionPolicy("tay", "payment").requiresApproval,
+  true,
+);
+assert.equal(foundationApi.canPerform("dawn", "payment", true), false);
+assert.equal(foundationApi.canPerform("rory", "external_commitment", true), false);
+assert.equal(foundationApi.canPerform("rory", "sensitive_content", true), false);
+assert.equal(foundationApi.canPerform("tay", "unrecognized-action"), false);
+assert.equal(
+  foundationApi.getAgentActionPolicy("rory", "payment").requiresApproval,
+  true,
+);
+assert.equal(runtimeApi.capabilityForTayAction("prepare_offer"), "prepare_offer");
+assert.equal(
+  runtimeApi.governResponseForAgent("dawn", createTayResponse("Build the first Tay feature")).action.permissionStatus,
+  "blocked",
+);
+assert.equal(
+  runtimeApi.governResponseForAgent("rory", createTayResponse("Create a plan for Tay governance")).action.permissionStatus,
+  "allowed",
+);
+assert.equal(
+  runtimeApi.governResponseForAgent("rory", createTayResponse("Prepare a revenue offer")).action.permissionStatus,
+  "blocked",
+);
 console.log("Agent session regressions passed: sticky selection, explicit routing, traced handoffs, shared channel session, invalid agent rejection.");
+console.log("Agent authority regressions passed: scoped capabilities, approval gates, child-safe boundary, unknown-action denial, chat gating.");

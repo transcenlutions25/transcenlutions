@@ -6,6 +6,11 @@ Implemented:
 - Explicit agent selection persists through ordinary follow-ups.
 - Specialist-to-specialist handoffs record both legs through Tay.
 - Historical Tay Core messages retain Tay attribution.
+- Transcript messages now show when Tay is acting in Dawn or Rory context without claiming a specialist model reply.
+- Agent capabilities now use an explicit allowlist; unknown actions deny by default.
+- Chat execution and approved handoffs now request a server-side policy check before proceeding.
+- Payment, external commitments, workforce changes, and sensitive content remain approval-gated for agents that are allowed to prepare them.
+- Dawn is limited to planning, content, and follow-up preparation; Rory is limited to context, planning, content, and notes.
 - Browser speech recognition submits one spoken request through the existing composer handler.
 - Read latest reply and stop-reading controls use browser speech synthesis.
 - Microphone denial/unsupported browser fallback and cleanup are implemented.
@@ -16,7 +21,8 @@ Limits and next work:
 - Actual microphone permissions, audio output, and mobile rendering require device/browser verification.
 - Tay Core remains rule-based. Dawn and Rory do not yet have model-generated responses.
 - The registry is not authenticated tenant/user/agent memory isolation. Do not expose this as a child-safe product yet.
-- Rory content filtering, parental access controls, scoped model context, and server-enforced action authority remain launch blockers.
+- Rory content filtering, parental access controls, scoped model context, and authenticated server-enforced action execution remain launch blockers.
+- The policy endpoint is a server-side decision boundary, but it does not yet authenticate tenant/user identity, execute actions, or prove child safety.
 - Human workforce approvals and AI staffing must be enforced server-side before external workforce actions are enabled.
 - Graph persistence remains subject to the existing authentication/storage gates; event submission is not proof of storage.
 - Model provider credentials, authenticated session persistence, and deployment still require integration and verification.

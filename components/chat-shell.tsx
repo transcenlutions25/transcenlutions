@@ -29,11 +29,14 @@ import type { MemoryEntry } from "../lib/memory";
 import { createTayResponse } from "../lib/tay-core";
 import {
   activeAgentName,
+  capabilityForTayAction,
   createAgentRuntime,
+  governResponseForAgent,
   routeRuntimeInput,
   selectRuntimeAgent,
   setRuntimeChannel,
 } from "../lib/agent-runtime";
+import { requestAgentActionPolicy } from "../lib/agent-policy-client";
 import { VoiceControls } from "./voice-controls";
 import { recordOperatingGraphEvent } from "../lib/operating-graph-client";
 import { appendMessage, agentRegistry, type AgentId } from "../lib/agent-foundation";
@@ -94,6 +97,8 @@ interface ChatMessage {
   id: string;
   role: "user" | "tay";
   text: string;
+  agentId?: AgentId;
+  contextAgentId?: AgentId;
 }
 
 const starter = "Build the first Tay feature";
@@ -155,6 +160,8 @@ export function ChatShell({
   const [activeResponse, setActiveResponse] = useState<TayResponse | null>(
     null,
   );
+  const [activeResponseAgentId, setActiveResponseAgentId] =
+    useState<AgentId>("tay");
   const [executionStatus, setExecutionStatus] =
     useState<ExecutionStatus>("idle");
   const [result, setResult] = useState<ActionResult | null>(null);
@@ -177,6 +184,8 @@ export function ChatShell({
     {
       id: "intro",
       role: "tay",
+      agentId: "tay",
+      contextAgentId: "tay",
       text: `${privateAlphaState.promise} Choose a path or tell me where you feel stuck. I will turn it into one clear next move with visible execution and feedback.`,
     },
   ]);
@@ -219,38 +228,57 @@ export function ChatShell({
 
     if (naturalFeedback && isFeedbackOnlyInput(trimmed)) {
       setActiveResponse(null);
+      setActiveResponseAgentId(routedRuntime.session.activeAgentId);
       setExecutionStatus("idle");
       setResult(null);
       setFeedbackDraft(null);
       setInput("");
       setMessages((current) => [
         ...current,
-        { id: `${naturalFeedback.id}-user`, role: "user", text: trimmed },
+        {
+          id: `${naturalFeedback.id}-user`,
+          role: "user",
+          text: trimmed,
+          contextAgentId: routedRuntime.session.activeAgentId,
+        },
         {
           id: `${naturalFeedback.id}-tay`,
           role: "tay",
+          agentId: "tay",
+          contextAgentId: routedRuntime.session.activeAgentId,
           text: "Feedback captured. Tay will use this signal to improve clarity and usefulness while mission, values, governance, payments, privacy, security, legal copy, user data, and memory architecture stay protected.",
         },
       ]);
       return;
     }
 
-    const response = createTayResponse(trimmed);
+    const response = governResponseForAgent(
+      routedRuntime.session.activeAgentId,
+      createTayResponse(trimmed),
+    );
     const logDetail = `${intentLabels[response.intent]} reviewed. ${
       response.action.title
     }: ${permissionLabels[response.action.permissionStatus]}.`;
 
     setActiveResponse(response);
+    setActiveResponseAgentId(routedRuntime.session.activeAgentId);
     setExecutionStatus("idle");
     setResult(null);
     setFeedbackDraft(null);
     setInput("");
     setMessages((current) => [
       ...current,
-      { id: `${response.id}-user`, role: "user", text: trimmed },
+      {
+        id: `${response.id}-user`,
+        role: "user",
+        text: trimmed,
+        contextAgentId: routedRuntime.session.activeAgentId,
+      },
       {
         id: `${response.id}-tay`,
         role: "tay",
+        agentId: "tay",
+        contextAgentId: routedRuntime.session.activeAgentId,
         text: `${response.message} Request type: ${
           intentLabels[response.intent]
         }. Proposed move: ${actionLabels[response.action.type]}. Status: ${
@@ -283,14 +311,71 @@ export function ChatShell({
     }
   };
 
-  const executeActiveAction = () => {
+  const recordAuthorityFailure = (response: TayResponse, reason: string) => {
+    const actionResult: ActionResult = {
+      status: "failed",
+      result:
+        "Tay stopped this request because the server authority check did not allow the selected agent action.",
+      nextStep: reason,
+    };
+
+    setResult(actionResult);
+    setFeedbackDraft(createFeedbackDraft(response.id));
+    setExecutionStatus("failed");
+    setMessages((current) => [
+      ...current,
+      {
+        id: `${response.id}-authority-failure`,
+        role: "tay",
+        agentId: "tay",
+        contextAgentId: activeResponseAgentId,
+        text: `${actionResult.result} ${actionResult.nextStep}`,
+      },
+    ]);
+    setLogEntries((entries) => [
+      createSessionLogEntry(
+        response,
+        `${actionResult.result} ${reason}`,
+        "blocked",
+      ),
+      ...entries,
+    ]);
+    setMemoryEntries((entries) =>
+      addSessionMemoryEntry(
+        entries,
+        createSessionMemoryEntry(response, actionResult),
+      ),
+    );
+  };
+
+  const executeActiveAction = async () => {
     if (!activeResponse) return;
     if (activeResponse.action.permissionStatus !== "allowed") return;
 
     const response = activeResponse;
+    const responseAgentId = activeResponseAgentId;
 
     setExecutionStatus("running");
     setResult(null);
+
+    try {
+      const policy = await requestAgentActionPolicy(
+        responseAgentId,
+        capabilityForTayAction(response.action.type),
+      );
+      if (!policy.allowed) {
+        recordAuthorityFailure(response, policy.reason);
+        return;
+      }
+    } catch (error) {
+      recordAuthorityFailure(
+        response,
+        error instanceof Error
+          ? error.message
+          : "The server authority check is unavailable. No action was executed.",
+      );
+      return;
+    }
 
     window.setTimeout(() => {
       const actionResult = executeSuggestedAction(response, {
@@ -304,6 +389,8 @@ export function ChatShell({
         {
           id: `${response.id}-result`,
           role: "tay",
+          agentId: "tay",
+          contextAgentId: activeResponseAgentId,
           text: `${actionResult.result} ${actionResult.nextStep}`,
         },
       ]);
@@ -324,14 +411,37 @@ export function ChatShell({
     }, 700);
   };
 
-  const resolveActiveApproval = (decision: ApprovalDecision) => {
+  const resolveActiveApproval = async (decision: ApprovalDecision) => {
     if (!activeResponse) return;
     if (activeResponse.action.permissionStatus !== "requires_approval") return;
 
     const response = activeResponse;
+    const responseAgentId = activeResponseAgentId;
 
     setExecutionStatus("running");
     setResult(null);
+
+    if (decision === "approved") {
+      try {
+        const policy = await requestAgentActionPolicy(
+          responseAgentId,
+          capabilityForTayAction(response.action.type),
+          true,
+        );
+        if (!policy.allowed) {
+          recordAuthorityFailure(response, policy.reason);
+          return;
+        }
+      } catch (error) {
+        recordAuthorityFailure(
+          response,
+          error instanceof Error
+            ? error.message
+            : "The server authority check is unavailable. No approved handoff was created.",
+        );
+        return;
+      }
+    }
 
     window.setTimeout(() => {
       const actionResult = resolveApproval(response, decision);
@@ -345,6 +455,8 @@ export function ChatShell({
         {
           id: `${response.id}-${decision}`,
           role: "tay",
+          agentId: "tay",
+          contextAgentId: activeResponseAgentId,
           text: `${actionResult.result} ${actionResult.nextStep}`,
         },
       ]);
@@ -560,7 +672,13 @@ export function ChatShell({
                   key={message.id}
                   className={`message message--${message.role}`}
                 >
-                  <span>{message.role === "tay" ? "Tay" : "You"}</span>
+                  <span>
+                    {message.role === "user"
+                      ? "You"
+                      : message.contextAgentId && message.contextAgentId !== "tay"
+                        ? `Tay · ${agentRegistry[message.contextAgentId].name} lane`
+                        : "Tay"}
+                  </span>
                   <p>{message.text}</p>
                 </article>
               ))}

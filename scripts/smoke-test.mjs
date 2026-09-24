@@ -674,3 +674,24 @@ function assertEqual(actual, expected, label) {
     throw new Error(`${label}: expected ${expected}, received ${actual}`);
   }
 }
+
+// Session routing regressions: follow-ups, explicit selection, full handoff chain.
+const assert = require("node:assert/strict");
+const runtimeApi = require("../lib/agent-runtime.ts");
+let runtimeState = runtimeApi.createAgentRuntime();
+assert.equal(runtimeState.session.activeAgentId, "tay");
+runtimeState = runtimeApi.selectRuntimeAgent(runtimeState, "dawn");
+runtimeState = runtimeApi.routeRuntimeInput(runtimeState, "Tell me more about that plan");
+assert.equal(runtimeState.session.activeAgentId, "dawn");
+runtimeState = runtimeApi.routeRuntimeInput(runtimeState, "The content is for children");
+assert.equal(runtimeState.session.activeAgentId, "dawn");
+runtimeState = runtimeApi.routeRuntimeInput(runtimeState, "Switch to Rory");
+assert.equal(runtimeState.session.activeAgentId, "rory");
+assert.deepEqual(runtimeState.traces.slice(-2).map(({from, to}) => [from, to]), [["dawn", "tay"], ["tay", "rory"]]);
+const priorSession = runtimeState.session;
+runtimeState = runtimeApi.setRuntimeChannel(runtimeState, "voice");
+assert.equal(runtimeState.session.id, priorSession.id);
+assert.equal(runtimeState.session.messages, priorSession.messages);
+assert.equal(runtimeState.session.activeAgentId, "rory");
+assert.throws(() => runtimeApi.selectRuntimeAgent(runtimeState, "unknown"));
+console.log("Agent session regressions passed: sticky selection, explicit routing, traced handoffs, shared channel session, invalid agent rejection.");

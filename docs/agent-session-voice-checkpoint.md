@@ -6,6 +6,9 @@ Implemented:
 - Explicit agent selection persists through ordinary follow-ups.
 - Specialist-to-specialist handoffs record both legs through Tay.
 - Historical Tay Core messages retain Tay attribution.
+- Agent capabilities now use an explicit allowlist; unknown actions deny by default.
+- Payment, external commitments, workforce changes, and sensitive content remain approval-gated for agents that are allowed to prepare them.
+- Dawn is limited to planning, content, and follow-up preparation; Rory is limited to context, planning, content, and notes.
 - Browser speech recognition submits one spoken request through the existing composer handler.
 - Read latest reply and stop-reading controls use browser speech synthesis.
 - Microphone denial/unsupported browser fallback and cleanup are implemented.
@@ -17,6 +20,7 @@ Limits and next work:
 - Tay Core remains rule-based. Dawn and Rory do not yet have model-generated responses.
 - The registry is not authenticated tenant/user/agent memory isolation. Do not expose this as a child-safe product yet.
 - Rory content filtering, parental access controls, scoped model context, and server-enforced action authority remain launch blockers.
+- The new authority contract is a client/shared-library policy boundary only; it is not server-side enforcement or proof of child safety.
 - Human workforce approvals and AI staffing must be enforced server-side before external workforce actions are enabled.
 - Graph persistence remains subject to the existing authentication/storage gates; event submission is not proof of storage.
 - Model provider credentials, authenticated session persistence, and deployment still require integration and verification.

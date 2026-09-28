@@ -290,4 +290,154 @@ The Workspace may expose category filters rather than adding a large number of t
 
 Use Transcenlutions/Crowne styling: dark royal purple/blue/black glass, gold structure, lightning-blue execution accents, readable typography, strong accessibility and compact mobile behavior. Work-state chips, cards and expandable previews may take inspiration from effective interaction patterns observed elsewhere, but layouts, branding, copy and visual identity must remain original.
 
+## 11. Tay Studio cinematography + multimodal creation canon
+
+Tay Studio is a first-class creation and filmmaking environment, not merely a prompt box. It should combine a simple natural-language interface with an optional advanced virtual Director of Photography (DP) control surface.
+
+### Creation modes
+
+A single Studio composer can switch among:
+- **Text / planning**
+- **Image**
+- **Video**
+- **Reference to Video**
+- **Talking Head / Avatar**
+- **AI Editor**
+- **Music**
+- future voice/audio, VFX, 3D and other media modes
+
+The mode picker should keep creation unified while routing each job to the appropriate provider/model stack.
+
+**Reference to Video is especially important for Crowne Legacy continuity** and should support approved character masters, locations, props, vehicles, wardrobe and style references.
+
+### Tay Auto + Advanced DP Controls
+
+Default behavior is **Tay Auto**: the user describes intent in plain language and Tay chooses the best camera language, model, settings and render path. Tay should explain important selections in plain English.
+
+Example:
+> Tay Auto selected a premium cinema capture profile, 24mm anamorphic framing, 24 fps and low-key blue-hour lighting because this shot needs monumental scale, storm highlight detail and theatrical motion.
+
+An **Advanced / DP Controls** mode exposes manual settings for filmmakers and power users.
+
+### Capture families
+
+Studio should support capture-language families such as:
+- Cinema
+- DSLR / mirrorless
+- Modern phones
+- Vintage phones
+- Film / analog
+- VHS / Hi8 / consumer camcorder
+- broadcast / documentary
+- surveillance / security
+- future specialty and virtual-camera profiles
+
+These are creative rendering profiles, not claims of physically using the named real-world hardware.
+
+### Camera + lens controls
+
+Observed useful control concepts to support:
+- focal lengths: approximately 14mm, 24mm, 35mm, 50mm, 85mm, 135mm, 200mm
+- aperture / depth-of-field controls from approximately f/1.2 through f/22
+- lens character: ultra-wide, wide, standard, portrait, telephoto, macro, anamorphic, tilt-shift, fisheye
+- camera movement / stabilization / framing controls
+- exposure, shutter and motion-blur controls where supported
+- frame-rate choices such as 24, 25, 30, 48, 60 and 120 fps
+
+Tay should translate technical choices into narrative language rather than forcing users to understand cinematography terminology.
+
+### Lighting + look controls
+
+Lighting moods may include:
+- golden hour
+- blue hour
+- overcast soft
+- harsh midday
+- low-key dramatic
+- high-key bright
+- neon / mixed sources
+- backlit silhouette
+- moonlit night
+- firelight
+
+Look / palette presets may exist for broad use cases such as monochrome, sepia, pastel, vivid, muted earth, cyberpunk, warm amber, analog-film and desaturated cinema.
+
+However, project-specific custom looks take precedence over generic presets.
+
+### Crowne Legacy Master Look Lock
+
+Crowne Legacy's visual identity is locked to:
+- dark royal purple
+- dark royal blue
+- black
+- rich gold
+- controlled electric / lightning blue accents
+
+Tay Studio must support a **Project Look Lock** so later shots, scenes and model changes preserve the approved palette and visual grammar unless the director intentionally overrides it for a narrative reason.
+
+A scene may vary brightness, saturation, temperature, contrast, capture format or era treatment while remaining recognizably within Crowne Legacy's visual identity.
+
+### Genre + narrative intent
+
+Genre can be explicitly selected or inferred from story intent. Useful categories may include action, horror, romance, sci-fi, comedy, thriller, drama, western, animation, music-video, surreal and vintage-cartoon treatments.
+
+Genre is guidance, not a hard style box. Tay may blend genres and should prioritize the screenplay, emotional target and established project look over a generic preset.
+
+### Output controls
+
+Studio should expose or automatically select:
+- aspect ratios such as 16:9, 21:9, 9:16, 1:1, 4:3 and 3:4
+- resolution appropriate to model/tier and production stage
+- duration / clip length
+- audio on/off and future audio-specific controls
+- render quality / model tier
+- reference assets
+- seed or continuity controls where providers support them
+
+Observed short-video duration choices include approximately 4, 5, 6, 8, 10, 12 and 15 seconds. Tay may split longer scenes into planned shots rather than asking one model to generate excessive duration in one pass.
+
+Low-resolution outputs such as 480p/720p can be used for cheap composition/motion tests when useful, but Crowne Legacy final masters require premium theatrical delivery quality and should not be considered complete at preview resolution.
+
+### Continuity memory
+
+Tay Studio must remember production decisions across the project.
+
+Each shot should be able to inherit:
+- project master look
+- scene camera package
+- lens language
+- frame rate
+- lighting continuity
+- location reference
+- character masters
+- wardrobe/prop state
+- time of day
+- preceding/following shot context
+- provider/model and generation parameters
+- approval status
+- cost/usage
+- continuity confidence
+
+The user should be able to say things such as:
+- "Match the previous shot."
+- "Use the approved Tay master."
+- "Keep this scene's lens package."
+- "Switch this memory to VHS but preserve the characters."
+- "Render the final in the Crowne master look."
+
+### Crowne Legacy cinematography baseline
+
+For principal present-day cinematic material, the default visual target is premium large-sensor cinema with a theatrical/anamorphic feel, 24 fps motion language and deliberate lensing. Specific real-camera names may be used as creative references when a provider exposes them, but Tay's durable canon is the **cinematic characteristics**, not dependency on one brand/model.
+
+For the current opening benchmark, a useful low-cost test baseline is:
+- wide cinema capture profile
+- ~24mm focal length
+- anamorphic character
+- around f/4 for environmental readability
+- 24 fps
+- blue-hour / moonlit transition
+- low-key dramatic lighting
+- Crowne Master Look locked
+- short preview duration before premium final rendering
+
 

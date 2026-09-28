@@ -49,6 +49,31 @@ Planning -> Generating -> Reviewing -> Rejected -> Regenerating -> Approved.
 
 The persistent task queue remains scalable: active + preview + backlog; reorder/pause/cancel; dependencies; progress; agent assignment; safe parallelism; persistence across sessions; integration with Agent Runtime + Operating Graph.
 
+### Tay model stack / execution stack
+
+Tay must have a first-class, visible, modular model stack rather than being tied to one model or vendor. The product should make the active stack understandable to the owner while allowing Tay to auto-route work when the owner does not want to choose models manually.
+
+Canonical stack lanes:
+- **Intelligence / orchestration:** a Tay routing layer with a fast/default mode, a deeper-reasoning mode, and optional named provider/model overrides. Tay may route across OpenAI, Anthropic, Google and future best-in-class providers according to task fit, quality, latency and cost.
+- **Image:** an independently selectable/swappable image-generation lane. Character-reference fidelity and reusable identity locks are required for Crowne Legacy production.
+- **Video:** an independently selectable/swappable video-generation lane for cinematic generation, animation and future production workflows.
+- **Voice / audio:** ElevenLabs or equivalent for speech, voice continuity, dubbing and audio generation.
+- **Code / build:** Codex, Claude, Gemini or equivalent coding agents connected to GitHub and the app/runtime toolchain.
+- **Knowledge / workspace:** Notion or equivalent plus Tay's internal project/canon context.
+- **Browser / computer execution:** PC or mobile default-browser operation and supported computer-use/browser automation.
+- **Deployment / infrastructure:** Vercel, Netlify or equivalent, chosen according to project requirements.
+- **Agent Runtime / Operating Graph:** the persistent queue, specialist agents, dependencies, approvals, status and execution graph that coordinate all lanes above.
+
+Stack UX rules:
+- The stack selector should be compact and available from the main Tay experience, similar in convenience to a model picker but original in Transcenlutions design.
+- The user can leave routing on **Tay Auto** or explicitly choose/lock a provider/model for a task.
+- Tay should show the provider/model being used for consequential or expensive work and record exact usage in the cost ledger.
+- When providers expose reliable estimates, show relative or estimated usage/cost before execution. When they do not, capture before/after usage so actual cost is still measurable.
+- Expensive generation should pause for owner approval when the action materially increases spend or commits external resources.
+- Provider/model names are replaceable implementation details; the stack architecture and capability lanes are canon.
+
+Reference observed in SuperCool on 2026-09-28 (research only, not Transcenlutions naming/UI canon): an intelligence selector with SuperCool Genesis, SuperCool Genesis High (~2x), Claude Opus 5.5 (~5x), Claude Fable 5.1 (~10x), and Claude Sonnet 5 (~2x), plus separate Video H3 Max and Image Nano Banana 2 selectors. Tay should preserve the useful product principle — visible, swappable intelligence/image/video lanes with cost awareness — without copying SuperCool branding, labels or visual design.
+
 ## 3. Crowne Legacy production objective
 
 Create a feature-film-quality Crowne Legacy movie designed to withstand the test of time and repeated theatrical viewing. Production should maximize legitimate emotional range, intellectual engagement, continuity, rewatchability and memorable cinematic craft.

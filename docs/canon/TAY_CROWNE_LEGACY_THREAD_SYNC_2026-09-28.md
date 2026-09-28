@@ -223,3 +223,71 @@ Long-term product promise is broader than movie creation: Tay should coordinate 
 6. Do not purchase high-cost SuperCool tiers until benchmark consumption justifies them.
 7. Continue individual character canon completion before final ensemble/movie character production.
 
+## 10. Command Feed + Workspace Library canon
+
+Tay must separate **live work visibility** from **durable work storage**.
+
+The conversational surface is the **Command Feed**. It shows what Tay and specialist agents are doing in real time while the user talks: checking files, researching, thinking, building, editing, generating, testing, reviewing, waiting for approval, completing, failing and retrying. This should feel alive and execution-focused, but use original Transcenlutions design rather than copying another product.
+
+### Command Feed behavior
+
+The Command Feed may render rich inline work objects such as:
+- live status/activity chips
+- expandable task/run cards
+- file and folder cards
+- code previews
+- diffs and edit summaries
+- build/test/smoke/deploy results
+- generated image/video/audio previews
+- research/source bundles
+- approvals and decisions
+- cost/credit/usage receipts
+- completion summaries and next-action cards
+
+The work must be visible in chat as it happens, but **chat is not the permanent filing system**.
+
+Every durable artifact created or modified through Tay is automatically captured outside the chat in the user's project workspace. The user should never need to scroll through an old conversation to find a file, build, asset, decision or deliverable.
+
+### Workspace Library
+
+Provide a separate **Workspace / Library** surface accessible from Tay's main navigation. It is the long-term organized home for work created through Tay.
+
+Default hierarchy:
+1. **Projects** — top-level containers such as Transcenlutions, Hallway Cleaning, Crowne Legacy, Tay Command, etc.
+2. **Tasks & Runs** — agent executions, workflow runs, status history and retry history.
+3. **Documents** — briefs, plans, specifications, reports, summaries and canon.
+4. **Code** — repositories, files, diffs, branches, pull requests and code artifacts.
+5. **Media** — images, video, audio, voice, music, storyboards and production assets.
+6. **Characters & Canon** — approved character masters, reference sets, visual locks, lore and continuity assets.
+7. **Builds & Releases** — build outputs, test results, release packages and version history.
+8. **Deployments** — previews, environments, production releases, domains and hosting records.
+9. **Research & Sources** — collected research, source bundles and evidence.
+10. **Approvals & Decisions** — owner approvals, rejected variants, consequential decisions and change history.
+11. **Costs & Usage** — provider/model usage, credits, direct cost, accepted output and efficiency metrics.
+12. **Archive** — superseded, rejected or inactive material retained for traceability.
+
+### Organization rules
+
+- Tay auto-files artifacts into the correct project and category; manual filing should be optional.
+- Every artifact carries searchable metadata: project, category, creator/agent, provider/model when relevant, date/time, status, version, related task/run, cost/usage when relevant, and links back to the originating Command Feed event.
+- Search, filters, favorites/pins, recents and project views must make later retrieval fast.
+- Outputs can appear inline in the Command Feed while simultaneously becoming durable Workspace Library objects.
+- Completed artifacts must remain retrievable even if the original chat is long, archived or no longer the user's current conversation.
+- Rejected/superseded versions should remain traceable without cluttering the default view.
+- The Workspace Library is not a passive file dump: it should understand relationships between tasks, files, builds, approvals, deployments and costs.
+- Tay should surface the most relevant saved artifact when the user later says things like "open the last build," "show me the approved Tay character," "find that deployment," or "continue the Crowne Legacy benchmark."
+
+### Navigation principle
+
+The primary experience should stay simple:
+- **Tay / Command** — live agent presence and execution.
+- **Chats** — conversational history.
+- **Workspace** — organized durable work, projects and artifacts.
+
+The Workspace may expose category filters rather than adding a large number of top-level tabs. The exact visual labels can evolve, but the separation between conversation history and durable organized work is canon.
+
+### Visual language
+
+Use Transcenlutions/Crowne styling: dark royal purple/blue/black glass, gold structure, lightning-blue execution accents, readable typography, strong accessibility and compact mobile behavior. Work-state chips, cards and expandable previews may take inspiration from effective interaction patterns observed elsewhere, but layouts, branding, copy and visual identity must remain original.
+
+

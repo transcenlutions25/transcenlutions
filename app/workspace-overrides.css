@@ -1,130 +1,180 @@
-/* Work continuation: action-first Tay workspace.
-   This intentionally overrides the earlier marketing/dashboard proportions without
-   replacing Tay Core, Action Engine, Governance, or any operating modules. */
+/* Tay Command Royal Minimal V1
+   Keep the command surface dominant and preserve the existing runtime. The web
+   shell should feel like the Mac chat surface: calm, full-height, chat-first,
+   with royal color/character identity retained and secondary systems available
+   without competing for the first viewport. */
 
 .shell {
-  width: min(1440px, 100%);
-  padding-top: 12px;
+  width: 100%;
+  max-width: none;
+  min-height: 100vh;
+  padding: 0;
 }
 
-/* The old 84vh hero buried the actual governed action loop. Keep identity, but
-   make Tay's working surface visible immediately. */
+/* Marketing belongs outside the working command surface. */
 .hero {
-  grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr);
-  min-height: 0;
-  padding: 18px 0 20px;
-  gap: 18px;
+  display: none;
 }
 
-.hero-copy {
-  gap: 10px;
-}
-
-.hero h1 {
-  max-width: 820px;
-  font-size: clamp(2.25rem, 7vw, 5.1rem);
-  line-height: .9;
-}
-
-.hero p {
-  max-width: 720px;
-  line-height: 1.55;
-}
-
-.tay-visual {
-  min-height: 230px;
-}
-
-.sacred-ring--outer {
-  width: 190px;
-  height: 190px;
-}
-
-.sacred-ring--inner {
-  width: 118px;
-  height: 118px;
-}
-
-.tay-orb {
-  width: 96px;
-  height: 96px;
-}
-
-/* The command surface is the product. Keep it visually dominant. */
+/* Full-screen command workspace: chat owns the canvas; system context stays in
+   a restrained rail rather than a field of equally loud cards. */
 .workspace {
-  align-items: start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: 0;
+  min-height: 100vh;
+  align-items: stretch;
 }
 
 .chat-column {
   min-width: 0;
+  min-height: 100vh;
 }
 
 .chat-panel {
-  border-color: rgba(216, 185, 87, .42);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, .35), 0 0 50px rgba(18, 60, 255, .12);
+  min-height: 100vh;
+  border: 0;
+  border-radius: 0;
+  padding: 18px clamp(16px, 3vw, 40px);
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(75, 45, 170, .13), transparent 34%),
+    linear-gradient(180deg, rgba(7, 8, 22, .98), rgba(5, 6, 18, .99));
+  box-shadow: inset -1px 0 rgba(216, 185, 87, .18);
 }
 
-/* Secondary operating panels remain available, but no longer compete with the
-   Ask -> Govern -> Act -> Report loop on first entry. */
-.workspace > aside,
-.workspace > .side-column {
-  opacity: .9;
+/* Keep Tay/Dawn/Rory identity visible but quiet. */
+.agent-runtime-bar {
+  margin: 4px 0 10px;
+  padding: 8px 10px;
+  border-color: rgba(216, 185, 87, .2);
+  background: rgba(15, 13, 38, .55);
+}
+
+.agent-switch {
+  min-width: 48px;
+}
+
+/* The launch onboarding and shortcut walls created the visual-noise problem.
+   The core chat remains the primary entry point. These helpers stay in source
+   for later progressive-disclosure placement rather than being deleted. */
+.alpha-onboarding-card,
+.starter-button,
+.quick-grid,
+.agent-runtime-note {
+  display: none;
+}
+
+.message-list {
+  flex: 1;
+  min-height: 0;
+  max-height: calc(100vh - 205px);
+  overflow-y: auto;
+  padding: 10px 4px 18px;
+  scrollbar-width: thin;
+}
+
+.message {
+  max-width: min(780px, 88%);
+}
+
+.voice-controls {
+  flex: 0 0 auto;
+}
+
+.composer {
+  position: sticky;
+  bottom: 12px;
+  z-index: 5;
+  flex: 0 0 auto;
+  margin-top: auto;
+  padding: 8px;
+  border: 1px solid rgba(216, 185, 87, .28);
+  border-radius: 18px;
+  background: rgba(9, 8, 25, .94);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .35);
+  backdrop-filter: blur(18px);
+}
+
+.composer input {
+  min-height: 44px;
+}
+
+/* Right-side operating context is intentionally quieter and independently
+   scrollable. It remains available without turning the chat into a dashboard. */
+.side-column {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding: 14px 12px 28px;
+  gap: 10px;
+  background: rgba(8, 7, 24, .96);
+  border-left: 1px solid rgba(216, 185, 87, .16);
+  scrollbar-width: thin;
+}
+
+.side-column .panel {
+  box-shadow: none;
+  border-color: rgba(216, 185, 87, .16);
+  background: rgba(20, 17, 48, .58);
+}
+
+/* Marketing/preview material remains implemented but does not follow the user
+   down the working surface as a long promotional page. */
+.shell > .section-grid,
+.shell > .preview-band,
+.shell > .split-panels,
+.shell > .module-cloud {
+  display: none;
 }
 
 @media (max-width: 900px) {
-  .shell {
-    padding: 8px 10px 36px;
-  }
-
-  .hero {
+  .workspace {
     grid-template-columns: 1fr;
-    padding-top: 10px;
   }
 
-  .hero-copy {
-    order: 1;
+  .chat-panel {
+    min-height: 100dvh;
+    padding: 12px 12px 16px;
+    box-shadow: none;
   }
 
-  .tay-visual {
-    order: 2;
-    min-height: 150px;
+  .message-list {
+    max-height: calc(100dvh - 190px);
   }
 
-  .hero h1 {
-    font-size: clamp(2.25rem, 13vw, 4rem);
+  /* Mobile defaults to the chat. Secondary panels remain below the primary
+     command surface until the dedicated drawer control lands. */
+  .side-column {
+    position: relative;
+    max-height: none;
+    border-left: 0;
+    border-top: 1px solid rgba(216, 185, 87, .16);
   }
 
-  .hero p {
-    font-size: .96rem;
-  }
-
-  .sacred-ring--outer {
-    width: 126px;
-    height: 126px;
-  }
-
-  .sacred-ring--inner {
-    width: 84px;
-    height: 84px;
-  }
-
-  .tay-orb {
-    width: 72px;
-    height: 72px;
+  .composer {
+    bottom: 8px;
   }
 }
 
 @media (max-width: 560px) {
-  .hero-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  .section-heading > span {
+    display: none;
   }
 
-  .hero-actions button {
-    justify-content: center;
+  .agent-runtime-bar {
+    align-items: center;
+    gap: 8px;
   }
 
-  .tay-visual {
-    min-height: 124px;
+  .agent-runtime-status {
+    font-size: .78rem;
+  }
+
+  .message {
+    max-width: 94%;
   }
 }

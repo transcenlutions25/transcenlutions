@@ -22,9 +22,11 @@
 | Platform identity | Identity contract checks passed. |
 | Type/lint/build | TypeScript, ESLint, public-copy guard and production build passed on Next.js 15.5.27. |
 
+The built server also returned HTTP 200 for Tay, the offer and order-access pages, and expected private/no-store HTTP 503 for disabled payment and webhook endpoints. The first Netlify preview caught a pre-existing plain-anchor lint error on the information pages; it was fixed using Next Link before the next deploy.
+
 ## Remaining release gates
 
-- Netlify admin currently asks for sign-in. Previous authenticated observation had no runtime variables. Reauthenticate and configure server-only values from `APEX_CHECKLIST_RELEASE.md`; no credentials in chat.
+- Netlify sign-in was restored. A fresh authenticated check confirms no project runtime variables. Configure server-only values from `APEX_CHECKLIST_RELEASE.md`; no credentials in chat.
 - Stripe connector currently exposes only the live account. Connect a sandbox for genuine end-to-end tests. Live card charges are not test fixtures.
 - Transactional sender/domain/reply mailbox needs approval and secure configuration. Resend adapter is implemented, but no account, expense or actual dispatch was created.
 - Actual inbox delivery, delayed-payment webhook delivery, bounce handling and production recovery are not verified. Older ambiguous email retries and undeliverable email require an operator.

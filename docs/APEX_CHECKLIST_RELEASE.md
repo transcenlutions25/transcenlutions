@@ -10,7 +10,7 @@ Build the product with `python3 products/funnel-checklist/build.py`. Install pin
 
 ## Runtime configuration — release blocked until verified
 
-The application now requires both payment verification and a transactional sender before enabling paid access. No provider was provisioned, subscription purchased, credential read, or live sales toggle enabled in this work. The last authenticated Netlify observation had no project environment variables. A fresh 2026-10-04 attempt is blocked by Netlify sign-in; current provider settings are not freshly certified.
+The application now requires both payment verification and a transactional sender before enabling paid access. No provider was provisioned, subscription purchased, credential read, or live sales toggle enabled in this work. Netlify sign-in was restored through the previously selected Google method. A fresh authenticated 2026-10-04 check confirms **No environment variables set for this project**.
 
 Configure values directly in trusted Netlify server/function environments, never in chat, Git, NEXT_PUBLIC variables, logs, screenshots or untrusted PR previews.
 

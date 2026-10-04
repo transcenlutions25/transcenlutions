@@ -33,4 +33,6 @@ jobs:
       - run: npm run test:identity
       - run: npm run lint
       - run: npm run smoke
+      - run: npm run test:apex
+      - run: python -m unittest discover -s tools/apex-flow -p "test_*.py"
       - run: npm run build

@@ -31,6 +31,7 @@
       if (!response.ok) throw new Error('Not accepted');
       sent = true;status.textContent='Your request was accepted. Reference: '+reference+'. This is not a purchase. Keep the reference if you contact transcenlutions@gmail.com.';
     } catch {
+      sent = true; // Ambiguous receipt: use support and the stable reference, not a duplicate POST.
       status.textContent='We could not confirm receipt. Email transcenlutions@gmail.com with reference '+reference+' instead of submitting repeatedly.';
     } finally {sending=false;button.disabled=sent;}
   });

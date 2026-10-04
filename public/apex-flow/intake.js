@@ -42,6 +42,7 @@
       sent = true;
       status.textContent = `The form service accepted your request. Reference: ${reference}. This is not a booking or payment confirmation. Keep your brief; if you need to follow up, email transcenlutions@gmail.com with this reference.`;
     } catch {
+      sent = true; // Ambiguous receipt: use support and the stable reference, not a duplicate POST.
       status.textContent = `We could not confirm receipt. Keep your brief and email it to transcenlutions@gmail.com. Reference: ${reference}. Avoid repeated submissions.`;
     } finally {sending = false; button.disabled = sent;}
   });

@@ -1,10 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    outputFileTracingIncludes: {
+  outputFileTracingIncludes: {
       "/api/apex/checklist": ["./products/funnel-checklist/funnel-leak-emergency-checklist.html"],
-    },
   },
   ...(process.env.NEXT_OUTPUT === "export"
     ? {

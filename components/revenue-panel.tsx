@@ -74,6 +74,16 @@ export function RevenuePanel({ onCommand, revenueSetup }: RevenuePanelProps) {
         </div>
       </div>
 
+      <article className="revenue-card">
+        <p className="eyebrow">Apex Flow · Done with you</p>
+        <h3>One workflow. A clearer working day.</h3>
+        <p>Free local workflow brief builder and a scoped implementation inquiry. Confirm feasibility, delivery availability, price and terms before payment.</p>
+        <div className="revenue-card__actions">
+          <a className="primary-button" href="/apex-flow/offer.html">Open Apex Flow</a>
+          <button className="secondary-button" type="button" onClick={() => onCommand("Prepare an Apex Flow DWY workflow scope. Verify tools, acceptance tests, delivery availability, price and terms before requesting payment. Do not claim integrations or fulfillment are verified without evidence.")}>Scope in Tay</button>
+        </div>
+      </article>
+
       <div className="revenue-grid">
         {revenueOffers.map((offer) => {
           const paymentState = getOfferPaymentState(offer);

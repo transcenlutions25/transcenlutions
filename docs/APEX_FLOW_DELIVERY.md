@@ -1,3 +1,7 @@
+# OWNER HOLD — 2026-10-04
+
+The owner has not yet practiced guided customer delivery. The $997 guided/DWY tier is closed and must not be sold or booked. The material below remains an internal practice and implementation reference. Current self-serve work is documented in `APEX_CHECKLIST_RELEASE.md`. This decision supersedes earlier launch proposals.
+
 # Apex Flow delivery definition and acceptance record
 
 ## Intended paid deliverable

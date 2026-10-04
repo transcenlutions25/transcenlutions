@@ -75,12 +75,12 @@ export function RevenuePanel({ onCommand, revenueSetup }: RevenuePanelProps) {
       </div>
 
       <article className="revenue-card">
-        <p className="eyebrow">Apex Flow · Done with you</p>
-        <h3>One workflow. A clearer working day.</h3>
-        <p>Free local workflow brief builder and a scoped implementation inquiry. Confirm feasibility, delivery availability, price and terms before payment.</p>
+        <p className="eyebrow">Apex Flow · Self-serve checklist</p>
+        <h3>Funnel Leak Emergency Checklist</h3>
+        <p>20 checks across five funnel stages, a named fix for every point and a downloadable plan. Existing $27 price; checkout stays closed until paid delivery is verified. Guided services are unavailable.</p>
         <div className="revenue-card__actions">
-          <a className="primary-button" href="/apex-flow/offer.html">Open Apex Flow</a>
-          <button className="secondary-button" type="button" onClick={() => onCommand("Prepare an Apex Flow DWY workflow scope. Verify tools, acceptance tests, delivery availability, price and terms before requesting payment. Do not claim integrations or fulfillment are verified without evidence.")}>Scope in Tay</button>
+          <a className="primary-button" href="/apex-flow/offer.html">Review Apex Flow</a>
+          <button className="secondary-button" type="button" onClick={() => onCommand("Prepare the Apex Flow $27 checklist launch from docs/APEX_CHECKLIST_RELEASE.md. Keep the $997 guided tier locked. Verify the complete digital deliverable and payment-to-download flow before enabling checkout. Do not claim collected revenue from tests.")}>Plan launch in Tay</button>
         </div>
       </article>
 
@@ -224,3 +224,4 @@ export function RevenuePanel({ onCommand, revenueSetup }: RevenuePanelProps) {
     </section>
   );
 }
+

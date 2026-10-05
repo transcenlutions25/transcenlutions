@@ -14,7 +14,7 @@ export const salesKits: SalesKit[] = [
     title: "Starter Map Buyer Outreach",
     buyerFit: [
       "has a business idea but no clear first offer",
-      "needs a simple passive-income path",
+      "needs a simple revenue path",
       "can act within the next week",
       "wants clarity more than a large build",
     ],

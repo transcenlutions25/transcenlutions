@@ -1,0 +1,2 @@
+# Preserve this original Mac source byte-for-byte, including its final blank line.
+integrations/tay-desktop/legacy/window/check.js whitespace=-blank-at-eof

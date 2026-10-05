@@ -1,5 +1,12 @@
 node_modules
 .next
+.next-desktop
+.identity-test/
+integrations/tay-desktop/legacy/runtime-state/
+integrations/tay-desktop/legacy/state/
+integrations/tay-desktop/legacy/browser-profiles/
+integrations/tay-desktop/legacy/projects.json
+integrations/tay-desktop/legacy/window/change-backups/
 out
 dist
 .env*

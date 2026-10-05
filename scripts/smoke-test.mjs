@@ -255,6 +255,15 @@ const cases = [
     resultIncludes: "Current box incomplete",
   },
   {
+    request: "Review Crowne Legacy dependencies",
+    intent: "manage_focus",
+    action: "route_focus",
+    permission: "allowed",
+    riskTier: "low",
+    resultStatus: "completed",
+    resultIncludes: "has not been automatically parked or removed",
+  },
+  {
     request: "Use an external API to automate leads",
     intent: "build_feature",
     action: "create_task",

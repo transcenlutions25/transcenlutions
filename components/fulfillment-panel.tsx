@@ -1,13 +1,20 @@
 "use client";
 
+import { useRef } from "react";
 import { ClipboardCheck, Sparkles } from "lucide-react";
 import { deliveryKits, fulfillmentCarePoints } from "../lib/delivery";
+import { WritingBlock } from "./writing-block";
 
 interface FulfillmentPanelProps {
   onCommand: (request: string) => void;
 }
 
 export function FulfillmentPanel({ onCommand }: FulfillmentPanelProps) {
+  const drafts = useRef<Record<string, string>>({});
+  function deliveryBrief(kit: typeof deliveryKits[number]) {
+    return [kit.deliveryPromise, `Delivery phases\n${kit.phases.map((phase, slot) => `${slot + 1}. ${phase}`).join("\n")}`,
+      `Buyer artifacts\n${kit.artifacts.map((artifact) => `• ${artifact}`).join("\n")}`, `Quality standard\n${kit.qualityStandard}`].join("\n\n");
+  }
   return (
     <section className="fulfillment-command" aria-label="Client fulfillment">
       <div className="section-header">
@@ -30,31 +37,14 @@ export function FulfillmentPanel({ onCommand }: FulfillmentPanelProps) {
               <p className="eyebrow">Delivery Kit</p>
             </div>
             <h3>{kit.title}</h3>
-            <p>{kit.deliveryPromise}</p>
-            <div>
-              <p className="mini-heading">Delivery phases</p>
-              <ol>
-                {kit.phases.map((phase) => (
-                  <li key={phase}>{phase}</li>
-                ))}
-              </ol>
-            </div>
-            <div>
-              <p className="mini-heading">Buyer artifacts</p>
-              <ul>
-                {kit.artifacts.map((artifact) => (
-                  <li key={artifact}>{artifact}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="quality-standard">
-              <strong>Quality standard</strong>
-              <p>{kit.qualityStandard}</p>
-            </div>
+            <WritingBlock id={`fulfillment:${kit.offerId}:delivery-brief`} title="Delivery brief" kind="document" content={deliveryBrief(kit)}
+              onContentChange={(value) => { drafts.current[`${kit.offerId}:delivery-brief`] = value; }} />
+            <WritingBlock id={`fulfillment:${kit.offerId}:followup`} title="Buyer follow-up" content={kit.followUpPrompt}
+              onContentChange={(value) => { drafts.current[`${kit.offerId}:followup`] = value; }} />
             <button
               className="secondary-button"
               type="button"
-              onClick={() => onCommand(kit.command)}
+              onClick={() => onCommand(`${kit.command}\n\nCurrent delivery brief:\n${drafts.current[`${kit.offerId}:delivery-brief`] ?? deliveryBrief(kit)}\n\nBuyer follow-up draft:\n${drafts.current[`${kit.offerId}:followup`] ?? kit.followUpPrompt}`)}
             >
               <Sparkles size={16} />
               Prepare with Tay

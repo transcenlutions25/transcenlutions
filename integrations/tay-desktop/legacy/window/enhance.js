@@ -1,0 +1,41 @@
+(function(){
+  const $=id=>document.getElementById(id), api=window.api;
+  const aside=document.querySelector('aside'), header=document.querySelector('header'), row=document.querySelector('.composer .row');
+  if(!aside||!header||!row)return;
+  // Turn the existing navigation into compact, collapsible sections.
+  const oldButtons=[...aside.querySelectorAll('button')], projectLabel=aside.querySelector('label'), project=aside.querySelector('#project'), small=aside.querySelector('small');
+  const details=(title,open)=>{const d=document.createElement('details');d.className='nav-section';d.open=open;const s=document.createElement('summary');s.textContent=title;d.append(s);const c=document.createElement('div');c.className='nav-content';d.append(c);return [d,c]};
+  const [projects,pc]=details('Projects',true),[workspace,wc]=details('Workspace',true);
+  if(projectLabel&&project){projectLabel.remove();pc.append(project);const add=aside.querySelector('#add');if(add)pc.append(add)}
+  const workspaceIds=['connections','tools','engines','foundry','historyButton','exportChat'];oldButtons.filter(b=>workspaceIds.includes(b.id)).forEach(b=>wc.append(b));
+  const marker=document.createElement('div');marker.className='tay-collapsed-note';marker.textContent='Current project / thread';pc.append(marker);
+  aside.append(projects,workspace);
+  // Offline is visible directly below the logo, as requested.
+  const offline=document.createElement('label');offline.className='tay-workspace-toggle';offline.innerHTML='<input id="offlineToggle" type="checkbox"> Offline mode';offline.title='When enabled, prevent this chat from using online providers';
+  const art=aside.querySelector('.brand-art');(art||aside.querySelector('.brand')).after(offline);
+  // Compact model dropdown in the top bar.
+  const tools=document.createElement('div');tools.className='tay-top-tools';
+  const mode=document.createElement('select');mode.id='quickMode';mode.className='tay-glass-icon';[['free','Free online · OpenRouter'],['local','Local · Ollama'],['router','Paid online · OpenRouter'],['openai','OpenAI API'],['claude','Claude API'],['perplexity','Perplexity API']].forEach(([v,t])=>mode.add(new Option(t,v)));mode.value='free';
+  const browser=document.createElement('button');browser.className='tay-glass-icon';browser.textContent='◉ Browser';browser.title='Open Tay browser';
+  const agent=document.createElement('button');agent.className='tay-glass-icon';agent.textContent='✦ Agent';agent.title='Show agent activity';
+  tools.append(mode,browser,agent);header.append(tools);
+  const settingsMode=$('mode');
+  function syncMode(v){if(settingsMode)settingsMode.value=v;const label=mode.selectedOptions[0]?.textContent||'';$('modeLabel').textContent=label;}
+  mode.onchange=()=>{syncMode(mode.value);if(mode.value==='router'||mode.value==='openai'||mode.value==='claude')$('settings').showModal()};
+  offline.onchange=()=>{if(offline.querySelector('input').checked){mode.value='local';syncMode('local');status('Offline mode enabled. Online providers are disabled for this session.')}else status('Offline mode disabled. Free online is selected by default.')};
+  // A single compact tool picker in the composer, like modern AI chat composers.
+  const menu=document.createElement('select');menu.className='tay-tool-menu';menu.setAttribute('aria-label','Choose a configured tool');[['','Tools'],['browser','Browser'],['research','Perplexity research'],['foundry','Venture Foundry'],['files','Project files'],['unity','Unity'],['unreal','Unreal'],['voice','Voice']].forEach(([v,t])=>menu.add(new Option(t,v)));menu.onchange=()=>{const v=menu.value;if(!v)return;if(v==='browser')browser.click();else if(v==='foundry')$('foundry').click();else if(v==='research')$('prompt').value='Research this with Perplexity: ';else if(v==='files')$('attach').click();else if(v==='voice')$('micOptions').click();else if(v==='unity'||v==='unreal')$('engines').click();menu.value=''};row.prepend(menu);
+  const attach=$('attach');if(attach){const originalAttach=attach.onclick;attach.textContent='＋';attach.title='Add';attach.setAttribute('aria-label','Add');attach.style.cssText='width:42px;padding:8px 0;text-align:center';const addMenu=document.createElement('div');addMenu.className='tay-composer-add';addMenu.innerHTML='<button data-add="files">Files and folders</button><button data-add="chrome">Attach Google Chrome</button><button data-add="project">Work in a project</button><button data-add="goal">Goal</button><button data-add="plan">Plan mode</button><button data-add="plugins">Plugins</button><button data-add="save">Archive copy</button>';row.style.position='relative';row.append(addMenu);attach.onclick=()=>addMenu.classList.toggle('open');addMenu.querySelectorAll('button').forEach(x=>x.onclick=()=>{const v=x.dataset.add;if(v==='files'){addMenu.classList.remove('open');return originalAttach?.()};if(v==='project')$('project')?.focus();else if(v==='goal')status('Set a measurable goal in the current thread.');else if(v==='plan')status('Plan mode selected for this thread.');else if(v==='plugins')status('Open Self Dev · Skills to manage plugins.');else if(v==='chrome')status('Chrome attachment will be available after browser permissions are configured.');else if(v==='save')$('saveThread')?.click();addMenu.classList.remove('open')});}
+  // Agent-style progress surface. It shows state; it does not grant hidden permissions.
+  const panel=document.createElement('section');panel.className='tay-agent';panel.innerHTML='<div class="agent-title"><div><h3>Tay Agent</h3><div class="agent-sub">Visible work plan for this conversation</div></div><button class="tay-agent-close">Close</button></div><label>Thread mode</label><select id="threadMode"><option>Chat — discuss and draft</option><option>Plan — create steps and files to review</option><option>Execute — use connected coding tools</option></select><button id="saveThread">Archive copy</button><ul><li data-step="plan" class="active">Plan the requested work</li><li data-step="context">Read selected project context</li><li data-step="act">Use the selected tool</li><li data-step="verify">Verify the result</li></ul><div class="agent-sub">Threads save continuously. Use Archive copy only when you want a separate checkpoint.</div>';document.querySelector('main').append(panel);
+  $('threadMode').onchange=()=>status('Thread mode: '+$('threadMode').selectedOptions[0].textContent);
+  $('saveThread').onclick=async()=>{try{await api('/save-thread',{project:$('project').value});status('Archive copy created. This thread is already saved continuously.')}catch(e){status(e.message)}};
+  agent.onclick=()=>panel.classList.toggle('open');panel.querySelector('.tay-agent-close').onclick=()=>panel.classList.remove('open');
+  function setStep(n){panel.querySelectorAll('li').forEach((x,i)=>x.classList.toggle('active',i===n))}
+  const send=$('send');if(send){send.addEventListener('click',()=>{document.body.dataset.tayActivity='working';setStep(1);setTimeout(()=>setStep(2),350);});}
+  const oldStatus=window.status;window.status=(t)=>{oldStatus?.(t);if(t&&/playing|response/i.test(t)){document.body.dataset.tayActivity='speaking';setStep(3)}else if(!t)document.body.dataset.tayActivity='idle'};
+  // Browser panel stays local to this window; external sites can be opened in a full tab if framing is blocked.
+  const bp=document.createElement('section');bp.className='tay-browser';bp.innerHTML='<div class="tay-browser-bar"><input id="tayBrowserUrl" value="https://www.google.com" aria-label="Browser address"><button id="tayBrowserGo">Go</button><button id="tayBrowserExternal">Open full browser</button><button id="tayBrowserClose">Close</button></div><iframe class="tay-browser-frame" id="tayBrowserFrame" title="Tay browser"></iframe>';document.querySelector('main').append(bp);
+  function go(){let u=$('tayBrowserUrl').value.trim();if(!(u.startsWith('http://')||u.startsWith('https://')))u='https://'+u;$('tayBrowserUrl').value=u;$('tayBrowserFrame').src=u}browser.onclick=()=>{bp.classList.add('open');go()};$('tayBrowserGo').onclick=go;$('tayBrowserUrl').onkeydown=e=>{if(e.key==='Enter')go()};$('tayBrowserClose').onclick=()=>bp.classList.remove('open');$('tayBrowserExternal').onclick=()=>window.open($('tayBrowserUrl').value,'_blank','noopener');
+  syncMode('free');
+})();

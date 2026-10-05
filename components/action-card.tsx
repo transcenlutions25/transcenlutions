@@ -13,6 +13,7 @@ import {
 } from "../lib/public-copy";
 import { CheckCircle2, Crown, Lock, Play, ShieldAlert } from "lucide-react";
 import { FeedbackStrip } from "./feedback-strip";
+import { WritingBlock } from "./writing-block";
 
 interface ActionCardProps {
   response: TayResponse | null;
@@ -171,7 +172,7 @@ export function ActionCard({
             </span>
             <p className="eyebrow">Result</p>
           </div>
-          <p>{result.result}</p>
+          <WritingBlock id={`${response.id}:result`} title="Result" content={result.result} />
           {result.artifact ? (
             <div className="artifact-preview">
               <div>
@@ -179,19 +180,10 @@ export function ActionCard({
                 <h3>{result.artifact.title}</h3>
                 <p>{result.artifact.subtitle}</p>
               </div>
-              <div className="artifact-section-grid">
-                {result.artifact.sections.map((section) => (
-                  <section key={section.heading}>
-                    <strong>{section.heading}</strong>
-                    <ul>
-                      {section.items.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </section>
-                ))}
-              </div>
-              <p className="artifact-care">{result.artifact.careNote}</p>
+              <WritingBlock id={`${response.id}:artifact`} title={result.artifact.title} kind="document"
+                content={[result.artifact.title, result.artifact.subtitle,
+                  ...result.artifact.sections.map(section => `${section.heading}\n${section.items.map(item => `• ${item}`).join("\n")}`),
+                  result.artifact.careNote].join("\n\n")} />
             </div>
           ) : null}
           {result.handoff ? (

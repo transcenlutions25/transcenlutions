@@ -1,0 +1,31 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const ts = require("typescript");
+require.extensions[".ts"] = (module, filename) => module._compile(ts.transpileModule(readFileSync(filename, "utf8"), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+}).outputText, filename);
+const { addQueuedRequest, moveQueuedRequest, recordMomentum, completedToday, readWorkspaceState } = require("../lib/workspace-state.ts");
+const requests = Array.from({ length: 8 }, (_, i) => ({ id: `objective-${i}`, text: `Objective ${i}`, agentId: "tay", mode: "chat", paused: false }));
+let queue = requests.reduce(addQueuedRequest, []);
+assert.equal(queue.length, 8, "queue accepts more than three objectives");
+assert.equal(addQueuedRequest(queue, requests[0]), queue, "acceptance is idempotent");
+assert.equal(moveQueuedRequest(queue, "objective-2", -1)[1].id, "objective-2");
+assert.equal(moveQueuedRequest(queue, "missing", -1), queue);
+assert.equal(moveQueuedRequest(queue, "objective-0", -1), queue);
+assert.equal(queue[0].id, "objective-0", "reordering does not mutate the original queue");
+let events = recordMomentum([], "verified-move", "2026-10-04T14:00:00Z");
+assert.equal(recordMomentum(events, "verified-move"), events, "repeat execution cannot farm progress");
+assert.equal(completedToday(events, new Date("2026-10-04T18:00:00Z")), 1);
+assert.equal(completedToday(events, new Date("2026-10-05T18:00:00Z")), 0);
+globalThis.localStorage = { getItem: () => JSON.stringify({ version: 1, conversations: [] }) };
+assert.equal(readWorkspaceState().version, 1);
+globalThis.localStorage.getItem = () => JSON.stringify({ version: 99 });
+assert.equal(readWorkspaceState(), null);
+delete globalThis.localStorage;
+const { getAgentActionPolicy } = require("../lib/agent-foundation.ts");
+assert.equal(getAgentActionPolicy("kj", "plan").allowed, true);
+assert.equal(getAgentActionPolicy("kj", "payment", true).allowed, false, "KJ selection cannot grant payment authority");
+assert.equal(getAgentActionPolicy("kj", "execute_local_task", true).allowed, false);
+console.log("Workspace checks passed: queue capacity, idempotency, immutable reorder, earned progress, storage schema.");

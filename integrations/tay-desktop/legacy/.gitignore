@@ -1,0 +1,18 @@
+# Only source belongs in this preservation folder.
+__pycache__/
+*.pyc
+.env*
+config.yml
+projects.json
+projects/
+runtime-state/
+opportunities.sqlite3*
+.aider.*
+window/browser/
+window/change-backups/
+window/selfdev-state/
+window/verification/
+window/custom.js
+window/custom.css
+window/*.log
+window/voice-*.mp3

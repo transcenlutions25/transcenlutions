@@ -4,7 +4,7 @@ const stackItems = [
   { name: "Chat System", status: "Active" },
   { name: "Action Engine", status: "Ready" },
   { name: "Governance Layer", status: "Active" },
-  { name: "Passive income focus", status: "Primary" },
+  { name: "Revenue outcomes", status: "Primary" },
   { name: "Founder OS", status: "Active" },
   { name: "Launch Readiness", status: "Active" },
   { name: "Deployment Prep", status: "Setup" },

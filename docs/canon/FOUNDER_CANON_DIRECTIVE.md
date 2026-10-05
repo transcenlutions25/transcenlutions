@@ -57,3 +57,7 @@ Builders, coding agents, planning agents, investor materials, websites, document
 Do not omit a canonical feature merely because it is expensive, complex, future-facing, or not part of the immediate implementation phase. Instead expose it in the system map with an appropriate dependency, phase, implementation status, or future-state marker.
 
 The goal is ONE TRANSCENLUTIONS SOURCE OF TRUTH.
+
+## October 5, 2026 — product behavior and owner authority
+
+The founder's direct follow-up is recorded as CANON in [Founder product and authority rules](FOUNDER_PRODUCT_AND_AUTHORITY_RULES_2026-10-05.md). It defines selective writing blocks, default product use across Tay and authorized agent chats, the founding owner's exclusive system-wide authority, account-only customization for other users, and left-panel administration for scoped human admins and configured admin AI agents. Canon status does not imply these services are already implemented or connected.

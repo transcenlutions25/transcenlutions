@@ -1,6 +1,7 @@
 # Transcenlutions Master Canon and System Map
 
 Updated: 2026-10-05 UTC (founder decisions: October 4, 2026, America/New_York).
+Latest addition: October 5, 2026, 11:42 a.m. America/New_York — [Founder product and authority rules](FOUNDER_PRODUCT_AND_AUTHORITY_RULES_2026-10-05.md).
 Source of truth: `transcenlutions25/transcenlutions`.
 
 ## Current founder decisions
@@ -9,6 +10,7 @@ Source of truth: `transcenlutions25/transcenlutions`.
 2. Build for the full Transcenlutions scope, not only the latest revenue offer.
 3. **The Mac Tay Command UI/UX is visual and interaction canon.** Preserve its artwork, conversation-first layout, navigation, compact controls, bottom composer, writing blocks, contextual panels, royal purple/black/gold materials and geometric identity. Improve legibility, accessibility and behavior within this design.
 4. The company is **Transcenlutions**. Tay Command is its command center. The Mac source and web workspace belong to one versioned platform; private Mac files and SQLite state are not automatically synchronized to the hosted app.
+5. **Writing blocks, product portability and authority follow the October 5 founder rules.** Editable/copyable prose uses writing blocks; ordinary chat does not. Created/purchased products are usable in Tay and authorized agent chats by default, subject to explicit compatibility limits and account entitlements. Only the founding owner can change the system globally. Owner-controlled admin invitations and customizable admin AI agents belong in left-panel Administration. This records required behavior, not completed backend enforcement.
 
 These direct instructions supersede the older description of Mac Tay as merely an optional reference. The September surface canon remains applicable where consistent. The Cobalt branch's root single-module mission is scoped to Cobalt; its instructions are preserved verbatim in [Cobalt module instructions](COBALT_CURRENT_MODULE_BUILD_INSTRUCTIONS.md). No payment, communication or approval safeguard is removed by this scope correction.
 

@@ -6,6 +6,8 @@ The source of truth is `transcenlutions25/transcenlutions`. Read `docs/canon/MAS
 
 The Mac Tay Command UI/UX is the visual and interaction canon. Preserve the approved artwork, purple/black/gold materials, conversation-first layout, navigation, bottom composer, writing blocks and contextual side panel. Refine accessibility, clarity and behavior within that design. Do not replace the workspace with a landing page or unrelated dashboard.
 
+Read [Founder product and authority rules](docs/canon/FOUNDER_PRODUCT_AND_AUTHORITY_RULES_2026-10-05.md) before changing output rendering, product delivery, account permissions or agent creation. Writing blocks are for editable/copyable prose deliverables, not ordinary chat. Products created or purchased here must be usable in Tay and authorized agent chats by default, with explicit compatibility exceptions. The founding owner alone can make system-wide changes; account ownership or an admin label never grants that authority. The left-panel Administration flow must support owner-controlled human-admin invitations and admin-agent creation (instructions, picture, voice and explicit scoped permissions). These are binding build requirements; production authentication and those management flows remain incomplete until verified.
+
 ## Protected rules
 
 - Preserve existing governance, approval gates, legal notices and revenue safeguards. Obtain owner authorization for consequential external actions; honor authorization already given for the current scope.

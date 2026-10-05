@@ -1,0 +1,72 @@
+/* Transcenlutions glass command surface */
+body{position:relative;overflow:hidden;background:#0a0710!important}
+/* Shared sizes keep the controls usable in a side-by-side chat window. */
+[hidden]{display:none!important}
+body{height:100dvh}
+aside{flex-shrink:0;width:248px;padding:22px 16px}
+main{position:relative;min-height:0}
+header{flex-wrap:wrap;gap:8px;padding:14px 20px}
+#projectName{min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tay-top-tools{width:100%;flex-wrap:wrap;gap:6px}
+.tay-top-tools select{min-width:0!important;max-width:220px;flex:1}
+.tay-top-tools button{white-space:nowrap}
+.tay-privacy-modes{margin:2px 0 12px}
+.tay-privacy-modes button{font-size:11px;margin:0}
+.tay-nav-stack details:not([open])>.nav-content{display:none}
+.tay-nav-stack summary{width:100%;font-size:13px;min-height:36px;margin-top:5px;user-select:none}
+.tay-nav-stack .nav-content{padding:4px 0 5px 10px;border-left:1px solid var(--edge);margin-left:8px}
+.nav-content>button,.nav-content>select{width:100%;font-size:12px;white-space:normal}
+.tay-sidebar-footer{margin-top:16px;position:sticky;bottom:-16px;padding:8px 0 12px;background:linear-gradient(0deg,#100b18 85%,transparent);z-index:4}
+.tay-sidebar-footer button{width:100%;font-size:13px}
+.brand{font-size:14px;letter-spacing:1.1px;overflow-wrap:anywhere}
+.composer{padding:8px 20px 14px}
+.composer .row{justify-content:flex-start;flex-wrap:nowrap;gap:8px}
+.composer .row>button{height:34px;min-width:34px;width:34px;padding:5px!important;display:inline-flex;align-items:center;justify-content:center}
+.composer .row>.send{width:auto;min-width:44px;margin-left:auto;font-size:12px}
+.composer .row .tay-tool-menu{min-width:65px!important;max-width:112px;padding:6px!important}
+.composer #micStatus:empty{display:none}
+.composer #prompt{min-height:58px;resize:vertical}
+#messages .msg,#prompt{font-size:var(--chat-text-size,15px)}
+.tay-settings-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.tay-settings-heading h2{margin:0}
+.tay-settings-heading p{margin:6px 0 18px}
+#taySettings{width:min(800px,94vw);padding:22px}
+.tay-settings-layout{display:grid;grid-template-columns:168px minmax(0,1fr);gap:22px}
+.tay-settings-nav{display:flex;flex-direction:column;gap:7px}
+.tay-settings-nav button{font-size:12px;text-align:left;padding:10px}
+.tay-settings-nav button[aria-pressed=true]{border-color:var(--gold);color:var(--gold);box-shadow:inset 0 1px #fff7,0 0 12px #8d49bd33}
+.tay-settings-content{min-height:355px}
+.tay-settings-content h3{margin:0 0 16px;color:var(--gold)}
+.tay-settings-content label{margin-top:14px}
+.tay-setting-check{display:flex;align-items:center;gap:9px;min-height:30px}
+.tay-setting-check input{flex-shrink:0}
+.tay-settings-links{display:flex;flex-direction:column;gap:8px}
+.tay-settings-footer{display:flex;align-items:center;gap:10px;border-top:1px solid var(--edge);padding-top:15px;margin-top:18px;flex-wrap:wrap}
+.tay-settings-footer span{flex:1;min-width:150px}
+.tay-settings-footer button{font-size:12px;padding:8px}
+.settings-actions{flex-wrap:wrap}
+.tay-high-contrast{filter:none!important;--edge:rgba(235,214,164,.8)}
+.tay-high-contrast .note,.tay-high-contrast small,.tay-high-contrast .tay-thread-context{color:#e3dcec}
+.tay-high-contrast button{border-color:#ddc69d}
+body[data-tay-accent=midnight] aside{background:linear-gradient(145deg,#182438,#090d18)}
+body[data-tay-accent=midnight] header{background:linear-gradient(120deg,#182237,#101724)}
+body[data-tay-accent=midnight] dialog{background:linear-gradient(140deg,#25344f,#101724 80%)}
+body[data-tay-accent=midnight] button,body[data-tay-accent=midnight] select{color:#d8e2ff}
+.tay-compact #messages{padding-top:18px}
+.tay-compact .composer .box{padding:10px}
+.tay-reduce-motion *,.tay-reduce-motion:before{animation:none!important;transition:none!important}
+@media(max-width:1000px){aside{width:214px;padding:16px 12px}.brand{font-size:12px;letter-spacing:.7px}header{padding:12px}#messages{padding:20px}.composer{padding:8px 12px 12px}.tay-thread-context{margin-left:0;max-width:180px}.tay-mode-label{display:none}}
+@media(max-width:600px){body{flex-direction:row}aside{display:flex;flex-direction:column;flex-wrap:nowrap;width:150px;gap:0;padding:12px 8px}aside .brand{font-size:11px;letter-spacing:0}.brand span{font-size:8px;letter-spacing:1px}aside label,aside small,aside .bottom{display:block}aside .tay-workspace-toggle{display:none}.brand-art{display:none}aside select{width:100%}.tay-top-tools{gap:4px}.tay-top-tools select{max-width:100%;flex-basis:100%}.tay-settings-layout{grid-template-columns:1fr;gap:14px}.tay-settings-nav{flex-direction:row;flex-wrap:wrap}.tay-settings-nav button{padding:6px;font-size:11px}.tay-settings-content{min-height:0}.composer .row .tay-tool-menu{max-width:70px}.composer .row{gap:4px}#taySettings{padding:14px}}
+body:before{content:"";position:fixed;inset:-35%;z-index:-1;pointer-events:none;opacity:.28;background:radial-gradient(circle at center,transparent 0 18%,rgba(111,57,169,.24) 18.2% 18.5%,transparent 18.8% 30%,rgba(223,181,95,.12) 30.2% 30.5%,transparent 30.8%),repeating-conic-gradient(from 15deg,rgba(120,62,191,.10) 0 8deg,transparent 8deg 30deg);background-size:100% 100%,260px 260px;animation:sacred-drift 90s linear infinite}
+body[data-tay-activity="working"]:before{animation-duration:22s;opacity:.42;filter:brightness(1.3)}body[data-tay-activity="speaking"]:before{animation-duration:45s;opacity:.5;filter:brightness(1.55)}
+@keyframes sacred-drift{to{transform:rotate(360deg) scale(1.12)}}
+.tay-workspace-toggle{display:flex;align-items:center;gap:7px;color:#dfbd72;font-size:11px;margin:8px 0}.tay-workspace-toggle input{width:15px;height:15px}
+.tay-top-tools{display:flex;gap:7px;align-items:center}.tay-top-tools button,.tay-top-tools select{font-size:12px;padding:8px 10px}.tay-top-tools select{min-width:158px;width:auto}
+.tay-browser{position:absolute;inset:0;z-index:20;display:none;flex-direction:column;background:#100c16}.tay-browser.open{display:flex}.tay-browser-bar{display:flex;gap:7px;padding:10px;border-bottom:1px solid #8c6a35;background:#1b1322}.tay-browser-bar input{flex:1}.tay-browser-frame{flex:1;width:100%;border:0;background:#fff}
+.tay-agent{position:absolute;right:20px;top:74px;z-index:19;width:min(380px,calc(100% - 40px));display:none;padding:18px;border:1px solid #d6ad60;border-radius:18px;background:linear-gradient(145deg,#33203f,#100c16e8);box-shadow:0 18px 70px #000b}.tay-agent.open{display:block}.tay-agent h3{margin:0}.tay-agent .agent-sub{color:#aaa;font-size:12px}.tay-agent ul{list-style:none;margin:15px 0;padding:0}.tay-agent li{padding:9px 0;border-bottom:1px solid #ffffff12;color:#858793;font-size:13px}.tay-agent li.active{color:#f1d38e}.tay-agent li.active:before{content:"◉";margin-right:8px;color:#e1ba65}.tay-agent li:before{content:"○";margin-right:8px}.tay-agent button{font-size:12px;padding:7px 10px}
+.tay-tool-menu{width:auto!important;min-width:120px!important;padding:8px 10px!important;font-size:12px!important;background:transparent!important;box-shadow:none!important}.tay-glass-icon{font-size:12px;padding:8px 10px!important}.tay-collapsed-note{font-size:11px;color:#98929e;padding:6px 0}.tay-browser-open{cursor:pointer}
+.tay-composer-add{display:none;position:absolute;left:0;bottom:48px;z-index:25;width:220px;padding:9px;border:1px solid var(--edge);border-radius:14px;background:linear-gradient(145deg,#32203e,#100c16);box-shadow:0 18px 60px #000b}.tay-composer-add.open{display:block}.tay-composer-add button{display:block;width:100%;margin:4px 0;padding:8px 10px;font-size:12px;text-align:left}
+.tay-thread-context{font-size:12px;color:#bda883;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px;margin-left:10px}.settings-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}.settings-actions button{font-size:12px;padding:8px 12px}.tay-reduce-motion:before,.tay-reduce-motion .brand-art{animation:none!important}.tay-reduce-motion:before{opacity:.12}
+.tay-nav-stack{display:flex;flex-direction:column;gap:2px}.tay-nav-stack>.nav-section{width:100%}.tay-nav-stack .nav-section .nav-section{margin-top:8px}.tay-preview{position:absolute;right:20px;top:74px;z-index:18;width:min(400px,calc(100% - 40px));display:none;padding:18px;border:1px solid #d6ad60;border-radius:18px;background:linear-gradient(145deg,#33203f,#100c16ed);box-shadow:0 18px 70px #000b}.tay-preview.open{display:block}.tay-preview-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.tay-preview h3{margin:0 0 4px}.tay-preview-stage{display:flex;flex-direction:column;gap:8px;margin-top:16px;padding:22px;border-radius:14px;border:1px solid #d6ad604d;background:radial-gradient(circle at 80% 20%,#7047a955,#160d20 65%);min-height:150px;justify-content:center}.tay-preview-stage strong{font-size:22px;color:#f1d38e;overflow-wrap:anywhere}.tay-preview-stage span:not(.badge){font-size:12px;color:#bdb2c7}
+.tay-mode-toggle{display:flex;align-items:center;gap:3px;padding:3px;border:1px solid var(--edge);border-radius:12px;background:#100c16aa}.tay-mode-toggle .tay-mode-label{font-size:10px;color:#bda883;padding:0 4px}.tay-mode-toggle button{font-size:11px!important;padding:5px 7px!important;border:0;box-shadow:none;background:transparent}.tay-mode-toggle button.active{background:linear-gradient(145deg,#f5dca1,#a9742e);color:#1c120b;box-shadow:0 0 12px #d9b78055}.tay-nav-stack summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between}.tay-nav-stack summary::-webkit-details-marker{display:none}.tay-nav-stack summary:after{content:'›';font-size:18px;line-height:1;color:#d9b780;transition:transform .18s}.tay-nav-stack details[open]>summary:after{transform:rotate(90deg)}.tay-compact .tay-nav-stack button{padding-top:7px;padding-bottom:7px}.tay-high-contrast{filter:contrast(1.08)}
+.tay-compact .tay-nav-stack summary{padding-top:5px;padding-bottom:5px}body[data-tay-accent="midnight"]{--gold:#b7c8ff;--edge:rgba(170,190,255,.42)}body[data-tay-accent="midnight"] .send{background:linear-gradient(165deg,#e7edff,#8399d4 43%,#29334f 53%,#9db4ee)}body[data-tay-accent="midnight"] .tay-mode-toggle button.active{background:linear-gradient(145deg,#dce7ff,#6e83c0)}

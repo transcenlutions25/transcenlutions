@@ -35,7 +35,7 @@ The adapter is for this Mac's local owner surface. The desktop server binds to l
 
 Agent identity, project/session checks, accepted settings, and attachment boundaries are validated by the server. The adapter exposes no model-selected tools or consequential action execution. Text can describe an action but cannot publish, edit source, spend, or generate a 3D asset through this runtime. These restrictions are an intentionally limited capability boundary; they do not replace the future policy, approval, and tool authorization system.
 
-Runtime data lives at `~/Tay/runtime-state/commands.sqlite3`, with a process ownership lock beside it. The database contains prompts and responses; treat it as private local data. API keys are excluded from objective payloads and events. The extension does not copy chats, browser profiles, credentials, or the existing desktop application's private source into the repository.
+Runtime data lives at `~/Tay/runtime-state/commands.sqlite3`, with a process ownership lock beside it. The database contains prompts and responses; treat it as private local data. API keys are excluded from objective payloads and events. The extension does not copy chats, browser profiles, credentials, or private user data into the repository. Curated production source is preserved separately in [legacy/README.md](legacy/README.md); [the feature map](../../docs/tay-desktop-feature-map.md) explains the shared interface and remaining local adapters.
 
 Attached references must be small text files inside the selected project. Internal and credential file paths are rejected. Local operational events record lifecycle changes and successful model/provider/latency metadata. They are not yet connected to the platform-wide Operating Graph.
 

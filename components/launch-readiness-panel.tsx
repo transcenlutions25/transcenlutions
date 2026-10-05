@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import {
   CheckCircle2,
   CircleAlert,
@@ -9,6 +10,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import type { LaunchReadinessState } from "../lib/launch-readiness";
+import { WritingBlock } from "./writing-block";
 
 interface LaunchReadinessPanelProps {
   launchReadiness: LaunchReadinessState;
@@ -26,6 +28,7 @@ export function LaunchReadinessPanel({
   launchReadiness,
   onCommand,
 }: LaunchReadinessPanelProps) {
+  const drafts = useRef<Record<string, string>>({});
   return (
     <section className="launch-command" aria-label="Launch readiness layer">
       <div className="section-header">
@@ -104,7 +107,8 @@ export function LaunchReadinessPanel({
       <div className="launch-onboarding">
         <div>
           <p className="eyebrow">Tay Onboarding</p>
-          <h3>{launchReadiness.onboardingQuestion}</h3>
+          <WritingBlock id="launch:onboarding:question" title="Onboarding question" content={launchReadiness.onboardingQuestion}
+            onContentChange={(value) => { drafts.current.question = value; }} />
           <p>
             Tay routes the answer into one path and one first move before
             suggesting any wider build.
@@ -114,7 +118,8 @@ export function LaunchReadinessPanel({
           {launchReadiness.onboardingPaths.map((path) => (
             <article key={path.id}>
               <strong>{path.label}</strong>
-              <p>{path.prompt}</p>
+              <WritingBlock id={`launch:onboarding:path:${path.id}`} title={`${path.label} prompt`} content={path.prompt}
+                onContentChange={(value) => { drafts.current[path.id] = value; }} />
             </article>
           ))}
         </div>
@@ -144,7 +149,8 @@ export function LaunchReadinessPanel({
             className="secondary-button"
             key={command}
             type="button"
-            onClick={() => onCommand(command)}
+            onClick={() => onCommand(command.startsWith("Prepare ") ?
+              `${command}\n\nCurrent onboarding question:\n${drafts.current.question ?? launchReadiness.onboardingQuestion}\n\nCurrent onboarding prompts:\n${launchReadiness.onboardingPaths.map((path) => `${path.label}\n${drafts.current[path.id] ?? path.prompt}`).join("\n\n")}` : command)}
           >
             {command}
           </button>

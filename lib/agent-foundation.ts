@@ -1,5 +1,5 @@
 /** Agent Foundation v1: shared runtime for chat and voice channels. */
-export type AgentId = "tay" | "dawn" | "rory";
+export type AgentId = "tay" | "dawn" | "kj" | "rory";
 export type Channel = "chat" | "voice";
 export type Authority = "orchestrator" | "specialist" | "child_safe";
 export type MemoryScope = "session" | "agent" | "tenant";
@@ -66,7 +66,7 @@ export const agentRegistry: Record<AgentId, AgentDefinition> = {
     role: "Executive orchestrator and primary relationship agent",
     authority: "orchestrator",
     constitution,
-    allowedDelegates: ["dawn", "rory"],
+    allowedDelegates: ["dawn", "kj", "rory"],
     allowedActions: [
       "read_context",
       "plan",
@@ -93,6 +93,10 @@ export const agentRegistry: Record<AgentId, AgentDefinition> = {
     constitution,
     allowedDelegates: [],
     allowedActions: ["read_context", "plan", "draft_content", "prepare_offer", "recommend_follow_up"],
+  },
+  kj: {
+    id: "kj", name: "KJ", role: "Forge Master · Head of Ascended Forge", authority: "specialist",
+    constitution, allowedDelegates: [], allowedActions: ["read_context", "plan", "draft_content"],
   },
   rory: {
     id: "rory",

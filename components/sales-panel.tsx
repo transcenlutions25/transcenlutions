@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import {
   CornerDownRight,
   MessageSquareText,
@@ -11,12 +12,15 @@ import {
   buyerReplyExamples,
 } from "../lib/buyer-replies";
 import { salesCarePoints, salesKits } from "../lib/sales";
+import { WritingBlock } from "./writing-block";
 
 interface SalesPanelProps {
   onCommand: (request: string) => void;
 }
 
 export function SalesPanel({ onCommand }: SalesPanelProps) {
+  const drafts = useRef<Record<string, string>>({});
+  const followUpIds = ["fit-question", "value-note", "next-step"];
   return (
     <section className="sales-command" aria-label="Buyer outreach">
       <div className="section-header">
@@ -39,10 +43,8 @@ export function SalesPanel({ onCommand }: SalesPanelProps) {
               <p className="eyebrow">Outreach Kit</p>
             </div>
             <h3>{kit.title}</h3>
-            <div className="message-script">
-              <strong>First message</strong>
-              <p>{kit.firstMessage}</p>
-            </div>
+            <WritingBlock id={`sales:${kit.offerId}:first-message`} title="First message" content={kit.firstMessage}
+              onContentChange={(value) => { drafts.current[`${kit.offerId}:first-message`] = value; }} />
             <div>
               <p className="mini-heading">Good buyer fit</p>
               <ul>
@@ -56,11 +58,11 @@ export function SalesPanel({ onCommand }: SalesPanelProps) {
             </div>
             <div>
               <p className="mini-heading">Follow-up prompts</p>
-              <ol>
-                {kit.followUps.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ol>
+              {kit.followUps.map((item, slot) => (
+                <WritingBlock key={followUpIds[slot]} id={`sales:${kit.offerId}:followup:${followUpIds[slot]}`}
+                  title={`Follow-up ${slot + 1}`} content={item}
+                  onContentChange={(value) => { drafts.current[`${kit.offerId}:followup:${followUpIds[slot]}`] = value; }} />
+              ))}
             </div>
             <div>
               <p className="mini-heading">Do not sell if</p>
@@ -76,7 +78,7 @@ export function SalesPanel({ onCommand }: SalesPanelProps) {
             <button
               className="secondary-button"
               type="button"
-              onClick={() => onCommand(kit.command)}
+              onClick={() => onCommand(`${kit.command}\n\nCurrent outreach draft:\n${drafts.current[`${kit.offerId}:first-message`] ?? kit.firstMessage}\n\nCurrent follow-up drafts:\n${kit.followUps.map((item, slot) => drafts.current[`${kit.offerId}:followup:${followUpIds[slot]}`] ?? item).join("\n\n")}`)}
             >
               <Sparkles size={16} />
               Prepare with Tay
@@ -106,15 +108,12 @@ export function SalesPanel({ onCommand }: SalesPanelProps) {
         </div>
         <div className="reply-command-grid">
           {buyerReplyExamples.map((example) => (
-            <button
-              className="reply-command"
-              key={example.label}
-              type="button"
-              onClick={() => onCommand(example.prompt)}
-            >
-              <span>{example.label}</span>
-              <em>{example.prompt}</em>
-            </button>
+            <div className="reply-command" key={example.label}>
+              <WritingBlock id={`sales:buyer-reply:${example.label}`} title={example.label} content={example.prompt}
+                onContentChange={(value) => { drafts.current[`buyer-reply:${example.label}`] = value; }} />
+              <button className="secondary-button" type="button"
+                onClick={() => onCommand(drafts.current[`buyer-reply:${example.label}`] ?? example.prompt)}>Use reply with Tay</button>
+            </div>
           ))}
         </div>
         <div className="sales-care-grid">

@@ -1,38 +1,17 @@
+// Recovered scope, not a claim that every service is connected.
+// Source and dependencies: docs/canon/MASTER_CANON_AND_SYSTEM_MAP.md.
 export const futureModules = [
-  {
-    title: "Business Command Workspace",
-    category: "Operations",
-    status: "Prepared",
-    text: "Turns goals, offers, tasks, and launch steps into Tay-routed command flows.",
-  },
-  {
-    title: "Creator Flow Studio",
-    category: "Content",
-    status: "Prepared",
-    text: "Shapes writing, creative direction, publishing rhythms, and project momentum through chat.",
-  },
-  {
-    title: "Connector Gateway",
-    category: "Automation",
-    status: "Approval-gated",
-    text: "Future outside services connect through governance, visible approvals, and logged results.",
-  },
-  {
-    title: "Insight Radar",
-    category: "Strategy",
-    status: "Prepared",
-    text: "Surfaces patterns, blockers, fatigue signals, and business opportunities for Tay to route.",
-  },
-  {
-    title: "Founder Command Console",
-    category: "Leadership",
-    status: "Prepared",
-    text: "Keeps priorities, operating notes, and strategic next moves centered on the owner.",
-  },
-  {
-    title: "Crowne Legacy Bridge",
-    category: "Companion Game",
-    status: "Preview",
-    text: "Connects future story progress, cooperative achievement, and ecosystem identity.",
-  },
-];
+  { title: "Tay Command workspace", status: "Available · local workspace", text: "Conversation, Queue and Steer, project references, writing blocks and workspace exports share the Mac Tay design. Hosted replies use guided Tay Core; private Mac state stays on the Mac." },
+  { title: "Business Command & Founder Console", status: "Available · planning tools", text: "Business priorities, offers, sales, fulfillment and founder focus sit beside the conversation. Drafts and plans do not imply outside actions were performed." },
+  { title: "Shared platform services", status: "Partial · foundation", text: "Identity and tenants, organizations, agents, authority, workflows, integrations, the Operating Graph, audit, memory, events, finance and model routing form one shared core. Authenticated durable services remain to be completed." },
+  { title: "Agents & live presence", status: "Partial · Mac runtime", text: "Tay orchestrates; Dawn and KJ have specialist roles. KJ leads Ascended Forge. The preserved Mac runtime supports local model work. Shared animated presence, governed delegation and hosted model execution are planned; Rory remains gated by child-safety requirements." },
+  { title: "Ascended Forge & 3D Forge", status: "Planned · production division", text: "Apps, websites, SaaS, games, AI, automation, media, 3D assets, QA and launches belong to KJ’s factory. Existing Mac tools are preserved; shared production pipelines and inspect–refine–approve–export flows need adapters and asset history." },
+  { title: "Creator Flow Studio & Crowne Legacy", status: "Planned · production canon", text: "Writing, publishing rhythms, cinematic story, character continuity, image, video, voice, music, VFX and QA share a governed production pipeline. Crowne Legacy is a flagship film/game world, with approved identities and cost tracking." },
+  { title: "Model stack & Connector Gateway", status: "Setup required", text: "Provider-neutral intelligence, image, video, voice, code, knowledge, browser and deployment lanes are canon. Tay Auto, manual overrides, budgets, safe failover and usage records depend on shared authorization and provider connections." },
+  { title: "Revenue, Apex Flow & lead recovery", status: "Partial · sandbox verified", text: "Apex Flow includes an offer, checkout delivery handlers and an offline checklist. One sandbox purchase-to-delivery flow was verified; live sales are gated. Cobalt Current lead recovery remains specified, with owner-reviewed drafts and no autonomous sending." },
+  { title: "Acquisition & Funding Engine", status: "Specified · not connected", text: "Acquisition workflows and a qualified funding pipeline preserve evidence, eligibility, applications, approvals and outcomes. Funding fees, signatures and submissions need specific approval; discovery automation is not active here." },
+  { title: "Learning Mode, Rory & Playbooks", status: "Planned · shared runtime", text: "Quick Guide, tiny guided steps and deep understanding teach the same workflows Tay operates. Experience-to-Playbook learning preserves verified lessons. Rory’s learning system requires its privacy and child-safety foundations." },
+  { title: "Insight Radar & reliability", status: "Partial · feedback foundation", text: "Session feedback and founder focus are available. Persistent insight, fatigue signals, routing improvements, notifications and reliable background work need authenticated history and measured outcomes." },
+  { title: "Personal workspace & Crowne", status: "Canon · economics unrecovered", text: "A persistent personal environment can be an office, cabin, mansion, throne room or another chosen setting. Crowne-based changes and upgrades are in scope; exact pricing and monetary mechanics must be recovered before implementation." },
+  { title: "Businesses & connected devices", status: "Canon · future integration", text: "Hallway Cleaning and future businesses consume shared platform services. Mobile, voice, Aegis and figurine interfaces must reach the same agent identity and memory. Owning a domain alone does not define or connect a product." },
+] as const;

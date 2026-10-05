@@ -28,7 +28,7 @@ export function setRuntimeChannel(runtime: AgentRuntimeState, channel: Channel):
 export function routeRuntimeInput(runtime: AgentRuntimeState, text: string): AgentRuntimeState {
   // Follow-ups keep their selected agent. Mentioning content or children is
   // not consent to change the conversation's agent.
-  const match = text.match(/^(?:please\s+)?(?:switch to|talk to|speak to|route (?:this )?to)\s+(tay|dawn|rory)\b/i);
+  const match = text.match(/^(?:please\s+)?(?:switch to|talk to|speak to|route (?:this )?to)\s+(tay|dawn|kj|rory)\b/i);
   const next = match ? selectRuntimeAgent(runtime, match[1].toLowerCase() as AgentId) : runtime;
   return { ...next, session: appendMessage(next.session, {
     role: "user", agentId: next.session.activeAgentId, text,

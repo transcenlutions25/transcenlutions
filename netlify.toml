@@ -3,7 +3,7 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "24"
   NEXT_PUBLIC_TAY_DEPLOYMENT_ENV = "test"
   NEXT_PUBLIC_TAY_HOSTING_TARGET = "Netlify"
   NEXT_PUBLIC_STRIPE_MODE = "test"

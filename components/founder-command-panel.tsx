@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import {
   CalendarCheck,
   CircleDot,
@@ -9,6 +10,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { founderOperatingState } from "../lib/founder-os";
+import { WritingBlock } from "./writing-block";
 
 interface FounderCommandPanelProps {
   onCommand: (request: string) => void;
@@ -22,6 +24,13 @@ const founderCommands = [
 ];
 
 export function FounderCommandPanel({ onCommand }: FounderCommandPanelProps) {
+  const familySummary = [
+    `Current focus: ${founderOperatingState.spouseVisibleSummary.currentFocus}`,
+    `Expected finish: ${founderOperatingState.spouseVisibleSummary.expectedFinish}`,
+    `Completed: ${founderOperatingState.spouseVisibleSummary.completed}`,
+    `Money readiness: ${founderOperatingState.spouseVisibleSummary.moneyReadiness}`,
+  ].join("\n");
+  const drafts = useRef({ family: familySummary, focus: founderOperatingState.antiDistractionPrompt });
   return (
     <section className="founder-command" aria-label="Founder command layer">
       <div className="section-header">
@@ -104,7 +113,8 @@ export function FounderCommandPanel({ onCommand }: FounderCommandPanelProps) {
             </span>
             <p className="eyebrow">Anti-Distraction</p>
           </div>
-          <p>{founderOperatingState.antiDistractionPrompt}</p>
+          <WritingBlock id="founder:focus:anti-distraction" title="Focus instruction" content={founderOperatingState.antiDistractionPrompt}
+            onContentChange={(value) => { drafts.current.focus = value; }} />
           <div className="founder-pill-list">
             {founderOperatingState.notNowBacklog.map((item) => (
               <span key={item}>{item}</span>
@@ -119,24 +129,8 @@ export function FounderCommandPanel({ onCommand }: FounderCommandPanelProps) {
             </span>
             <p className="eyebrow">Family Alignment</p>
           </div>
-          <dl className="family-summary">
-            <div>
-              <dt>Current focus</dt>
-              <dd>{founderOperatingState.spouseVisibleSummary.currentFocus}</dd>
-            </div>
-            <div>
-              <dt>Expected finish</dt>
-              <dd>{founderOperatingState.spouseVisibleSummary.expectedFinish}</dd>
-            </div>
-            <div>
-              <dt>Completed</dt>
-              <dd>{founderOperatingState.spouseVisibleSummary.completed}</dd>
-            </div>
-            <div>
-              <dt>Money readiness</dt>
-              <dd>{founderOperatingState.spouseVisibleSummary.moneyReadiness}</dd>
-            </div>
-          </dl>
+          <WritingBlock id="founder:focus:family-summary" title="Family focus summary" kind="document" content={familySummary}
+            onContentChange={(value) => { drafts.current.family = value; }} />
         </article>
       </div>
 
@@ -146,7 +140,9 @@ export function FounderCommandPanel({ onCommand }: FounderCommandPanelProps) {
             className="secondary-button"
             key={command}
             type="button"
-            onClick={() => onCommand(command)}
+            onClick={() => onCommand(command === "Prepare spouse-visible focus summary" ?
+              `${command}\n\nCurrent summary draft:\n${drafts.current.family}` : command.startsWith("Park ") ?
+                `${command}\n\nCurrent focus instruction:\n${drafts.current.focus}` : command)}
           >
             {command}
           </button>

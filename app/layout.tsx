@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./workspace-overrides.css";
+import "./tay-workspace.css";
+import "../public/transcenlutions-brand.css";
 
 export const metadata: Metadata = {
   title: "Tay | Transcenlutions Command Room",

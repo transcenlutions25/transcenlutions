@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface InfoPageSection {
   heading: string;
   body: string;
@@ -13,9 +15,9 @@ interface InfoPageProps {
 export function InfoPage({ eyebrow, title, intro, sections }: InfoPageProps) {
   return (
     <main className="info-shell">
-      <a className="info-back" href="/">
+      <Link className="info-back" href="/">
         Back to Tay command room
-      </a>
+      </Link>
       <article className="info-panel">
         <p className="eyebrow">{eyebrow}</p>
         <h1>{title}</h1>

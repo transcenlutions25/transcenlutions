@@ -1,0 +1,78 @@
+/* Shared Mac Tay materials. The offline product embeds this file at build time. */
+:root {
+  --tc-black: #0a0710;
+  --tc-purple: #281b33;
+  --tc-panel: #17101f;
+  --tc-gold: #dfbd72;
+  --tc-text: #f1eaf5;
+  --tc-muted: #b7aebe;
+  --tc-edge: rgba(222, 185, 114, .35);
+  --tc-activity: #88c9ff;
+}
+.transcenlutions-product {
+  color-scheme: dark;
+  --bg: var(--tc-black);
+  --panel: var(--tc-panel);
+  --text: var(--tc-text);
+  --ink: var(--tc-text);
+  --muted: var(--tc-muted);
+  --paper: var(--tc-black);
+  --line: var(--tc-edge);
+  --blue: var(--tc-gold);
+  --green: var(--tc-gold);
+  --lime: var(--tc-purple);
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 80% 0, #39234866, transparent 48rem), var(--tc-black);
+  color: var(--tc-text);
+}
+.transcenlutions-product a { color: var(--tc-gold); }
+.transcenlutions-product h1, .transcenlutions-product h2 { color: #f0d29b; }
+.transcenlutions-product h1 em, .transcenlutions-product .brand span,
+.transcenlutions-product .eyebrow, .transcenlutions-product .step b { color: var(--tc-gold); }
+.transcenlutions-product .card, .transcenlutions-product .panel,
+.transcenlutions-product .check {
+  background: linear-gradient(145deg, #281b33, #17101f);
+  border: 1px solid var(--tc-edge);
+  border-radius: 16px;
+  box-shadow: inset 0 1px #ffffff0d, 0 12px 30px #0003;
+}
+.transcenlutions-product .summary { color: var(--tc-text); background: #160f1d; }
+.transcenlutions-product .stage-score, .transcenlutions-product .storage { background: #281b33; }
+.transcenlutions-product .stage-score small, .transcenlutions-product .small { color: var(--tc-muted); }
+.transcenlutions-product .tag, .transcenlutions-product .pill { color: #efcf90; background: #281b33; border: 1px solid var(--tc-edge); }
+.transcenlutions-product button, .transcenlutions-product .button {
+  min-height: 44px;
+  border: 1px solid #d9b36d;
+  border-radius: 12px;
+  background: linear-gradient(150deg, #f3d991, #c49749 55%, #93682f);
+  color: #24180b;
+  box-shadow: inset 0 1px 1px #fff7, 0 2px 8px #0005;
+}
+.transcenlutions-product .secondary {
+  color: var(--tc-text);
+  border-color: var(--tc-edge);
+  background: linear-gradient(145deg, #4d2a63, #21152c);
+}
+.transcenlutions-product input:not([type=checkbox]):not([type=hidden]),
+.transcenlutions-product textarea, .transcenlutions-product select {
+  min-height: 44px;
+  color: var(--tc-text);
+  background: #100b16;
+  border: 1px solid #826791;
+  border-radius: 9px;
+}
+.transcenlutions-product input[type=checkbox] { accent-color: var(--tc-gold); }
+.transcenlutions-product :focus-visible { outline: 3px solid var(--tc-gold); outline-offset: 4px; }
+.transcenlutions-product button:disabled { cursor: not-allowed; opacity: .55; }
+.transcenlutions-product .brand { overflow-wrap: anywhere; }
+.transcenlutions-product header { gap: 16px; flex-wrap: wrap; }
+.transcenlutions-product .brand small { display: block; margin-top: 4px; color: var(--tc-muted); font-size: 11px; font-weight: 500; letter-spacing: .08em; }
+@media (prefers-reduced-motion: reduce) { html:has(.transcenlutions-product) { scroll-behavior: auto; } }
+@media print {
+  .transcenlutions-product { color-scheme: light; background: white; color: black; --ink: #111; --muted: #444; --green: #333; --line: #bbb; }
+  .transcenlutions-product .panel, .transcenlutions-product .check,
+  .transcenlutions-product .stage-score { color: black; background: white; box-shadow: none; border-color: #bbb; }
+  .transcenlutions-product h1, .transcenlutions-product h2, .transcenlutions-product a,
+  .transcenlutions-product .eyebrow, .transcenlutions-product .small,
+  .transcenlutions-product .stage-score small, .transcenlutions-product .brand small { color: #222; }
+}

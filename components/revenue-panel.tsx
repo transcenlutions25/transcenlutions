@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import {
   Banknote,
   FlaskConical,
@@ -19,6 +20,7 @@ import {
   revenueOffers,
 } from "../lib/revenue";
 import type { RevenueSetupState } from "../lib/revenue-setup";
+import { WritingBlock } from "./writing-block";
 
 interface RevenuePanelProps {
   onCommand: (request: string) => void;
@@ -27,6 +29,12 @@ interface RevenuePanelProps {
 
 export function RevenuePanel({ onCommand, revenueSetup }: RevenuePanelProps) {
   const companyEmailState = getCompanyEmailState();
+  const drafts = useRef<Record<string, string>>({});
+  function offerBrief(offer: typeof revenueOffers[number]) {
+    return [offer.promise, `Best for\n${offer.bestFor}`, `Delivery\n${offer.delivery}`,
+      `Buyer receives\n${offer.includes.map((item) => `• ${item}`).join("\n")}`,
+      `Intake questions\n${offer.buyerIntake.map((item) => `• ${item}`).join("\n")}`].join("\n\n");
+  }
 
   return (
     <section className="revenue-command" aria-label="Revenue launch">
@@ -74,6 +82,16 @@ export function RevenuePanel({ onCommand, revenueSetup }: RevenuePanelProps) {
         </div>
       </div>
 
+      <article className="revenue-card">
+        <p className="eyebrow">Apex Flow · Self-serve checklist</p>
+        <h3>Funnel Leak Emergency Checklist</h3>
+        <p>20 checks across five funnel stages, a named fix for every point and a downloadable plan. Existing $27 price; checkout stays closed until paid delivery is verified. Guided services are unavailable.</p>
+        <div className="revenue-card__actions">
+          <a className="primary-button" href="/apex-flow/offer.html">Review Apex Flow</a>
+          <button className="secondary-button" type="button" onClick={() => onCommand("Prepare the Apex Flow $27 checklist launch from docs/APEX_CHECKLIST_RELEASE.md. Keep the $997 guided tier locked. Verify the complete digital deliverable and payment-to-download flow before enabling checkout. Do not claim collected revenue from tests.")}>Plan launch in Tay</button>
+        </div>
+      </article>
+
       <div className="revenue-grid">
         {revenueOffers.map((offer) => {
           const paymentState = getOfferPaymentState(offer);
@@ -87,42 +105,18 @@ export function RevenuePanel({ onCommand, revenueSetup }: RevenuePanelProps) {
                 <strong>{offer.price}</strong>
               </div>
               <h3>{offer.name}</h3>
-              <p>{offer.promise}</p>
-              <div className="offer-meta">
-                <span>{offer.delivery}</span>
-                <span>{offer.bestFor}</span>
-              </div>
+              <WritingBlock id={`revenue:${offer.id}:offer-brief`} title="Offer brief draft" kind="document" content={offerBrief(offer)}
+                onContentChange={(value) => { drafts.current[offer.id] = value; }} />
               <div className={`payment-status payment-status--${paymentState.mode}`}>
                 <strong>{paymentState.title}</strong>
                 <p>{paymentState.description}</p>
               </div>
-              <div>
-                <p className="mini-heading">Buyer receives</p>
-                <ul>
-                  {offer.includes.map((item) => (
-                    <li key={item}>
-                      <ShieldCheck size={15} />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <p className="mini-heading">Intake captures</p>
-                <ul>
-                  {offer.buyerIntake.map((item) => (
-                    <li key={item}>
-                      <ShieldCheck size={15} />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <p className="writing-block__scope-note">Editing the draft updates your writing. Checkout price and payment settings stay in the offer controls.</p>
               <div className="revenue-card__actions">
                 <button
                   className="secondary-button"
                   type="button"
-                  onClick={() => onCommand(offer.command)}
+                  onClick={() => onCommand(`${offer.command}\n\nCurrent offer brief draft:\n${drafts.current[offer.id] ?? offerBrief(offer)}`)}
                 >
                   Prepare in Tay
                 </button>
@@ -214,3 +208,4 @@ export function RevenuePanel({ onCommand, revenueSetup }: RevenuePanelProps) {
     </section>
   );
 }
+

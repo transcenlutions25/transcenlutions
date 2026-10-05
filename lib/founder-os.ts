@@ -29,8 +29,8 @@ export interface FounderOperatingState {
 }
 
 export const founderOperatingState: FounderOperatingState = {
-  currentFocus: "Box 4: Founder Operating System",
-  expectedFinish: "2 weeks",
+  currentFocus: "Shared Transcenlutions platform foundation",
+  expectedFinish: "Set after the next scoped milestone",
   completed: [
     "Tay command foundation",
     "Governance foundation",
@@ -39,7 +39,7 @@ export const founderOperatingState: FounderOperatingState = {
   moneyReadiness:
     "Prepared, with live collection awaiting real Stripe and company email setup.",
   dailyPriorities: [
-    "Keep Box 4 as the only build target.",
+    "Advance the shared platform while preserving the full canon and Mac Tay design.",
     "Pick three priorities for today before adding new ideas.",
     "Complete one revenue-readiness action tied to Stripe, email, buyer outreach, or delivery.",
     "Record one win and one stall before ending the work session.",
@@ -56,7 +56,7 @@ export const founderOperatingState: FounderOperatingState = {
   ],
   notNowBacklog: [
     "Dating app",
-    "Crowne Legacy build",
+    "Crowne Legacy production pipeline (dependencies pending)",
     "advanced agent council",
     "full autonomy",
     "marketplace expansion",
@@ -66,14 +66,14 @@ export const founderOperatingState: FounderOperatingState = {
     "What stalled and why?",
     "What moved revenue readiness forward?",
     "What created context switching?",
-    "What is the next box?",
+    "What is the next verified platform milestone?",
   ],
   lanes: [
     {
       lane: "NOW",
       purpose: "Active work only.",
       items: [
-        "Box 4 Founder Operating System",
+        "shared platform and Mac Tay workspace",
         "daily execution rhythm",
         "weekly review rhythm",
         "family-visible focus summary",
@@ -94,6 +94,7 @@ export const founderOperatingState: FounderOperatingState = {
       items: [
         "persistent memory",
         "agent council",
+        "Crowne Legacy and Forge production pipelines",
         "advanced autonomy",
       ],
     },
@@ -102,18 +103,17 @@ export const founderOperatingState: FounderOperatingState = {
       purpose: "Strong ideas intentionally held back.",
       items: [
         "dating app",
-        "Crowne Legacy",
-        "marketplace",
-        "extra brands or divisions",
+        "marketplace expansion",
+        "unscoped new proposals",
       ],
     },
   ],
   antiDistractionPrompt:
     "Current box incomplete. Add to backlog or continue current phase?",
   spouseVisibleSummary: {
-    currentFocus: "Box 4",
-    expectedFinish: "2 weeks",
-    completed: "first three build stages",
+    currentFocus: "Shared Transcenlutions platform foundation",
+    expectedFinish: "Set after the next scoped milestone",
+    completed: "command, governance and revenue planning foundations",
     moneyReadiness: "Prepared, awaiting Stripe/email setup",
   },
 };
@@ -161,12 +161,21 @@ export function createFounderFocusResult(request: string): ActionResult {
   const isBacklog = backlogTerms.some((term) => normalized.includes(term));
   const artifact = createFounderArtifact();
 
-  if (isExpansion || isBacklog) {
+  if (isBacklog) {
     return {
       status: "completed",
-      result: `${founderOperatingState.antiDistractionPrompt} Tay routed the idea to PARKED unless the operator chooses to continue Box 4 first.`,
+      result: `${founderOperatingState.antiDistractionPrompt} A backlog review is prepared; confirm its priority without removing it from the platform scope.`,
       nextStep:
-        "Next step: finish today's Box 4 priority, then review the parked idea during the weekly review.",
+        "Next step: finish today's scoped priority, then review the backlog item during the weekly review.",
+      artifact,
+    };
+  }
+
+  if (isExpansion) {
+    return {
+      status: "completed",
+      result: "Scope review prepared: this request belongs in the broader Transcenlutions map. Review its dependencies and priority; it has not been automatically parked or removed.",
+      nextStep: "Next step: select a scoped milestone that uses the shared platform services.",
       artifact,
     };
   }
@@ -177,7 +186,7 @@ export function createFounderFocusResult(request: string): ActionResult {
       result:
         "Weekly review prepared: inspect what shipped, what stalled, revenue progress, bottlenecks, and the next box before starting any expansion.",
       nextStep:
-        "Next step: answer the weekly review prompts and choose one Box 4 improvement for the next work session.",
+        "Next step: answer the weekly review prompts and choose one shared-platform improvement for the next work session.",
       artifact,
     };
   }
@@ -186,7 +195,7 @@ export function createFounderFocusResult(request: string): ActionResult {
     return {
       status: "completed",
       result:
-        "Family alignment summary prepared: current focus is Box 4, expected finish is two weeks, the first three build stages are complete, and money readiness awaits Stripe/email setup.",
+        `Family alignment summary prepared: ${founderOperatingState.spouseVisibleSummary.currentFocus}. Completed: ${founderOperatingState.spouseVisibleSummary.completed}. ${founderOperatingState.moneyReadiness}`,
       nextStep:
         "Next step: share the focus summary and keep new ideas in PARKED until the current box is complete.",
       artifact,

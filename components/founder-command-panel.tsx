@@ -17,10 +17,10 @@ interface FounderCommandPanelProps {
 }
 
 const founderCommands = [
-  "Show today's Box 4 priorities",
+  "Show today's founder priorities",
   "Run weekly founder review",
   "Prepare spouse-visible focus summary",
-  "Park the dating app until Box 4 is complete",
+  "Review the backlog before starting another project",
 ];
 
 export function FounderCommandPanel({ onCommand }: FounderCommandPanelProps) {

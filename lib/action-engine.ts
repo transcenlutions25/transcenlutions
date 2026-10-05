@@ -49,7 +49,7 @@ export function executeSuggestedAction(
     return {
       status: "completed",
       result:
-        "Task created: define the passive-income outcome, name the business asset, and confirm the request reaches a visible result.",
+        "Task created: define the revenue outcome, name the business asset, and confirm the request reaches a visible result.",
       nextStep:
         "Next step: choose the smallest business asset Tay should structure next: offer, workflow, content engine, or operating task.",
     };
@@ -91,7 +91,7 @@ export function executeSuggestedAction(
     return {
       status: "completed",
       result: "Note saved in the current activity record.",
-      nextStep: "Next step: add another note, plan, or passive-income build request.",
+      nextStep: "Next step: add another note, plan, or revenue build request.",
     };
   }
 

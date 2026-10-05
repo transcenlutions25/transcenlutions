@@ -136,7 +136,7 @@ function mapIntentToAction(intent: TayIntent): TayActionType {
 
 function createMessage(intent: TayIntent) {
   if (intent === "build_feature") {
-    return "I see a build request. I can turn this into a focused business task for Transcenlutions, with passive income as the priority.";
+    return "I see a build request. I can turn this into a focused business task for Transcenlutions, with useful outcomes and measurable revenue as the priority.";
   }
 
   if (intent === "sell_offer") {
@@ -160,7 +160,7 @@ function createMessage(intent: TayIntent) {
   }
 
   if (intent === "write_plan") {
-    return "I see a planning request. I can draft a focused plan that protects the passive-income direction before any work begins.";
+    return "I see a planning request. I can draft a focused plan that protects the revenue direction before any work begins.";
   }
 
   if (intent === "record_note") {
@@ -189,7 +189,7 @@ function createActionTitle(intent: TayIntent) {
 
 function createActionSummary(intent: TayIntent, userText: string) {
   if (intent === "build_feature") {
-    return `Create a focused passive-income task from: "${userText.trim()}".`;
+    return `Create a focused revenue task from: "${userText.trim()}".`;
   }
 
   if (intent === "sell_offer") {
@@ -229,7 +229,7 @@ function createActionSummary(intent: TayIntent, userText: string) {
 
 function createNextStep(intent: TayIntent) {
   if (intent === "build_feature") {
-    return "Next step: confirm the move to create the task result and connect it to passive income.";
+    return "Next step: confirm the move to create the task result and connect it to a measurable outcome.";
   }
 
   if (intent === "sell_offer") {
@@ -241,7 +241,7 @@ function createNextStep(intent: TayIntent) {
   }
 
   if (intent === "manage_focus") {
-    return "Next step: execute the focus route, then continue Box 4 or park the distraction.";
+    return "Next step: execute the focus route, then choose the next scoped platform milestone.";
   }
 
   if (intent === "prepare_launch") {

@@ -14,6 +14,7 @@ The integration branch preserves merge ancestry for acquisition contract (PR 3),
 - Standardized Node 24 in CI, Netlify, `.nvmrc` and package engines. jsdom 30 requires Node 22.22.2+, 24.15.0+ or 26+; the former Node 20 CI could not load its undici dependency. No test was skipped to hide that mismatch. Source: https://github.com/jsdom/jsdom/releases and npm package engines.
 - Added shared Mac material styles for Apex's offer, access and offline checklist; print output remains light and the downloaded product remains self-contained.
 - Exposed the recovered system map in Explore with implementation states. Corrected the welcome text so it does not imply unconfigured tools are connected.
+- Replaced stale passive-income response copy with revenue/outcome language and the old fixed Box 4/two-week focus with the shared platform milestone. Canonical business/agent requests no longer automatically report being parked; explicit backlog requests retain their review path. Added a regression for this full-scope behavior.
 - Increased small mobile header/queue/voice targets within the existing layout.
 - Preserved Cobalt's original module instructions verbatim and made the root build instructions reflect the founder's whole-platform scope.
 

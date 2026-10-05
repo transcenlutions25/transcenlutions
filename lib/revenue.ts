@@ -60,7 +60,7 @@ export const revenueOffers: RevenueOffer[] = [
     buyerProblem:
       "The buyer has an idea, skill, or goal but cannot see the first sellable offer clearly.",
     promise:
-      "A focused passive-income command map with one offer, one workflow, and one next action.",
+      "A focused revenue command map with one offer, one workflow, and one next action.",
     outcome:
       "Buyer leaves with one clear offer, one practical execution workflow, and one governed next step.",
     scope: [
@@ -76,7 +76,7 @@ export const revenueOffers: RevenueOffer[] = [
     bestFor: "Founders who need the first sellable move made clear",
     includes: [
       "60-minute command session",
-      "passive-income offer outline",
+      "revenue offer outline",
       "first execution workflow",
       "governed next-step list",
     ],

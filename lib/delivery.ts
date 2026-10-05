@@ -14,7 +14,7 @@ export const deliveryKits: DeliveryKit[] = [
     offerId: "starter-map",
     title: "Starter Map Delivery Kit",
     deliveryPromise:
-      "Turn one business idea into a clear passive-income offer, first workflow, and next action.",
+      "Turn one business idea into a clear revenue offer, first workflow, and next action.",
     phases: [
       "Confirm buyer goal and current blocker",
       "Name the first sellable outcome",

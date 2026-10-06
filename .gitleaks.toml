@@ -1,0 +1,11 @@
+[extend]
+useDefault = true
+
+# Generic-key detection spans two empty template assignments and mistakes the
+# NEXT variable's identifier for a value. Allow this exact non-secret only.
+[[allowlists]]
+description = "Empty environment template variable identifier, not a credential"
+condition = "AND"
+paths = ['''(^|/)\.env\.example$''']
+regexTarget = "secret"
+regexes = ['''^ANTHROPIC_API_KEY=$''']

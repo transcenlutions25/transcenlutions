@@ -35,6 +35,7 @@ jobs:
       - run: npm audit --omit=dev --audit-level=high
       - run: npm run typecheck
       - run: npm run test:identity
+      - run: npm run test:participation
       - run: npm run test:workspace
       - run: npm run lint
       - run: npm run smoke

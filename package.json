@@ -18,7 +18,8 @@
     "test:security": "node scripts/check-security.mjs",
     "security:dependencies": "node scripts/security-dependencies.mjs",
     "security:secrets": "bash scripts/security-secrets.sh",
-    "security": "npm run test:security && npm run security:dependencies && npm run security:secrets"
+    "security": "npm run test:security && npm run security:dependencies && npm run security:secrets",
+    "test:participation": "tsc lib/participation/*.ts scripts/check-participation.ts --strict --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .participation-test && node .participation-test/scripts/check-participation.js && node -e \"require('fs').rmSync('.participation-test',{recursive:true,force:true})\""
   },
   "dependencies": {
     "clsx": "^2.1.1",

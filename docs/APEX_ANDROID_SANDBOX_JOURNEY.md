@@ -1,25 +1,31 @@
-# Apex mobile sandbox journey
+# Apex mobile checkout preparation
 
-This review adds a deliberately test-only checkout entry to the existing offer and paid download flow. It does not enable live sales, configure providers, send email, create accounts or implement authenticated product-library registration.
+This is a source-review milestone, **not a completed purchase flow**. The new endpoint always keeps checkout closed. Existing private order downloads remain usable subject to the unchanged payment verification and runtime configuration. No provider settings, live payments, outbound email, account connections, authenticated library or character artwork are changed.
 
-## Configuration and provider checks
+## Configuration and proof boundary
 
-`GET /api/apex/checkout` is read-only and returns no secrets or customer data. It is covered by the existing `/api/*` edge policy. Default state is unavailable. The existing full delivery configuration must pass `payments.ready`, mode must be `test`, and the additional server-only `APEX_CHECKLIST_TEST_CHECKOUT_ENABLED=true` must be set in the isolated test runtime. No settings are enabled by this change.
+`GET /api/apex/checkout` is read-only, accepts no customer inputs and returns no secrets or customer data. It is covered by the existing `/api/*` edge policy. Default state is unavailable. Even inspection of the test catalogue requires the existing full delivery configuration, `APEX_STRIPE_MODE=test`, and server-only `APEX_CHECKLIST_TEST_CHECKOUT_ENABLED=true`. The last flag permits inspection only; it cannot open checkout in this milestone.
 
-The existing restricted Stripe key additionally needs Payment Links read permission to inspect the configured link and its expanded line items. Missing permission fails closed; do not expand credentials without owner approval. The handler checks the exact test link ID, active test state, Stripe-hosted test URL, one active one-time USD27 price with quantity one, no adjustable quantity, extras, shipping, automatic tax or promotion codes, and the exact configured access-page return URL. Misconfiguration/provider outage returns an unavailable state. A live configuration never exposes a checkout link through this endpoint.
+Inspection requires existing restricted-key Payment Links read permission; no credential permissions are expanded by this change. Line items and optional items are explicitly expanded. Checks cover the exact active test link, Stripe test URL, one active one-time USD27 price/quantity, returned USD subtotal/total of 2700 cents, zero tax/discount, no price quantity transformation, extras, shipping, automatic tax or promotion codes, and exact configured access-page return URL.
 
-The response is a point-in-time configuration check, not proof of webhook registration, sender verification, inbox delivery or settlement. Repeat the existing sandbox acceptance matrix before release. Payment Links can be edited after verification; review the total on Stripe before proceeding. Do not use real cards in the sandbox.
+**Blocker:** retrieved Payment Link line items do not expose evidence that adjustable quantity is disabled. A missing request-side `adjustable_quantity` field is not proof. Even a valid catalogue returns `state: unavailable` with `reason: quantity-lock-unverified`, never a checkout URL. There is no manual attestation bypass. Live configurations never call the provider or expose checkout.
+
+This endpoint does not prove webhook registration, sender verification, inbox delivery or settlement. No real Stripe call or payment was made during implementation; provider behavior in tests is synthetic.
+
+## Next coherent implementation slice
+
+Build a sandbox-only server-created Checkout Session with fixed server-side price and quantity and no adjustable quantities, promotions or extras. This must include bounded same-origin POST validation, idempotency and duplicate/ambiguous-response recovery, safe return/cancel URLs, test-mode provider evidence, and a compatible sandbox-only entitlement provenance rule. Existing fulfillment currently requires the configured Payment Link; direct Sessions do not satisfy that invariant. Do not simply remove the link guard. Preserve exact paid price/quantity and refund/dispute checks, add negative provenance tests, and run sandbox email/download acceptance before any activation. Live commerce remains a separate approved release.
 
 ## Mobile and portable access
 
-Offer and access pages retain shared brand materials, visible focus, status announcements and 44px controls. The offer resets the checkout link while rechecking after back/forward-cache restoration, and provides a retry without creating a payment session. Existing download verification, private session-link handling, refund/dispute checks and tab-local recovery remain unchanged.
+Offer and access pages retain shared brand materials, focus, status announcements and 44px controls. Availability retry creates no session. Existing private-link cleanup, tab recovery and paid-download checks remain intact. Test orders are visibly labeled.
 
-Android file handling depends on the selected browser/file manager. Download the HTML file; if a previewer shows source, open it with a compatible local-HTML browser or transfer to a computer. The checklist's existing text action plan is the supported human-readable chat handoff; JSON transfers progress into the checklist. Account-library registration and agent execution are explicitly unavailable. Files and order links are different: never share the private order link with another user or agent.
+Android handling depends on browser/file manager: save the HTML file, open it with a compatible local-HTML browser or transfer it to a computer. Existing text action-plan export supports a human-readable chat handoff; JSON transfers progress into the checklist. Authenticated product-library registration and agent execution remain unavailable. Never share the private order link with another user or agent.
 
-## Release boundary
+## Review and release
 
-This is a source review milestone, not a production release. Live payment activation, terms/support finalization, authenticated library integration, real Android browser QA, provider sandbox end-to-end verification and deployed edge checks remain release gates. Existing product source is public; paid delivery is not digital-rights management. Character artwork is unchanged.
+Local regression/build checks do not replace actual Android visual QA, real sandbox end-to-end tests or deployed edge verification. Preserve existing disclosure that source is public and paid delivery is not digital-rights management.
 
-If publishing source before hosting credits are verified, use `[skip ci]` in both the commit message and draft PR title. GitHub push/pull_request workflows and Netlify branch/preview builds are intentionally skipped; this is not a passing CI result. Do not merge until budget-safe CI and preview verification have run on the final commit.
+For source-only publication before hosting usage is verified, `[skip ci]` is present in the commit message and draft PR title. GitHub push/pull_request workflows and Netlify branch/preview builds are deliberately skipped, not passed. Do not merge until approved CI and preview verification run on the final commit.
 
-Sources: https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs and https://docs.netlify.com/deploy/manage-deploys/manage-deploys-overview/ .
+Sources: https://docs.stripe.com/api/payment-link/object ; https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs ; https://docs.netlify.com/deploy/manage-deploys/manage-deploys-overview/ .

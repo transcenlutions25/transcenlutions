@@ -13,11 +13,8 @@
    const response = await fetch('/api/apex/checkout', {cache:'no-store',signal:AbortSignal.timeout(12000)});
    if (!response.ok) throw Error('unavailable');
    const data = await response.json();
-   if (data.state === 'test' && data.amount === 2700 && data.currency === 'usd') {
-    const url = new URL(data.checkoutUrl);
-    if (url.origin !== 'https://buy.stripe.com' || !/^\/test_[A-Za-z0-9]+$/.test(url.pathname) || url.search || url.hash || url.username || url.password) throw Error('unverified');
-    link.href = url.href; link.hidden = false;
-    status.textContent = 'Sandbox ready: $27 test transaction only. Use Stripe test payment details, never a real card.';
+   if (data.state === 'unavailable' && data.reason === 'quantity-lock-unverified') {
+    status.textContent = 'Test checkout remains closed: fixed checkout quantity cannot yet be verified. No payment is requested.';
    } else {
     status.textContent = 'Checkout is not open. Read the sample or request launch details below.';
    }

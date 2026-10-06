@@ -6,10 +6,12 @@
  const query=new URLSearchParams(location.search),fragment=new URLSearchParams(location.hash.slice(1));
  const supplied=fragment.has('session_id')||query.has('session_id');
  let session=fragment.get('session_id')||query.get('session_id'),fileUrl,sending=false;
+ const modeEl=document.getElementById('order-mode');
  const clear=()=>{try{sessionStorage.removeItem(key);}catch{}};
  if(supplied){
   clear();if(valid(session)){try{sessionStorage.setItem(key,JSON.stringify({id:session,expires:Date.now()+ttl}));}catch{}}
  }else{try{const saved=JSON.parse(sessionStorage.getItem(key));if(saved&&saved.expires>Date.now()&&saved.expires<=Date.now()+ttl&&valid(saved.id))session=saved.id;else clear();}catch{clear();}}
+ if(valid(session)&&session.startsWith('cs_test_')){modeEl.hidden=false;modeEl.textContent='Sandbox order: no real payment. This does not grant production account access.';}
  // Retain order access in this tab for refresh; strip it from visible URL/referrers.
  history.replaceState(null,'',location.pathname);
  if(!valid(session))statusEl.textContent='Open your private order link from your checkout or delivery email. If you already paid and need help, contact support with your receipt.';
@@ -25,5 +27,5 @@
   }catch(error){statusEl.textContent=error.name==='TimeoutError'||error.name==='AbortError'?'Verification timed out. Please retry; this cannot charge you again.':error.message||'Verification unavailable. Please retry or contact support.';button.disabled=false;}
   finally{sending=false;forget.disabled=false;}
  });
- forget.addEventListener('click',()=>{clear();session=null;if(fileUrl)URL.revokeObjectURL(fileUrl);file.removeAttribute('href');file.hidden=true;button.hidden=false;button.disabled=true;forget.hidden=true;statusEl.textContent='Order access cleared from this tab. Reopen your private delivery email link when you need it.';});
+ forget.addEventListener('click',()=>{clear();session=null;modeEl.hidden=true;modeEl.textContent='';if(fileUrl)URL.revokeObjectURL(fileUrl);file.removeAttribute('href');file.hidden=true;button.hidden=false;button.disabled=true;forget.hidden=true;statusEl.textContent='Order access cleared from this tab. Reopen your private delivery email link when you need it.';});
 })();

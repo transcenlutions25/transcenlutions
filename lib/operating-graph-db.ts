@@ -10,12 +10,17 @@ function getPool(): Pool {
     throw new Error("DATABASE_URL is required for persistent Tay Operating Graph storage.");
   }
 
+  // URL SSL options can override pg's explicit TLS configuration; disallow them.
+  const parsed = new URL(connectionString);
+  if (process.env.NODE_ENV === "production" && [...parsed.searchParams.keys()].some(key => key.toLowerCase().startsWith("ssl"))) {
+    throw new Error("Configure database TLS using DATABASE_SSL_CA, without URL SSL parameters.");
+  }
   pool = new Pool({
     connectionString,
     max: 5,
     ssl:
       process.env.NODE_ENV === "production"
-        ? { rejectUnauthorized: false }
+        ? { rejectUnauthorized: true, ...(process.env.DATABASE_SSL_CA ? { ca: process.env.DATABASE_SSL_CA } : {}) }
         : undefined,
   });
 

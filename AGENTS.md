@@ -27,3 +27,7 @@ The original Cobalt Current build instructions are preserved verbatim in `docs/c
 Use the checked-in dependency lock, Node 24.15.0 or later in the Node 24 line, strict TypeScript and existing conventions. Keep server authorization and credentials on the server. Maintain keyboard access, visible focus, mobile touch targets, empty/error states and reduced-motion support.
 
 Follow branch → automated checks → deployment preview → controlled main merge → production verification. Run the Launch gate checks, including identity, workspace, Apex workflows and preserved desktop runtime tests. Verify changed user journeys in the deployed preview and confirm the deployed commit. Record limitations and a rollback reference. Do not silently move a custom domain or enable live commerce as part of release verification.
+
+## Security gate
+
+Read `security/README.md` before adding endpoints, provider integrations or authority flows. Run `npm run security` plus Launch gate checks. New endpoints must remain covered by the edge rules and bounded server-side validation. Never promote untrusted references into system instructions, accept client approval as server authorization, add public secret environment variables, or silently broaden/renew security exceptions. Preserve signed webhook bytes and production fail-closed identity. Keep security workflow changes in the same reviewed PR as the code they protect.

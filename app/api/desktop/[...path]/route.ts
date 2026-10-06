@@ -1,3 +1,4 @@
+import { readJson, requestError } from "../../../../lib/request-security";
 import { NextResponse } from "next/server";
 import { desktopBridgeUrl, trustedDesktopRequest } from "../../../../lib/desktop-bridge";
 
@@ -12,12 +13,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ pat
   const path = (await params).path.join("/");
   if (!permitted.has(path)) return NextResponse.json({ error: "Unknown desktop operation." }, { status: 404 });
   try {
-    const body = await request.text();
-    if (Buffer.byteLength(body) > 200000) return NextResponse.json({ error: "Request is too large." }, { status: 413 });
-    let payload: unknown;
-    try { payload = JSON.parse(body); }
-    catch { return NextResponse.json({ error: "Invalid JSON request." }, { status: 400 }); }
-    if (!payload || typeof payload !== "object" || Array.isArray(payload)) return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+    let payload: Record<string, unknown>;
+    try { payload = await readJson(request, 200000, `http://${request.headers.get("host")}`); }
+    catch (error) { return requestError(error); }
+    const body = JSON.stringify(payload);
     const page = await fetch(bridge, { cache: "no-store", signal: AbortSignal.timeout(5000), redirect: "error" });
     const html = await page.text();
     const token = html.match(/\b(?:const|let|var)\s+token\s*=\s*['"]([^'"]+)['"]/i)?.[1];

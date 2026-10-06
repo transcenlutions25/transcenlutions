@@ -84,7 +84,7 @@ try {
     assert.equal(options.redirect, "error");
     return Response.json(responsePayload);
   };
-  const accepted = await operation("runtime/enqueue", payload, { Authorization: "Bearer browser-only", Cookie: "private=browser-only" });
+  const accepted = await operation("runtime/enqueue", payload, { Authorization: "Bearer browser-only", Cookie: "private=browser-only" }, "http://localhost:18745/api/desktop/runtime/enqueue");
   assert.equal(accepted.status, 200);
   assert.equal(accepted.headers.get("Cache-Control"), "no-store");
   assert.deepEqual(await accepted.json(), responsePayload);

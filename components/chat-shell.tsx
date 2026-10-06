@@ -121,13 +121,13 @@ function validConversation(value: unknown): value is SavedConversation {
   if (!value || typeof value !== "object") return false;
   const item = value as SavedConversation;
   return typeof item.id === "string" && typeof item.title === "string" && typeof item.projectId === "string"
-    && typeof item.input === "string" && Number.isFinite(item.updated) && item.agentId in agentRegistry
+    && typeof item.input === "string" && Number.isFinite(item.updated) && Object.prototype.hasOwnProperty.call(agentRegistry, item.agentId)
     && ["chat", "plan", "execute"].includes(item.mode)
     && Array.isArray(item.messages) && item.messages.every(message => message && typeof message.id === "string"
       && typeof message.text === "string" && ["user", "tay"].includes(message.role)
-      && (!message.contextAgentId || message.contextAgentId in agentRegistry))
+      && (!message.contextAgentId || Object.prototype.hasOwnProperty.call(agentRegistry, message.contextAgentId)))
     && Array.isArray(item.queue) && item.queue.every(request => request && typeof request.id === "string"
-      && typeof request.text === "string" && request.agentId in agentRegistry && typeof request.paused === "boolean")
+      && typeof request.text === "string" && Object.prototype.hasOwnProperty.call(agentRegistry, request.agentId) && typeof request.paused === "boolean")
     && Array.isArray(item.logEntries) && item.logEntries.every(entry => entry && typeof entry.id === "string" && typeof entry.timestamp === "string" && typeof entry.detail === "string")
     && Array.isArray(item.memoryEntries) && item.memoryEntries.every(entry => entry && typeof entry.id === "string" && typeof entry.title === "string" && typeof entry.detail === "string" && typeof entry.category === "string")
     && Array.isArray(item.feedbackEntries) && item.feedbackEntries.every(entry => entry && typeof entry.id === "string" && typeof entry.detail === "string" && typeof entry.label === "string" && typeof entry.category === "string");
@@ -301,7 +301,7 @@ export function ChatShell({
     const restored = selectRuntimeAgent(createAgentRuntime(), saved.agentId);
     restored.session.id = saved.id;
     setAgentRuntime(restored); setMode(saved.mode); setInput(saved.input);
-    const responseAgentId = saved.responseAgentId in agentRegistry ? saved.responseAgentId : saved.agentId;
+    const responseAgentId = Object.prototype.hasOwnProperty.call(agentRegistry, saved.responseAgentId) ? saved.responseAgentId : saved.agentId;
     const response = saved.response && typeof saved.response.userText === "string"
       ? { ...governResponseForAgent(responseAgentId, createTayResponse(saved.response.userText)), id: saved.response.id } : null;
     setActiveResponse(response); setActiveResponseAgentId(responseAgentId);
@@ -890,7 +890,7 @@ export function ChatShell({
     </>}>
       <div ref={messageListRef} className="tay-message-list" aria-label="Conversation messages" aria-live="polite">
         {displayMessages.filter(message => !search || message.text.toLowerCase().includes(search.toLowerCase())).map(message => <article key={message.id} className={`tay-message tay-message--${message.role}`}>
-          <span className="tay-message-author">{message.role === "user" ? "You" : message.contextAgentId && message.contextAgentId in agentRegistry ? agentRegistry[message.contextAgentId].name : "Tay"}</span>
+          <span className="tay-message-author">{message.role === "user" ? "You" : message.contextAgentId && Object.prototype.hasOwnProperty.call(agentRegistry, message.contextAgentId) ? agentRegistry[message.contextAgentId].name : "Tay"}</span>
           {message.role === "tay" ? <ReusableReply id={`${desktopEnabled ? `desktop:${desktop.project}:${desktop.state?.session_id}` : `${selectedProject}:${threadId}`}:${message.id}`} text={message.text} revise={desktopEnabled ? reviseWriting : undefined}
             onChange={!desktopEnabled ? text => setMessages(current => current.map(item => item.id === message.id && item.text !== text ? { ...item, text } : item)) : undefined} /> : <><p>{message.text}</p><button type="button" onClick={() => { setInput(message.text); composerRef.current?.focus(); }}>Edit & reuse</button></>}
           {message.artifact && message.artifactResponseId !== activeResponse?.id ? <WritingBlock id={`${message.artifactResponseId}:artifact`} title={message.artifact.title} kind="document"

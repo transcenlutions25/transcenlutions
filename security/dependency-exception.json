@@ -1,0 +1,6 @@
+{
+  "package": "braces",
+  "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+  "expires": "2026-10-20T00:00:00Z",
+  "reason": "No patched upstream release as of 2026-10-06 (latest 3.0.3). Present only through lint/Tailwind build tools using repository-owned glob patterns; never accept user-supplied build glob patterns. Production audit must remain clean. Replace/remove the vulnerable chain or reassess before expiry. This is a disclosed temporary exception, not a fix."
+}

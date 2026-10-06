@@ -56,7 +56,7 @@ try {
   await webhookSecurity(req(signedBody), { next: async () => new Response('ok') });
   const raw = req(signedBody); await webhookSecurity(raw, { next: async () => { assert.equal(await raw.text(), signedBody); return new Response('ok'); } });
   assert.equal((await webhookSecurity(req(null, {}, 'GET'), context)).status, 405);
-  for (const config of [apiConfig, webhookConfig, siteConfig]) {
+  for (const config of [apiConfig, siteConfig]) {
     assert.deepEqual(config.rateLimit.aggregateBy, ['ip', 'domain']);
     assert.ok(config.rateLimit.windowLimit > 0 && config.rateLimit.windowLimit <= 600);
     assert.equal(config.rateLimit.windowSize, 60); assert.equal(config.onError, 'fail');
@@ -69,6 +69,7 @@ try {
     else if (text.includes('export const POST')) assert.ok(text.includes('createHandlers()'), `${file} must use an audited body boundary`);
   }
   assert.equal(apiConfig.path, '/api/*'); assert.equal(apiConfig.excludedPath, webhookConfig.path);
-  assert.equal(siteConfig.path, '/*'); assert.equal(siteConfig.excludedPath, apiConfig.path);
+  assert.equal(siteConfig.path, '/*'); assert.equal(siteConfig.excludedPath, undefined);
+  assert.equal(webhookConfig.rateLimit, undefined, 'Free Netlify plan allows only two rate rules; webhook inherits site-wide rule');
   console.log('Security regression checks passed: payloads, approval forgery, prototype fields, internal evidence, edge coverage and signed-body preservation.');
 } finally { process.env = previous; rmSync(temp, { recursive: true, force: true }); }

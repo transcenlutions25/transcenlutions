@@ -1,4 +1,4 @@
-/** Independent allowance protects signed Stripe retries from interactive traffic. */
+/** Signed Stripe retries use the site-wide allowance, not the tighter API rule. */
 export default async function webhookSecurity(request, context) {
   if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
   const length = request.headers.get('content-length');
@@ -8,5 +8,4 @@ export default async function webhookSecurity(request, context) {
 }
 export const config = {
   path: '/api/apex/stripe-webhook', onError: 'fail',
-  rateLimit: { windowLimit: 600, windowSize: 60, aggregateBy: ['ip', 'domain'] },
 };

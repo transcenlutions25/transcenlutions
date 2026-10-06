@@ -27,6 +27,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run test:security
       - run: npm run test:identity
+      - run: npm run test:participation
       - run: npm run test:workspace
       - run: npm run test:apex
       - run: python -m unittest discover -s integrations/tay-desktop/tests -v

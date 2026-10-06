@@ -51,3 +51,18 @@ jobs:
         with:
           fetch-depth: 0
       - run: bash scripts/security-secrets.sh
+  preview:
+    name: Deployed edge security
+    if: github.event_name == 'pull_request'
+    needs: [regression, dependencies, secrets]
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node scripts/check-preview-security.mjs
+        env:
+          TAY_PREVIEW_URL: https://deploy-preview-${{ github.event.pull_request.number }}--tay-command.netlify.app
+          TAY_PREVIEW_SHA: ${{ github.event.pull_request.head.sha }}

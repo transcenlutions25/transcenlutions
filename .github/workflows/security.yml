@@ -1,0 +1,68 @@
+name: Security gate
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 10 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  regression:
+    name: Security regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - run: npm ci --ignore-scripts
+      - run: npm run test:security
+      - run: npm run test:identity
+      - run: npm run test:workspace
+      - run: npm run test:apex
+      - run: python -m unittest discover -s integrations/tay-desktop/tests -v
+  dependencies:
+    name: Dependency vulnerabilities
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run security:dependencies
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: bash scripts/security-secrets.sh
+  preview:
+    name: Deployed edge security
+    if: github.event_name == 'pull_request'
+    needs: [regression, dependencies, secrets]
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node scripts/check-preview-security.mjs
+        env:
+          TAY_PREVIEW_URL: https://deploy-preview-${{ github.event.pull_request.number }}--tay-command.netlify.app
+          TAY_PREVIEW_SHA: ${{ github.event.pull_request.head.sha }}

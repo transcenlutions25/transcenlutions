@@ -162,7 +162,7 @@ export function getAgentActionPolicy(
     };
   }
 
-  const definition = agentRegistry[agentId];
+  const definition = Object.prototype.hasOwnProperty.call(agentRegistry, agentId) ? agentRegistry[agentId] : undefined;
   if (!definition) {
     return {
       agentId,

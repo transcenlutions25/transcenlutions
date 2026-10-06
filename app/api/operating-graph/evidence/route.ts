@@ -1,3 +1,4 @@
+import { internalEvidenceAllowed } from "../../../../lib/internal-evidence-auth";
 import { NextResponse } from "next/server";
 import {
   getOperatingGraphEvidence,
@@ -7,7 +8,8 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
+  if (!internalEvidenceAllowed(request)) return NextResponse.json({ ok: false, error: "Authenticated internal evidence access is required." }, { status: 401, headers: { "Cache-Control": "no-store" } });
   if (!process.env.DATABASE_URL || !process.env.TAY_INTERNAL_TENANT_SLUG) {
     return NextResponse.json(
       { ok: false, configured: false, evidence: null },
@@ -27,8 +29,8 @@ export async function GET() {
       warning:
         "Internal Transcenlutions usage is not external customer traction. Report external pilots and paid revenue separately.",
     });
-  } catch (error) {
-    console.error("Operating Graph evidence read failed", error);
+  } catch {
+    console.error("Operating Graph evidence read failed");
     return NextResponse.json(
       { ok: false, configured: true, evidence: null },
       { status: 500 },

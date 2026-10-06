@@ -1,3 +1,4 @@
+import { readJson, requestError, onlyFields } from "../../../../lib/request-security";
 import { NextRequest, NextResponse } from "next/server";
 import {
   agentRegistry,
@@ -5,7 +6,7 @@ import {
   type AgentId,
 } from "../../../../lib/agent-foundation";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 function isAgentId(value: unknown): value is AgentId {
@@ -19,19 +20,16 @@ export async function POST(request: NextRequest) {
   let body: Record<string, unknown>;
 
   try {
-    body = (await request.json()) as Record<string, unknown>;
-  } catch {
-    return NextResponse.json(
-      { ok: false, error: "Invalid JSON." },
-      { status: 400 },
-    );
-  }
+    body = await readJson(request, 2048);
+    onlyFields(body, ["agentId", "action", "approved"]);
+  } catch (error) { return requestError(error); }
 
   const agentId = body.agentId;
   const action = body.action;
-  const approved = body.approved === true;
+  // Public callers cannot mint approval. This endpoint is advisory only.
+  const approved = false;
 
-  if (!isAgentId(agentId) || typeof action !== "string" || !action.trim()) {
+  if (!isAgentId(agentId) || typeof action !== "string" || !action.trim() || action.length > 80 || (body.approved !== undefined && typeof body.approved !== "boolean")) {
     return NextResponse.json(
       { ok: false, error: "agentId and action are required." },
       { status: 400 },

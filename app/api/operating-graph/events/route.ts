@@ -1,3 +1,5 @@
+import { readJson, requestError, onlyFields } from "../../../../lib/request-security";
+import { internalEvidenceAllowed } from "../../../../lib/internal-evidence-auth";
 import { NextRequest, NextResponse } from "next/server";
 import {
   appendOperatingGraphEvent,
@@ -20,13 +22,6 @@ const allowedEventTypes = new Set([
   "feedback",
 ]);
 
-function evidenceIngestEnabled() {
-  return (
-    process.env.NODE_ENV !== "production" ||
-    process.env.TAY_ALLOW_UNAUTHENTICATED_EVIDENCE === "true"
-  );
-}
-
 function cleanText(value: unknown, max = 1000): string | null {
   if (typeof value !== "string") return null;
   return value.trim().slice(0, max) || null;
@@ -38,7 +33,7 @@ function cleanNumber(value: unknown): number | null {
 }
 
 export async function POST(request: NextRequest) {
-  if (!evidenceIngestEnabled()) {
+  if (!internalEvidenceAllowed(request)) {
     return NextResponse.json(
       {
         ok: false,
@@ -61,10 +56,16 @@ export async function POST(request: NextRequest) {
 
   let body: Record<string, unknown>;
   try {
-    body = (await request.json()) as Record<string, unknown>;
-  } catch {
-    return NextResponse.json({ ok: false, error: "Invalid JSON." }, { status: 400 });
-  }
+    body = await readJson(request);
+    onlyFields(body, ["eventKey", "eventType", "correlationId", "causationId", "intent", "actionType", "permissionStatus", "governanceRuleId", "riskTier", "riskScore", "auditStatus", "executionStatus", "resultSummary", "durationMs", "estimatedCostUsd", "humanInterventionCount", "failureCode", "recoveryCode", "feedbackRating", "metadata"]);
+    for (const [key, value] of Object.entries(body)) {
+      if (key === "metadata") {
+        if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Invalid metadata");
+      } else if (["riskScore", "durationMs", "estimatedCostUsd", "humanInterventionCount"].includes(key)) {
+        if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || (key === "humanInterventionCount" && !Number.isSafeInteger(value))) throw new Error("Invalid number");
+      } else if (value !== null && (typeof value !== "string" || value.length > (key === "resultSummary" ? 1000 : 220))) throw new Error("Invalid text");
+    }
+  } catch (error) { return requestError(error); }
 
   const eventKey = cleanText(body.eventKey, 220);
   const eventType = cleanText(body.eventType, 80);
@@ -120,8 +121,8 @@ export async function POST(request: NextRequest) {
     const tenantId = await resolveInternalTenantId();
     const stored = await appendOperatingGraphEvent(tenantId, event);
     return NextResponse.json({ ok: true, stored }, { status: 201 });
-  } catch (error) {
-    console.error("Operating Graph event persistence failed", error);
+  } catch {
+    console.error("Operating Graph event persistence failed");
     return NextResponse.json(
       { ok: false, error: "Operating Graph persistence failed." },
       { status: 500 },

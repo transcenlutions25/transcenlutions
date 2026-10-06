@@ -1,6 +1,11 @@
 /* Extend the existing composer; all accepted work is owned by the server. */
 (() => {
   const byId = id => document.getElementById(id);
+  // Legacy UI remains intact, but credentials are now server environment only.
+  for (const id of ['key', 'voiceKey']) {
+    const input = byId(id);
+    if (input) { input.value = ''; input.disabled = true; input.placeholder = 'Configured securely on the server'; }
+  }
   const legacySend = send, legacyLoad = load, legacyNew = byId('new').onclick;
   let state = null, project = '', selectedSession = '', epoch = 0, submitting = false;
   let intent = 'queue', steerTarget = null, legacyNodes = [], lastTranscript = '', lastBoard = '';
@@ -66,14 +71,14 @@
     return {mode: privacy === 'online' ? byId('mode').value : 'local',
       model: privacy === 'online' ? byId('model').value : '', privacy,
       thread_mode: window.tayThread?.getMode() || 'chat', files: [...files],
-      key: byId('key').value, paid: byId('paid').checked};
+      paid: byId('paid').checked};
   }
   async function command(item, operation, extra = {}) {
     if (!state) return;
     const guard = epoch, scope = project, session = state.session_id;
     try {
       const result = await change('/runtime/command', {project: scope, session_id: session, id: item.id,
-        operation, ...extra, key: byId('key').value, paid: byId('paid').checked});
+        operation, ...extra, paid: byId('paid').checked});
       if (guard === epoch) {
         apply(result);
         announce(item.status === 'active' && ['pause','cancel','steer'].includes(operation)

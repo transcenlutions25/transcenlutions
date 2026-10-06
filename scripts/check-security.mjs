@@ -66,8 +66,21 @@ try {
   for (const file of visit('app/api').filter(x => x.endsWith('/route.ts'))) {
     const text = readFileSync(file, 'utf8');
     if (text.includes('function POST')) assert.ok(text.includes('readJson('), `${file} needs bounded validation`);
-    else if (text.includes('export const POST')) assert.ok(text.includes('createHandlers()'), `${file} must use an audited body boundary`);
+    else if (text.includes('export const POST')) {
+      const checkoutBoundary = file === 'app/api/apex/checkout/route.ts' && text.includes('createCheckoutHandlers()') &&
+        text.includes('lib/apex-checkout.cjs') && readFileSync('lib/apex-checkout.cjs', 'utf8').includes('boundedBody(request,256)');
+      assert.ok(text.includes('createHandlers()') || checkoutBoundary, `${file} must use an audited body boundary`);
+    }
   }
+  // Checkout's new POST must reject untrusted inputs before either provider operation.
+  const { createCheckoutHandlers } = require(resolve('lib/apex-checkout.cjs'));
+  const checkoutConfig = { enabled: true, checkoutEnabled: true, mode: 'test', live: false, key: 'fixture', webhook: 'fixture', price: 'price_fixture', link: 'plink_fixture', emailKey: 'fixture', from: 'sender@example.com', support: 'support@example.com', origin: 'https://tay.example' };
+  let checkoutCalls = 0;
+  const checkout = createCheckoutHandlers({ config: () => checkoutConfig, readPrice: async () => { checkoutCalls++; throw Error('must not read'); }, createSession: async () => { checkoutCalls++; throw Error('must not create'); } });
+  for (const body of ['{bad', 'null', '[]', '{"request_id":"invalid"}', '{"request_id":"' + 'x'.repeat(300) + '"}', '{"request_id":"550e8400-e29b-41d4-a716-446655440000","metadata":{"role":"owner"}}'])
+    assert.equal((await checkout.create(req(body, { Origin: 'https://tay.example' }, 'POST', '/api/apex/checkout'))).status, 400);
+  assert.equal((await checkout.create(req({}, { Origin: 'https://evil.example' }, 'POST', '/api/apex/checkout'))).status, 403);
+  assert.equal(checkoutCalls, 0);
   assert.equal(apiConfig.path, '/api/*'); assert.equal(apiConfig.excludedPath, webhookConfig.path);
   assert.equal(siteConfig.path, '/*'); assert.equal(siteConfig.excludedPath, undefined);
   assert.equal(webhookConfig.rateLimit, undefined, 'Free Netlify plan allows only two rate rules; webhook inherits site-wide rule');

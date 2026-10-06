@@ -39,3 +39,7 @@ Live commerce and real identity remain separate approved work. No live enablemen
 Both commits and draft PR title use `[skip ci]` while hosting usage remains unverified. Actions/Netlify builds are deliberately skipped, not passed. Do not merge until authorized CI and deployed edge/browser verification run on the final commit.
 
 References: https://docs.stripe.com/api/checkout/sessions/create ; https://docs.stripe.com/api/idempotent_requests ; https://docs.stripe.com/checkout/fulfillment ; https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs ; https://docs.netlify.com/deploy/manage-deploys/manage-deploys-overview/ .
+
+## Manual Android-sized browser verification
+
+The existing Security gate has a `workflow_dispatch`-only `Android-sized local browser QA` job on a standard public Ubuntu runner. It installs pinned Playwright/Chromium, builds and serves the app locally, and tests360/390px mobile Chromium viewports. It never navigates to Stripe: provider responses/downloads are synthetic and external browser requests are blocked. Checks cover disabled/loading/error/prepared/reset states, private-link cleanup, retry/download/clear, horizontal overflow, core labels/keyboard activation and real local production-identity401. Screenshots and a machine-readable synthetic-only report are uploaded for seven days. This verifies rendered mobile browser behavior, not a physical Android device or real provider acceptance. Existing security jobs and the PR-only deployed-preview condition are unchanged.

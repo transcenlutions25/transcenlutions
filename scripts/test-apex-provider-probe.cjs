@@ -216,3 +216,35 @@ test('Netlify conditionally invokes the probe only after a successful build and 
     assert.equal(run.status, expectedExit); assert.equal(run.stdout, expectedOutput); assert.equal(run.stderr, '');
   }
 });
+
+
+test('opaque key suffixes reach the provider unchanged; local checks do not authenticate them', async () => {
+  for (const suffix of ['synthetic_suffix', 'synthetic-suffix', 'synthetic_suffix-with-hyphen']) {
+    const key = ['rk', 'live', suffix].join('_');
+    const env = {...fixture(), APEX_STRIPE_RESTRICTED_KEY: key}, deps = fakeProvider();
+    assert.equal((await runProbe(env, deps)).status, 'read_checks_passed');
+    assert.equal(deps.calls.length, 4);
+    for (const call of deps.calls) assert.equal(call.options.headers.Authorization, 'Bearer ' + key);
+    assert.equal(env.APEX_STRIPE_RESTRICTED_KEY, key);
+  }
+});
+
+test('key diagnostics distinguish missing, mode, prefix and unsafe formatting without exposing values', async () => {
+  const key = fixture().APEX_STRIPE_RESTRICTED_KEY;
+  const cases = [
+    [{APEX_STRIPE_MODE: 'test'}, 'live_mode_required'],
+    ...[undefined, null, '', 42].map(value => [{APEX_STRIPE_RESTRICTED_KEY: value}, 'restricted_key_missing']),
+    ...[['rk', 'test', 'syntheticOnly'].join('_'), ['sk', 'live', 'syntheticOnly'].join('_'), 'otherPrefix']
+      .map(value => [{APEX_STRIPE_RESTRICTED_KEY: value}, 'restricted_key_live_prefix_required']),
+    ...['rk_live_', ' ' + key, key + ' ', key + '\n', key + '\t', key + '\u0000', key + '\u007f', key + '\u0085',
+      '"' + key + '"', "'" + key + "'", '`' + key + '`', key + '"']
+      .map(value => [{APEX_STRIPE_RESTRICTED_KEY: value}, 'restricted_key_format_unconfirmed']),
+  ];
+  for (const [patch, reason] of cases) {
+    const env = {...fixture(), ...patch}, original = env.APEX_STRIPE_RESTRICTED_KEY, deps = fakeProvider();
+    const result = await runProbe(env, deps);
+    assert.equal(result.status, 'blocked'); assert.equal(result.reason, reason); assert.equal(deps.calls.length, 0);
+    assert.equal(env.APEX_STRIPE_RESTRICTED_KEY, original);
+    assert.doesNotMatch(JSON.stringify(result), /synthetic|rk_live|otherPrefix/);
+  }
+});

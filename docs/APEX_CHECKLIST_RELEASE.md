@@ -25,11 +25,24 @@ Configure values directly in trusted Netlify server/function environments, never
 | `APEX_DELIVERY_FROM` | Bare email address on a sender domain verified by the email provider. |
 | `APEX_SUPPORT_EMAIL` | Monitored reply-to address; confirm replies arrive before release. |
 | `APEX_SITE_ORIGIN` | Exact HTTPS deployment origin, no slash/path/query. Use the sandbox deployment while testing. |
-| `APEX_CHECKLIST_SALES_ENABLED` | Default absent/false. Set `true` only in isolated testing first; production requires the full acceptance gate. This does not publish a Buy button. |
+| `APEX_CHECKLIST_SALES_ENABLED` | Default absent/false. Set `true` only in isolated testing first; production requires the full acceptance gate. This does not publish a Buy button by itself. |
+| `APEX_CHECKLIST_PUBLIC_CHECKOUT_ENABLED` | Default absent/false. Separate operational approval to expose the existing live Payment Link only after every live acceptance gate below passes. Never enable in a preview or sandbox. |
 
 The ChatGPT Stripe connector exposes only a live account in this session and does not install credentials in Netlify. Do not charge a live card to simulate tests.
 
 Existing catalog: product `prod_V3MBNEBCG09Rzj`, price `price_1U3FTOPLMwl8qmZP4vwkUOi8`, link `plink_1U3FTTPLMwl8qmZPn4DQzrKE`. The last verified live link used hosted confirmation without a download redirect. It must not be advertised as working instant delivery until configured and tested.
+
+## Guarded public offer (default off)
+
+`GET /api/apex/checkout` is a provider-free configuration gate. It returns only `{enabled:false}` unless the public-checkout flag is exactly `true`, Netlify's captured build `CONTEXT` is `production`, `APEX_STRIPE_MODE=live`, the existing delivery configuration passes `ready(config())`, and the request URL origin exactly matches `APEX_SITE_ORIGIN`. Cross-origin caller headers fail closed. No caller parameter can select a price, link or mode. The enabled response contains only the pinned existing USD 27 Payment Link; it never creates Checkout Sessions or calls a provider. Responses are private/no-store and remain under the existing `/api/*` and site-wide edge rules.
+
+The flag records a **separate operational approval**, not proof supplied by this endpoint. Presence/format checks cannot verify credential permissions, the sender domain, webhook registration, redirect, email arrival, support coverage, legal-copy approval or delivery success. An authorized operator must verify those acceptance gates before enabling it in the protected production runtime. `next.config.mjs` captures Netlify's build-only `CONTEXT` into the nonsecret `APEX_BUILD_CONTEXT` constant explicitly referenced by the server route; it does not rely on a runtime `CONTEXT` variable. Missing and preview build markers remain closed even if runtime variables say production. Do not configure an `APEX_BUILD_CONTEXT` runtime override or promote preview artifacts. See [Netlify runtime environment limits](https://docs.netlify.com/build/functions/environment-variables/). Missing JavaScript, configuration, a failed check, or a preview/test context keeps the page inquiry-only. Returning from another tab or browser back/forward rechecks the gate and clears old links first.
+
+The offer discloses the current compatibility exception before purchase: standalone browser HTML, JSON progress and text-plan exports; automatic Tay product-library registration is unavailable and universal agent execution is not promised. The sample and consent-based interest form stay available. No new terms, refund commitments, prices or guided services are introduced. The global `/support` page points checklist questions to the existing transcenlutions@gmail.com address; `/terms`, `/refund` and `/privacy` still contain starter copy requiring owner review. Their existence is not legal approval, and the public flag must stay off until the applicable customer-facing policies are finalized.
+
+To hide the public offer without blocking existing buyer downloads, set `APEX_CHECKLIST_PUBLIC_CHECKOUT_ENABLED=false` in production and apply the host's environment update/redeploy procedure. Recheck the endpoint and page on the deployed commit. This presentation gate does not revoke a Stripe URL already copied or opened; disabling the provider Payment Link is a separate authorized action when stopping new payments is required. `APEX_CHECKLIST_SALES_ENABLED=false` remains the broader fulfillment kill switch and blocks paid downloads too.
+
+Local synthetic tests cover allowed/denied configuration, request origin/context, no provider calls, no-store output, no-JavaScript/failure fallback and stale browser responses. They do not establish provider readiness, actual browser rendering, deployed edge enforcement or collected revenue. Deployment, live runtime changes and provider acceptance are separate approvals and checks; this code change leaves both flags off by default.
 
 ## Payment → email → download
 
@@ -50,10 +63,12 @@ Metadata names: `apex_email_started`, `apex_email_payload` (SHA-256, not message
 - Reconciliation: examine the failed Stripe event and corresponding email-provider record privately. If the email was accepted, repair the acceptance metadata using the verified provider ID and matching template version. If it was definitely never accepted, an authorized operator can reset the pending metadata and resend the Stripe event. Never clear uncertain state blindly. No automatic resends to a changed address.
 - Bounced/suppressed/missing delivery email: buyer may still download from their checkout return. Support verifies the receipt privately and resolves the address/delivery issue. Do not request card details. These exceptions remain manual.
 - Form POST timeout: the page displays the stable inquiry reference, disables another POST in that page instance, and directs the visitor to email. It does not claim receipt. Refresh/new-tab/global form deduplication is not guaranteed by Netlify; treat matching references as one inquiry.
-- Kill switch: set `APEX_CHECKLIST_SALES_ENABLED=false`, remove public checkout entry points, redeploy. This also blocks paid downloads until restored. Existing downloaded files remain usable.
+- Kill switch: set both `APEX_CHECKLIST_PUBLIC_CHECKOUT_ENABLED=false` and `APEX_CHECKLIST_SALES_ENABLED=false`, then apply the environment update/redeploy. This also blocks paid downloads until restored. Existing downloaded files remain usable.
 - Rollback: redeploy the last verified provider deployment from the release record; never force-push or overwrite main. Keep delivery metadata and template `v1` compatible with pending requests.
 
 ## Required live acceptance before selling
+
+October 7 offer-only update: preserve the separately recorded October 4 legacy sandbox purchase-to-email/download acceptance. This change does not modify the payment or delivery handlers, reset or move that sandbox, or require another sandbox purchase solely to activate the offer. The sandbox steps below record the original acceptance scope; they are not authorization to repeat it. Production configuration, branded sender, webhook/redirect, support and customer-policy verification remain separate prerequisites.
 
 1. Owner checks the actual file and confirms it matches the offer.
 2. Connect an isolated Stripe sandbox and verified transactional sender; install credentials securely in a trusted test runtime. Do not send real buyer data to a new provider until approved.

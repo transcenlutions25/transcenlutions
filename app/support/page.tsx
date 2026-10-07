@@ -9,7 +9,7 @@ export default function SupportPage() {
       sections={[
         {
           heading: "Primary support route",
-          body: "The intended support inbox is support@transcenlutions.com. It must be created and verified before public launch.",
+          body: "For Apex Flow checklist access or product questions, email transcenlutions@gmail.com. Do not send passwords, payment-card details, or customer records.",
         },
         {
           heading: "Billing questions",

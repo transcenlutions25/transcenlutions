@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = 'npm run build && if [ "${APEX_PROVIDER_PROBE_ENABLED:-false}" = "true" ]; then npm run probe:apex-providers; fi'
   publish = ".next"
 
 [build.environment]

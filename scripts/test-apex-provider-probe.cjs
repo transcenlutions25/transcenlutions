@@ -174,14 +174,13 @@ test('ambiguous, rejected and malformed email acceptance is not retried or logge
   }
 });
 
-test('command output is fixed/redacted and regular builds have no probe hook or public endpoint', () => {
+test('command output is fixed/redacted and npm build has no probe lifecycle hook', () => {
   const output = spawnSync(process.execPath, ['scripts/apex-provider-probe.cjs'], {
     cwd: process.cwd(), env: {PATH: process.env.PATH, APEX_STRIPE_RESTRICTED_KEY: 'do-not-log-this'}, encoding: 'utf8'});
   assert.equal(output.status, 1); assert.equal(output.stderr, '');
   assert.equal(JSON.parse(output.stdout).reason, 'disabled'); assert.doesNotMatch(output.stdout, /do-not-log-this/);
   const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
   for (const name of ['build', 'prebuild', 'postbuild', 'dev', 'start']) assert.doesNotMatch(pkg.scripts[name] || '', /provider-probe/);
-  assert.doesNotMatch(readFileSync('netlify.toml', 'utf8'), /provider-probe/);
 });
 
 
@@ -192,4 +191,28 @@ test('locked-candidate approval permits validating the same checkout-enabled bui
   const blocked = fakeProvider();
   assert.equal((await runProbe({...env, APEX_PROVIDER_PROBE_STAGING_APPROVAL: ''}, blocked)).status, 'blocked');
   assert.equal(blocked.calls.length, 0);
+});
+
+
+test('Netlify conditionally invokes the probe only after a successful build and exact opt-in', () => {
+  const command = readFileSync('netlify.toml', 'utf8').match(/^  command = '([^\n]+)'$/m)?.[1];
+  assert.ok(command, 'Expected a literal, reviewable Netlify build command');
+  assert.equal(command, 'npm run build && if [ "${APEX_PROVIDER_PROBE_ENABLED:-false}" = "true" ]; then npm run probe:apex-providers; fi');
+  const fakeNpm = 'npm() { printf "%s\\n" "$2"; if [ "$2" = "build" ]; then return "$BUILD_EXIT"; fi; return "$PROBE_EXIT"; }; ';
+  for (const flag of [undefined, '', 'false', 'TRUE', '1']) {
+    const env = {PATH: process.env.PATH, BUILD_EXIT: '0', PROBE_EXIT: '0'};
+    if (flag !== undefined) env.APEX_PROVIDER_PROBE_ENABLED = flag;
+    const run = spawnSync('bash', ['-c', fakeNpm + command], {env, encoding: 'utf8'});
+    assert.equal(run.status, 0); assert.equal(run.stdout, 'build\n'); assert.equal(run.stderr, '');
+  }
+  for (const [buildExit, probeExit, expectedExit, expectedOutput] of [
+    ['0', '0', 0, 'build\nprobe:apex-providers\n'],
+    ['17', '0', 17, 'build\n'],
+    ['0', '1', 1, 'build\nprobe:apex-providers\n'],
+  ]) {
+    const run = spawnSync('bash', ['-c', fakeNpm + command], {encoding: 'utf8', env: {
+      PATH: process.env.PATH, BUILD_EXIT: buildExit, PROBE_EXIT: probeExit, APEX_PROVIDER_PROBE_ENABLED: 'true',
+    }});
+    assert.equal(run.status, expectedExit); assert.equal(run.stdout, expectedOutput); assert.equal(run.stderr, '');
+  }
 });

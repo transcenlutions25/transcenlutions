@@ -1,5 +1,5 @@
 'use strict';
-// One-off operator command. Never import this into a route or npm build hook.
+// One-off operator command, conditionally invoked by Netlify only when enabled. No HTTP route.
 const ORIGIN = 'https://tay-command.netlify.app';
 const PRICE = 'price_1U3FTOPLMwl8qmZP4vwkUOi8';
 const PRODUCT = 'prod_V3MBNEBCG09Rzj';

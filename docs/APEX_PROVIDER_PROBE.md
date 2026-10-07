@@ -1,6 +1,6 @@
 # One-off production provider probe
 
-This is a code-only preparation. It does not authorize or perform a deployment, provider request, email, purchase, sandbox reset, credential creation or runtime change. Existing Apex order, webhook and email handlers are unchanged. The command is not part of `npm run build`, a CI hook, an HTTP route, or a scheduled job.
+This is a code-only preparation. It does not authorize or perform a deployment, provider request, email, purchase, sandbox reset, credential creation or runtime change. Existing Apex order, webhook and email handlers are unchanged. The `npm run build` script is unchanged. Netlify’s checked-in build command invokes the probe only behind its explicit default-off enable switch; there is no HTTP route or scheduled job.
 
 ## Bounded evidence
 
@@ -43,15 +43,15 @@ All gates must match:
 - `APEX_PROVIDER_PROBE_APPROVED_AT` equal to the fixed timestamp for the approved release attempt; it must not be in the future or at least one hour old
 - For the separately approved email only: `APEX_PROVIDER_PROBE_EMAIL_ENABLED=true` plus the exact configured sender/support and existing Resend key
 
-The release operator can temporarily select `npm run build && npm run probe:apex-providers` as the locked candidate's build command after approval. The command fails the build when blocked or when a requested check is unconfirmed. Normal builds stay unchanged. Restore the normal build command and remove/disable probe flags after this one-off validation; do not leave an email trigger in future build settings.
+Netlify’s file-based build command overrides the UI build setting. The checked-in command therefore runs the unchanged `npm run build`, then invokes `npm run probe:apex-providers` only when `APEX_PROVIDER_PROBE_ENABLED` is exactly `true`. Missing/false values skip the probe without provider calls or output; a failed app build never invokes it. An enabled probe with missing, expired, preview or otherwise invalid approval fails the build. Configure approved flags only for the trusted production candidate, never for deploy previews. Remove/disable the probe and email flags after the one-off validation; a subsequent build must not inherit an active approval window.
 
 A separately approved candidate may have its public-checkout flag already true so the exact staged build can later be published without another configuration build. This probe does not set that flag or grant publication approval. The existing checkout origin guard still keeps the public checkout response disabled on the deploy permalink. The currently published deployment and the sandbox remain untouched. Publish only the exact validated candidate after the remaining delivery, support, policy and owner approval gates are satisfied.
 
 ## Local verification and sources
 
-`node --test scripts/test-apex-provider-probe.cjs` uses synthetic configuration and HTTP stubs only. It covers all gates independently, denied/non-production contexts, expiration, pinned requests, unexpected records, bounded/error responses, no secret leakage, email opt-in, fixed recipients, idempotency and ambiguous outcomes. `npm run test:apex` includes these tests. These tests do not establish live provider readiness.
+`node --test scripts/test-apex-provider-probe.cjs` uses synthetic configuration and HTTP stubs only. It covers all gates independently, denied/non-production contexts, expiration, pinned requests, unexpected records, bounded/error responses, no secret leakage, email opt-in, fixed recipients, idempotency ambiguous outcomes, and conditional build-command sequencing/failure propagation. `npm run test:apex` includes these tests. These tests do not establish live provider readiness.
 
 Primary references:
-- Netlify [build environment variables](https://docs.netlify.com/build/configure-builds/environment-variables/)
+- Netlify [file-based command precedence](https://docs.netlify.com/build/configure-builds/file-based-configuration/) and [build environment variables](https://docs.netlify.com/build/configure-builds/environment-variables/)
 - Stripe [retrieve Price](https://docs.stripe.com/api/prices/retrieve), [list Checkout Sessions](https://docs.stripe.com/api/checkout/sessions/list), [list PaymentIntents](https://docs.stripe.com/api/payment_intents/list), [list Charges](https://docs.stripe.com/api/charges/list)
 - Resend [send email](https://resend.com/docs/api-reference/emails/send-email) and [24-hour idempotency keys](https://resend.com/docs/dashboard/emails/idempotency-keys)

@@ -29,7 +29,18 @@ function authorization(env, now) {
   // Stripe documents the live restricted prefix, not an alphanumeric suffix grammar.
   // Treat the remainder as opaque; reject paste delimiters/control characters without trimming.
   if (/[\s\x00-\x1f\x7f-\x9f"'`]/u.test(key)) return 'restricted_key_format_unconfirmed';
-  if (!key.startsWith('rk_live_')) return 'restricted_key_live_prefix_required';
+  if (!key.startsWith('rk_live_')) {
+    // Fixed categories only: never output any token bytes, suffix, length or hash.
+    // These prefix hints do not authenticate a credential or relax the restricted-key gate.
+    if (key.startsWith('sk_live_')) return 'standard_live_secret_key_not_restricted';
+    if (key.startsWith('rk_test_')) return 'test_restricted_key';
+    if (key.startsWith('sk_test_')) return 'test_standard_secret_key';
+    if (key.startsWith('sk_org_')) return 'organization_key_not_supported';
+    if (key.startsWith('pk_live_') || key.startsWith('pk_test_')) return 'publishable_key';
+    if (key.startsWith('whsec_')) return 'webhook_secret';
+    if (key.startsWith('re_')) return 'resend_key';
+    return 'unknown_key_type';
+  }
   if (key.length === 'rk_live_'.length) return 'restricted_key_format_unconfirmed';
   return null;
 }
@@ -118,3 +129,4 @@ async function main() {
 }
 if (require.main === module) main();
 module.exports = {authorization, runProbe, APPROVAL_WINDOW_MS};
+

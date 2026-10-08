@@ -234,8 +234,9 @@ test('key diagnostics distinguish missing, mode, prefix and unsafe formatting wi
   const cases = [
     [{APEX_STRIPE_MODE: 'test'}, 'live_mode_required'],
     ...[undefined, null, '', 42].map(value => [{APEX_STRIPE_RESTRICTED_KEY: value}, 'restricted_key_missing']),
-    ...[['rk', 'test', 'syntheticOnly'].join('_'), ['sk', 'live', 'syntheticOnly'].join('_'), 'otherPrefix']
-      .map(value => [{APEX_STRIPE_RESTRICTED_KEY: value}, 'restricted_key_live_prefix_required']),
+    [{APEX_STRIPE_RESTRICTED_KEY: ['rk', 'test', 'syntheticOnly'].join('_')}, 'test_restricted_key'],
+    [{APEX_STRIPE_RESTRICTED_KEY: ['sk', 'live', 'syntheticOnly'].join('_')}, 'standard_live_secret_key_not_restricted'],
+    [{APEX_STRIPE_RESTRICTED_KEY: 'otherPrefix'}, 'unknown_key_type'],
     ...['rk_live_', ' ' + key, key + ' ', key + '\n', key + '\t', key + '\u0000', key + '\u007f', key + '\u0085',
       '"' + key + '"', "'" + key + "'", '`' + key + '`', key + '"']
       .map(value => [{APEX_STRIPE_RESTRICTED_KEY: value}, 'restricted_key_format_unconfirmed']),
@@ -248,3 +249,54 @@ test('key diagnostics distinguish missing, mode, prefix and unsafe formatting wi
     assert.doesNotMatch(JSON.stringify(result), /synthetic|rk_live|otherPrefix/);
   }
 });
+
+test('wrong-key categories are fixed hints, never provider calls or credential output', async () => {
+  const cases = [
+    [['sk', 'live'], 'standard_live_secret_key_not_restricted'],
+    [['rk', 'test'], 'test_restricted_key'],
+    [['sk', 'test'], 'test_standard_secret_key'],
+    [['sk', 'org'], 'organization_key_not_supported'],
+    [['pk', 'live'], 'publishable_key'],
+    [['pk', 'test'], 'publishable_key'],
+    [['whsec'], 'webhook_secret'],
+    [['re'], 'resend_key'],
+    [['unknown'], 'unknown_key_type'],
+    [['RK', 'LIVE'], 'unknown_key_type'],
+  ];
+  for (const [parts, reason] of cases) {
+    for (const suffix of ['never-log-this', 'a-different-opaque-suffix']) {
+      const key = [...parts, suffix].join('_');
+      const env = {...fixture(), APEX_STRIPE_RESTRICTED_KEY: key, APEX_PROVIDER_PROBE_EMAIL_ENABLED: 'true'};
+      const deps = fakeProvider(), result = await runProbe(env, deps);
+      assert.deepEqual(result, {status: 'blocked', reason, price: 'not_checked', checkoutRead: 'not_checked',
+        paymentIntentRead: 'not_checked', chargeRead: 'not_checked', email: 'not_requested',
+        metadataWritesVerified: false, sessionExpansionsVerified: false,
+        webhookSecretVerified: false, inboxDeliveryVerified: false});
+      assert.equal(deps.calls.length, 0);
+      assert.equal(env.APEX_STRIPE_RESTRICTED_KEY, key);
+      assert.equal(JSON.stringify(result).includes(key), false);
+      assert.equal(JSON.stringify(result).includes(suffix), false);
+      for (const patch of [{APEX_PROVIDER_PROBE_ENABLED: 'false'}, {CONTEXT: 'deploy-preview'},
+        {APEX_PROVIDER_PROBE_APPROVED_AT: new Date(NOW - APPROVAL_WINDOW_MS).toISOString()}]) {
+        const denied = fakeProvider(), gated = await runProbe({...env, ...patch}, denied);
+        assert.notEqual(gated.reason, reason);
+        assert.equal(denied.calls.length, 0);
+      }
+      for (const malformed of [' ' + key, key + '\n', '"' + key + '"']) {
+        const invalid = fakeProvider();
+        assert.equal((await runProbe({...env, APEX_STRIPE_RESTRICTED_KEY: malformed}, invalid)).reason,
+          'restricted_key_format_unconfirmed');
+        assert.equal(invalid.calls.length, 0);
+      }
+    }
+    const output = spawnSync(process.execPath, ['scripts/apex-provider-probe.cjs'], {
+      cwd: process.cwd(), encoding: 'utf8', env: {...fixture(), PATH: process.env.PATH,
+        APEX_PROVIDER_PROBE_APPROVED_AT: new Date().toISOString(),
+        APEX_STRIPE_RESTRICTED_KEY: [...parts, 'never-log-this'].join('_'),
+        APEX_PROVIDER_PROBE_EMAIL_ENABLED: 'true'}});
+    assert.equal(output.status, 1); assert.equal(output.stderr, '');
+    assert.equal(JSON.parse(output.stdout).reason, reason);
+    assert.doesNotMatch(output.stdout, /never-log-this|synthetic-email-key/);
+  }
+});
+

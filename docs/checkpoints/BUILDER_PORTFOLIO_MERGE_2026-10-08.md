@@ -2,26 +2,56 @@
 
 ## Purpose
 
-This checkpoint consolidates the currently verified ChatGPT-connected builder inventory and revenue-readiness findings into the canonical Transcenlutions repository without replacing Tay Command or overwriting Mac/local work.
+This checkpoint consolidates the verified connected builder inventory, revenue-readiness findings, ONE TAY runtime target, and Tay Self-Build Foundry cost-offset mandate into the canonical Transcenlutions repository without replacing Tay Command or overwriting Mac/local work.
 
 ## Canon preservation rules
 
 1. `transcenlutions25/transcenlutions` on `main` remains the versioned source of truth.
 2. Existing Tay Command is extended, not rebuilt or replaced.
-3. The Mac Tay interface under `$HOME/Tay/window` remains a preserved visual/interaction reference and separate local implementation.
-4. The dirty local checkout under `$HOME/Documents/Transcenlutions` remains preserved until deliberate reconciliation; do not reset, force-push, or silently overwrite it.
-5. Replit is a development/execution surface, not a replacement source of truth. Changes created there must ultimately be reconciled back to GitHub through controlled review.
-6. No secrets, private browser state, local queue database, or credentials are copied into this checkpoint.
+3. Tay dot/hosted and Tay Mac are two surfaces of **ONE TAY** and must converge on the same authenticated identity, memory, queue, Operating Graph, agents, business state, revenue state, assets, and Cost Displacement Ledger.
+4. The Mac keeps local privileged capabilities and protected device-only state; local tools do not create a second Tay brain.
+5. The dirty local checkout under `$HOME/Documents/Transcenlutions` remains preserved until deliberate reconciliation; do not reset, force-push, or silently overwrite it.
+6. Replit is an active hosted development/execution surface for the full platform, not a replacement source of truth.
+7. No secrets, private browser state, local queue database, or credentials are copied into GitHub.
 
-These rules are consistent with the existing canon documents:
+Canonical additions in this branch:
 
-- `docs/canon/TAY_COMMAND_BUILD_DIRECTIVE_2026-09-24.md`
-- `docs/canon/TAY_COMMAND_SURFACE_CANON_V1_2026-09-28.md`
-- `docs/checkpoints/TAY_LOCAL_STATE_CHECKPOINT_2026-10-01.md`
+- `docs/canon/ONE_TAY_SELF_BUILD_FOUNDRY_CANON_2026-10-08.md`
+- `config/one-tay-runtime.json`
+- `integrations/tay-desktop/ONE_TAY_MIGRATION_2026-10-08.md`
+
+## ONE TAY status
+
+The repository already contains a shared Next interface and optional Mac launcher that can serve the same application on Mac while connecting to the existing local service. That is the correct migration foundation.
+
+The remaining major gap is cross-device/shared authoritative state. Current legacy behavior still has separate browser storage and Mac queue storage. The target now explicitly requires shared authenticated conversations, objectives, queue state, approvals, business state, revenue state, cost state, workspace assets, and Operating Graph history with safe offline reconciliation.
+
+Do not claim ONE TAY synchronization complete until the acceptance tests in the Mac migration directive pass.
+
+## Tay Self-Build Foundry
+
+Tay must progressively internalize the capabilities needed to build, test, deploy, operate, market, and improve Tay/Transcenlutions so external costs can be reduced, eliminated, or offset by collected revenue before free trials/credits expire whenever practical.
+
+Foundry target modules:
+
+- Code Forge
+- UI / Design Forge
+- Data Forge
+- Deploy Forge
+- Automation Forge
+- Browser & QA Forge
+- Agent Forge
+- Media Forge
+- Revenue & CRM Forge
+- Commerce Layer
+- Communications Forge
+- Cost Displacement Ledger
+
+External providers remain replaceable adapters/fallbacks until Tay-owned replacements pass acceptance tests. Do not recreate regulated payment/banking/legal infrastructure merely to avoid appropriate provider fees.
 
 ## Connected / available builders
 
-### Connected and usable from this ChatGPT account
+### Connected and usable
 
 - Replit
 - Lovable
@@ -32,7 +62,7 @@ These rules are consistent with the existing canon documents:
 - Supabase
 - Figma
 
-### Available to connect if later needed
+### Available to connect if later justified
 
 - Base44
 - Webflow
@@ -40,7 +70,7 @@ These rules are consistent with the existing canon documents:
 - WordPress.com
 - Railway
 
-Do not add another builder merely because it is available. The revenue-first rule applies: use an additional platform only when it materially shortens time to collected revenue or solves a verified blocker.
+Do not add another builder merely because it exists. Add one only when it materially shortens time to collected revenue or solves a verified blocker.
 
 ## Lovable inventory
 
@@ -53,23 +83,29 @@ Workspace: `Kyle's Lovable`
 - Apex Funnel Command — scaffold completed, not published.
 - One older unnamed project from 2025-09-04 — not published.
 
-### SiteForge Local revenue-readiness snapshot
+### SiteForge Local revenue snapshot
 
-Verified from the live Lovable project and its enabled Supabase database:
-
-- Public landing site exists and is published.
+- Public landing site published.
 - Public pricing page exists.
-- Supabase database is enabled.
-- `prospects`, `pipeline_events`, `discovered_leads`, `app_settings`, and related tables exist.
-- Setup payment link is configured.
-- Monthly care-plan payment link is configured.
-- Current CRM counts: 10 prospects total; 9 `New Lead`; 1 `Contacted`.
+- Supabase database enabled.
+- Setup payment link configured.
+- Monthly care-plan payment link configured.
+- 10 prospects total: 9 `New Lead`, 1 `Contacted`.
 - Recorded cash collected: $0.
 - Current discovered lead count: 0.
-- The public pricing CTA currently routes prospects to contact/request flow rather than directly to checkout.
-- Internal payment links are designed to appear after proposal/won states and do not by themselves mark money as collected.
 
-Conclusion: **SiteForge Local is the closest verified build to sale.** It can support a manually closed sale now if outreach produces a qualified buyer, but it is not yet an autonomous revenue engine.
+SiteForge Local is a second-priority near-term revenue surface after Apex Flow.
+
+## Apex Flow revenue correction
+
+Apex Flow is already being advertised and must be treated as the **first revenue priority**, not as a future blocked module.
+
+Verified live Stripe offers include:
+
+- Leak Fix Report — Apex Flow — USD 97 one-time.
+- Full Funnel Audit — Apex Flow — USD 297 one-time.
+
+Existing live payment paths must be protected during ONE TAY and Self-Build Foundry consolidation. Older release documentation that describes earlier guarded states must be reconciled against current live provider state instead of being used to shut down an advertised path.
 
 ## Floot inventory
 
@@ -77,11 +113,11 @@ Conclusion: **SiteForge Local is the closest verified build to sale.** It can su
 - ProofPay — unpublished.
 - Mr G Maintenance Scheduler — unpublished.
 
-The connected Floot workspace is currently on the free plan. None of these three projects were live at the time of this checkpoint.
+Connected Floot workspace is on the free plan.
 
 ## Replit inventory
 
-Existing editable apps discovered under the connected `transcenlutions` Replit account:
+Existing editable Replit apps include:
 
 1. TerribleDarkorangeLight
 2. Tay Home Hub
@@ -117,7 +153,7 @@ Existing editable apps discovered under the connected `transcenlutions` Replit a
 32. Service Arbitrage Hub
 33. Personal AI Assistant
 
-Verified Replit publish state during this checkpoint:
+Verified publish-state snapshot at discovery time:
 
 - Transcenlutions Portfolio Command — previously published, currently suspended.
 - Bidness — previously published, currently suspended.
@@ -131,61 +167,28 @@ Verified Replit publish state during this checkpoint:
 - Cinematic Pulse Studio — never published.
 - Career Catalyst Suite — never published.
 
-Not every Replit app has been individually re-audited in this pass. Absence from the publish-state subsection is not a claim about readiness.
-
 ### Replit convergence target
 
-Use **Transcenlutions Portfolio Command** as the primary Replit convergence surface for the owner-facing Transcenlutions/Tay product unless a later code audit proves another existing Replit app is materially closer to the GitHub canon.
+Use **Transcenlutions Portfolio Command** as the primary hosted Replit implementation surface for the full live ONE TAY platform unless a later code audit proves another existing app materially closer to canon.
 
-Rules for that convergence:
+Rules:
 
-- Do not rebuild Tay Command from scratch.
-- Preserve existing working behavior in the Replit app while aligning it to the GitHub/Mac Tay canon.
-- Tay remains the Executive Chief of Staff / primary orchestrator.
-- Chat stays the dominant command surface.
-- Use the royal purple, royal blue, black, gold, and lightning-blue design language.
-- Keep queue, governance, memory, revenue, deployment, and operating systems secondary to the active conversation via progressive disclosure.
-- Preserve the distinction: agent = person/worker, business/division = organization/place, tool = equipment, workflow = production line.
-- Ascended Forge remains a division/digital factory; KJ runs the Forge; Tay sits above it at the executive level.
-- Replit work must be reconciled back into GitHub rather than becoming a competing canon.
+- Do not rebuild Tay from scratch.
+- Preserve working behavior.
+- Chat stays the dominant surface.
+- Tay remains Executive Chief of Staff / primary orchestrator.
+- KJ runs Ascended Forge under Tay.
+- Revenue, queue, governance, memory, deployment, cost, and Foundry systems use progressive disclosure.
+- Replit changes intended to become permanent reconcile back into GitHub.
+- Do not publish a new hosted release until the current update is stable and verified.
 
 ## Vercel inventory
 
-Connected Vercel team: `transcenlutions25's projects`.
-
-Projects currently visible:
-
-- v0-pulse-ai-launch
-- stackr
-- pulse-ai-c5mp
-- seamless-solutions-final-app
-- seamless
-- seamless-solutions
-- pulse-ai
-- pulse-ai-starter
-- v0-new-project-qai2pscemhw
-- pulse-ai-starter-ro24
-- seamless-solutions-wmx5
-- seamless-solutions-bdrf
-- bidness-royals
-- bidness-deploy
-- bidness-royal
-- bidness-live
-- bidness-3i69
-- bidness-app-h3zh
-- bidness-live-a4pg
-- bidness-app-db1m
-- bidness-live-z2mi
-- shopify-gpt-starter
-- bidness-app
-- bidness-v1
-- bidness
-
-These are deployment/project surfaces, not automatically canonical products. Consolidation must follow the GitHub source-of-truth rules above.
+Connected team includes multiple Pulse, Seamless, Bidness, and Shopify starter projects. Treat these as deployment/project surfaces, not automatically canonical products.
 
 ## Supabase inventory
 
-Connected Supabase projects discovered:
+Connected projects discovered:
 
 - create-fast-simple — INACTIVE.
 - marriage-faith-unity — INACTIVE.
@@ -193,38 +196,28 @@ Connected Supabase projects discovered:
 - Seamless Turns — INACTIVE.
 - Ky's Creator Quest — INACTIVE.
 
-SiteForge Local uses Lovable's enabled Supabase-backed database separately from the five inactive projects listed above.
+SiteForge Local separately uses its enabled Lovable-backed Supabase database.
 
-## Revenue priority from this checkpoint
+## Revenue and cost priority
 
-### Priority 1 — sell before rebuilding
-
-**SiteForge Local** is currently closest to money because it already has:
-
-- a public offer;
-- pricing;
-- a CRM/prospect pipeline;
-- payment links;
-- an existing pool of prospects.
-
-Its highest-value next work is not another redesign. The next work is qualified outreach, proposal movement, payment-link delivery, and collection verification.
-
-### Priority 2 — Transcenlutions/Tay platform convergence
-
-Continue the owner-facing platform in Replit under **Transcenlutions Portfolio Command**, but treat it as a controlled implementation surface that obeys GitHub canon.
-
-### Priority 3 — revenue modules
-
-Hallway Cleaning, Apex Revenue Command, Bidness, DevWingman, Service Arbitrage Hub, and related tools should become governed modules/business surfaces rather than independent competing command centers whenever practical.
+1. **Apex Flow** — already advertised; protect and verify end-to-end purchase/delivery; collect revenue.
+2. **SiteForge Local** — move existing prospects to proposal/payment/collection.
+3. **ONE TAY shared runtime** — eliminate duplicate-system drift and enable one operating brain across hosted and Mac.
+4. **Code Forge + Browser/QA Forge** — reduce builder/testing dependency first because they accelerate replacement of everything else.
+5. **Deploy/Data/Automation Forge** — displace recurring infrastructure/tooling costs where practical.
+6. **Media/Agent/UI Forge** — replace or route around expensive creative/provider trials based on ledger urgency and actual spend.
 
 ## Definition of done for the next convergence pass
 
-The next pass is successful when:
+The next pass succeeds when:
 
-1. GitHub canon is untouched except through a reviewable integration branch/PR.
-2. Mac/local Tay work remains preserved and is not reset.
-3. Replit Transcenlutions Portfolio Command reflects the chat-first Tay canon without deleting working features.
-4. The app includes a durable registry of active businesses/apps and their status.
-5. Revenue-producing surfaces are visible to Tay as businesses/modules, not duplicated platform identities.
-6. SiteForge Local has a verified path from prospect -> proposal -> payment link -> collected cash.
-7. Any Replit code intended to become permanent is reconciled back to `transcenlutions25/transcenlutions` through a controlled GitHub merge.
+1. GitHub canon remains protected through reviewable changes.
+2. Mac/local work remains preserved.
+3. Replit Transcenlutions Portfolio Command reflects ONE TAY and Self-Build Foundry canon.
+4. A shared runtime contract is implemented, not merely documented.
+5. Tay dot and Mac can see the same test objective/conversation state.
+6. A Mac-only capability can execute a governed ONE TAY objective and return its result to hosted Tay without duplicate state.
+7. Apex Flow purchase/delivery remains intact.
+8. SiteForge Local's path from prospect -> proposal -> payment -> collected cash remains intact.
+9. Cost Displacement Ledger tracks each paid/trial tool and its replacement/offset plan.
+10. Permanent Replit implementation reconciles back into GitHub through controlled merge.

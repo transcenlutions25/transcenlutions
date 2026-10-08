@@ -1,0 +1,59 @@
+{
+  "version": "2026-10-08",
+  "identity": "ONE_TAY",
+  "surfaces": {
+    "hosted": {
+      "name": "Tay dot / hosted Transcenlutions",
+      "role": "remote full platform surface"
+    },
+    "mac": {
+      "name": "Tay Mac",
+      "role": "local privileged surface with device adapters"
+    }
+  },
+  "shared_authoritative_state": [
+    "user_identity",
+    "agent_identity",
+    "conversations",
+    "memory",
+    "objectives",
+    "command_queue",
+    "steering",
+    "approvals",
+    "operating_graph",
+    "business_registry",
+    "provider_registry",
+    "cost_displacement_ledger",
+    "revenue_state",
+    "workspace_assets",
+    "deployment_state"
+  ],
+  "device_local_state": [
+    "device_secrets",
+    "browser_profiles",
+    "local_provider_credentials",
+    "local_file_permissions",
+    "local_model_processes",
+    "device_hardware_state",
+    "offline_cache"
+  ],
+  "sync_requirements": {
+    "stable_ids": true,
+    "idempotency": true,
+    "revision_checks": true,
+    "conflict_detection": true,
+    "silent_overwrite_forbidden": true,
+    "offline_reconciliation": true,
+    "audit_events": true
+  },
+  "capability_routing": {
+    "cloud_tools": "shared runtime routes to authorized hosted/provider tools",
+    "mac_tools": "shared runtime routes to authorized local Mac adapters when device is available",
+    "fallback": "external providers remain available until Tay-owned replacements pass acceptance tests"
+  },
+  "source_of_truth": {
+    "code_and_canon": "transcenlutions25/transcenlutions",
+    "development_execution_surface": "Replit Transcenlutions Portfolio Command",
+    "local_surface": "Tay Mac shared launcher/local adapters"
+  }
+}

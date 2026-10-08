@@ -13,6 +13,8 @@ The probe makes at most four Stripe GET requests:
 
 These checks prove only the reported reads at that moment. They do not prove Checkout Session metadata-write access, real-session expanded-object permissions, the configured webhook secret's match with Stripe, webhook delivery, payment-to-file fulfillment, inbox arrival or future availability. A 404 is a failed check, never proof of complete permissions. The probe never signs a synthetic webhook, transmits its signing secret, creates an order/Checkout Session, charges a card, writes payment metadata or changes a provider object.
 
+Local key checks distinguish `live_mode_required`, `restricted_key_missing`, `restricted_key_live_prefix_required` and `restricted_key_format_unconfirmed`. These are fixed codes, not credential contents or evidence that a key is valid. Stripe authenticates the unchanged token during the approved read checks. Do not infer a suffix alphabet from scanner patterns or mask examples.
+
 ## Separate optional test email
 
 Only `APEX_PROVIDER_PROBE_EMAIL_ENABLED=true`, after separate approval, permits a single Resend POST attempt after all four Stripe checks pass. Sender and recipient are pinned in code:
@@ -36,7 +38,7 @@ All gates must match:
 
 - Netlify-provided `NETLIFY=true`, `CONTEXT=production`, `PULL_REQUEST=false`, with no preview-server flag
 - Netlify `URL` and `APEX_SITE_ORIGIN` both exactly `https://tay-command.netlify.app`
-- `APEX_STRIPE_MODE=live` and an existing live restricted key
+- `APEX_STRIPE_MODE=live` and an existing live restricted key with the documented `rk_live_` prefix and a nonempty opaque remainder; whitespace, control characters and quote/backtick delimiters are rejected without modifying or trimming the key
 - `APEX_PROVIDER_PROBE_ENABLED=true`
 - `APEX_PROVIDER_PROBE_STAGING_APPROVAL=locked-unpublished-production`
 - `APEX_PROVIDER_PROBE_APPROVED_COMMIT` equal to the exact reviewed 40-character `COMMIT_REF`
@@ -53,5 +55,5 @@ A separately approved candidate may have its public-checkout flag already true s
 
 Primary references:
 - Netlify [file-based command precedence](https://docs.netlify.com/build/configure-builds/file-based-configuration/) and [build environment variables](https://docs.netlify.com/build/configure-builds/environment-variables/)
-- Stripe [retrieve Price](https://docs.stripe.com/api/prices/retrieve), [list Checkout Sessions](https://docs.stripe.com/api/checkout/sessions/list), [list PaymentIntents](https://docs.stripe.com/api/payment_intents/list), [list Charges](https://docs.stripe.com/api/charges/list)
+- Stripe [key prefixes](https://docs.stripe.com/keys), [official CLI key validation](https://github.com/stripe/stripe-cli/blob/f2cde88fe03e786c143ee4b512024235902e920b/pkg/validators/validate.go), [retrieve Price](https://docs.stripe.com/api/prices/retrieve), [list Checkout Sessions](https://docs.stripe.com/api/checkout/sessions/list), [list PaymentIntents](https://docs.stripe.com/api/payment_intents/list), [list Charges](https://docs.stripe.com/api/charges/list)
 - Resend [send email](https://resend.com/docs/api-reference/emails/send-email) and [24-hour idempotency keys](https://resend.com/docs/dashboard/emails/idempotency-keys)

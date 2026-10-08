@@ -23,8 +23,14 @@ function authorization(env, now) {
   const at = Date.parse(env.APEX_PROVIDER_PROBE_APPROVED_AT || '');
   if (!Number.isFinite(at) || !Number.isFinite(now) || now < at || now - at >= APPROVAL_WINDOW_MS)
     return 'approval_window_closed';
-  if (env.APEX_STRIPE_MODE !== 'live' || typeof env.APEX_STRIPE_RESTRICTED_KEY !== 'string' ||
-      !/^rk_live_[A-Za-z0-9]+$/.test(env.APEX_STRIPE_RESTRICTED_KEY)) return 'live_restricted_key_required';
+  if (env.APEX_STRIPE_MODE !== 'live') return 'live_mode_required';
+  const key = env.APEX_STRIPE_RESTRICTED_KEY;
+  if (typeof key !== 'string' || !key) return 'restricted_key_missing';
+  // Stripe documents the live restricted prefix, not an alphanumeric suffix grammar.
+  // Treat the remainder as opaque; reject paste delimiters/control characters without trimming.
+  if (/[\s\x00-\x1f\x7f-\x9f"'`]/u.test(key)) return 'restricted_key_format_unconfirmed';
+  if (!key.startsWith('rk_live_')) return 'restricted_key_live_prefix_required';
+  if (key.length === 'rk_live_'.length) return 'restricted_key_format_unconfirmed';
   return null;
 }
 function baseline() {

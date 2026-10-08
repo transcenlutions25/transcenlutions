@@ -4,9 +4,43 @@
     "repository": "transcenlutions25/transcenlutions",
     "branch": "main",
     "preservation_rule": "extend_not_rebuild",
-    "mac_reference": "$HOME/Tay/window",
+    "one_tay": true,
+    "hosted_surface": "Tay dot / hosted Transcenlutions platform",
+    "mac_surface": "$HOME/Tay/window + shared launcher/local privileged adapters",
+    "shared_runtime_required": true,
+    "shared_state_required": [
+      "identity",
+      "conversations",
+      "memory",
+      "command_queue",
+      "approvals",
+      "operating_graph",
+      "business_registry",
+      "revenue_state",
+      "cost_displacement_ledger",
+      "workspace_assets"
+    ],
     "dirty_local_checkout": "$HOME/Documents/Transcenlutions",
     "replit_role": "development_execution_surface_not_source_of_truth"
+  },
+  "self_build_foundry": {
+    "enabled_target": true,
+    "modules": [
+      "Code Forge",
+      "UI Design Forge",
+      "Data Forge",
+      "Deploy Forge",
+      "Automation Forge",
+      "Browser QA Forge",
+      "Agent Forge",
+      "Media Forge",
+      "Revenue CRM Forge",
+      "Commerce Layer",
+      "Communications Forge"
+    ],
+    "objective": "replace, reduce, or revenue-offset external tool costs before trials or credits expire whenever practical",
+    "cost_displacement_ledger_required": true,
+    "replacement_rule": "keep external fallback until internal acceptance tests pass"
   },
   "builders": {
     "lovable": {
@@ -15,7 +49,7 @@
         {"name": "Dawn AI Creator Studio", "published": false},
         {"name": "Crowne OS Command", "published": false},
         {"name": "Tay Bridge Command", "published": false},
-        {"name": "SiteForge Local", "published": true, "revenue_priority": 1},
+        {"name": "SiteForge Local", "published": true, "revenue_priority": 2},
         {"name": "Apex Funnel Command", "published": false},
         {"name": "unnamed-2025-09-04", "published": false}
       ]
@@ -32,6 +66,7 @@
     "replit": {
       "connected": true,
       "convergence_target": "Transcenlutions Portfolio Command",
+      "target_role": "full live hosted ONE TAY platform surface",
       "projects": [
         "TerribleDarkorangeLight",
         "Tay Home Hub",
@@ -123,6 +158,20 @@
       ]
     }
   },
+  "revenue_priority": [
+    {
+      "rank": 1,
+      "business": "Apex Flow",
+      "state": "already_advertised_active_revenue_surface",
+      "rule": "protect_and_verify_purchase_delivery_path_before internal replacement work"
+    },
+    {
+      "rank": 2,
+      "business": "SiteForge Local",
+      "state": "published_manual_close_ready",
+      "rule": "move existing prospects toward proposal payment and collected cash"
+    }
+  ],
   "siteforge_local": {
     "published": true,
     "database_enabled": true,
@@ -132,6 +181,16 @@
     "prospects_by_status": {"New Lead": 9, "Contacted": 1},
     "cash_collected": 0,
     "discovered_leads": 0,
-    "readiness": "closest_verified_to_sale_manual_close_possible_not_autonomous"
+    "readiness": "manual_close_possible_not_autonomous"
+  },
+  "apex_flow": {
+    "advertised": true,
+    "stripe_live_products_verified": true,
+    "live_offers_verified": [
+      {"name": "Leak Fix Report — Apex Flow", "price_usd": 97},
+      {"name": "Full Funnel Audit — Apex Flow", "price_usd": 297}
+    ],
+    "priority": 1,
+    "rule": "do not break the working sales path while consolidating ONE TAY"
   }
 }

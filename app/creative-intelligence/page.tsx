@@ -31,7 +31,7 @@ export default function CreativeIntelligencePage() {
         <p className="eyebrow">Transcenlutions Market Intelligence</p>
         <h1>Creative Intelligence 2026</h1>
         <p className="info-intro">
-          Contra's October 8, 2026 briefing reinforces the Transcenlutions direction: AI is becoming standard creative infrastructure, while human taste, perspective, judgment, and accountable execution become more valuable — not less.
+          Contra&apos;s October 8, 2026 briefing reinforces the Transcenlutions direction: AI is becoming standard creative infrastructure, while human taste, perspective, judgment, and accountable execution become more valuable — not less.
         </p>
 
         <div className="info-section-grid">

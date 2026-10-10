@@ -36,6 +36,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run test:identity
       - run: npm run test:workspace
+      - run: npm run test:intelligence
       - run: npm run lint
       - run: npm run smoke
       - run: npm run test:apex

@@ -22,6 +22,7 @@ export interface WorkspaceFrameProps {
   children: ReactNode;
   sidecar?: ReactNode;
   sidecarTitle?: string;
+  sidecarContentKey?: string;
   sidecarToolbar?: ReactNode;
   sidecarOpen?: boolean;
   onSidecarOpenChange?: (open: boolean) => void;
@@ -58,6 +59,7 @@ export function WorkspaceFrame({
   children,
   sidecar,
   sidecarTitle = "Workspace",
+  sidecarContentKey = sidecarTitle,
   sidecarToolbar,
   sidecarOpen: controlledSidecarOpen,
   onSidecarOpenChange,
@@ -80,7 +82,7 @@ export function WorkspaceFrame({
   const railRef = useRef<HTMLElement>(null);
   const sidecarRef = useRef<HTMLElement>(null);
   const sidecarHeadingRef = useRef<HTMLHeadingElement>(null);
-  const previousSidecarTitleRef = useRef(sidecarTitle);
+  const previousSidecarContentRef = useRef(sidecarContentKey);
   const resizeRef = useRef<{ kind: "rail" | "sidecar"; origin: number; width: number } | null>(null);
   const overlayHistoryRef = useRef<ReturnType<typeof createMobileOverlayHistory> | null>(null);
   const focusPanelRef = useRef<"navigation" | "sidecar" | null>(null);
@@ -202,8 +204,8 @@ export function WorkspaceFrame({
     if (sidecarRef.current) sidecarRef.current.inert = !sidecarOpen || (mobile && drawerOpen);
 
     const previousOverlay = focusPanelRef.current;
-    const sidecarContentChanged = activePanel === "sidecar" && previousOverlay === "sidecar" && previousSidecarTitleRef.current !== sidecarTitle;
-    previousSidecarTitleRef.current = sidecarTitle;
+    const sidecarContentChanged = activePanel === "sidecar" && previousOverlay === "sidecar" && previousSidecarContentRef.current !== sidecarContentKey;
+    previousSidecarContentRef.current = sidecarContentKey;
     focusPanelRef.current = activePanel;
     if (restoreFrameRef.current !== null) {
       window.cancelAnimationFrame(restoreFrameRef.current);
@@ -263,7 +265,7 @@ export function WorkspaceFrame({
     }
     document.addEventListener("keydown", trap);
     return () => document.removeEventListener("keydown", trap);
-  }, [mobile, drawerOpen, sidecarOpen, sidecarTitle, activePanel, activeOverlay, conversationId]);
+  }, [mobile, drawerOpen, sidecarOpen, sidecarContentKey, activePanel, activeOverlay, conversationId]);
 
   function widthLimits(kind: "rail" | "sidecar") {
     return kind === "rail"

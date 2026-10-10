@@ -24,10 +24,11 @@ export async function GET(request: Request) {
     return NextResponse.json({
       ok: true,
       configured: true,
+      evidence_contract_version: 2,
       scope: "internal_production_usage",
       evidence,
       warning:
-        "Internal Transcenlutions usage is not external customer traction. Report external pilots and paid revenue separately.",
+        "Internal Transcenlutions usage is not external customer traction. Cost totals are event estimates, not verified charges; billed cost and the deprecated measured-cost field remain unknown. Report paid revenue separately.",
     });
   } catch {
     console.error("Operating Graph evidence read failed");

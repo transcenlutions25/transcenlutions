@@ -56,6 +56,12 @@ Every trace is correlated by `correlation_id`. The event ledger is append-only. 
 Do not reduce the moat to a governance UI. Governance is a feature; permissioned operational intelligence accumulated from real work is the moat.
 
 ## Evidence rules
+
+Cost compatibility correction: read [Cost evidence contract v2](operating-cost-evidence-compatibility.md).
+The historical database field `measured_cost_usd` aggregates estimates only.
+The API now labels that value `estimated_cost_usd`; its deprecated measured key
+and billed cost remain null until actual billing evidence exists. No migration
+or new provider connection is part of this source change.
 The dashboard/API must derive metrics from `tay_operating_events` / `tay_workflow_evidence`; never hard-code traction numbers.
 
 Keep these categories separate:

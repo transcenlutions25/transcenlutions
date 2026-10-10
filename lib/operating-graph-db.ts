@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import { createOperatingCostEvidence } from "./operating-cost-evidence";
 
 let pool: Pool | null = null;
 
@@ -142,14 +143,18 @@ export async function getOperatingGraphEvidence(tenantId: string) {
        failures,
        human_interventions,
        median_duration_ms,
-       measured_cost_usd
+       measured_cost_usd as estimated_cost_usd
      from tay_workflow_evidence
      where tenant_id = $1`,
     [tenantId],
   );
 
-  return (
-    result.rows[0] ?? {
+  // Compatibility: the existing view names SUM(estimated_cost_usd)
+  // "measured_cost_usd". Read it under its truthful meaning without changing
+  // the database. A configured event store is not access to provider billing.
+  const row = result.rows[0];
+  return {
+    ...(row ?? {
       workflows_started: 0,
       workflows_completed: 0,
       approvals: 0,
@@ -158,7 +163,7 @@ export async function getOperatingGraphEvidence(tenantId: string) {
       failures: 0,
       human_interventions: 0,
       median_duration_ms: null,
-      measured_cost_usd: null,
-    }
-  );
+    }),
+    ...createOperatingCostEvidence(row?.estimated_cost_usd),
+  };
 }

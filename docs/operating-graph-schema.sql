@@ -129,7 +129,8 @@ create index if not exists tay_operating_events_workflow_idx
 create index if not exists tay_operating_events_type_idx
   on tay_operating_events (tenant_id, event_type, occurred_at desc);
 
--- Read model: measured evidence only. No hard-coded traction.
+-- Read model: observed workflow events and separately classified cost estimates.
+-- No hard-coded traction or provider-billed cost is represented here.
 create or replace view tay_workflow_evidence as
 select
   tenant_id,
@@ -141,6 +142,10 @@ select
   count(*) filter (where failure_code is not null) as failures,
   sum(human_intervention_count) as human_interventions,
   percentile_cont(0.5) within group (order by duration_ms) filter (where duration_ms is not null) as median_duration_ms,
+  -- Historical column name retained for existing-view compatibility. This SUM
+  -- contains estimates only, never measured charges. The application read adapter
+  -- exposes it as estimated_cost_usd and keeps measured/billed API values NULL.
+  -- Do not rename this view column or run a migration as part of that adapter fix.
   sum(estimated_cost_usd) filter (where estimated_cost_usd is not null) as measured_cost_usd
 from tay_operating_events
 group by tenant_id;

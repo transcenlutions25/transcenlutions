@@ -336,3 +336,30 @@
   .tay-app .tay-mode-switch button, .tay-app .tay-search summary,
   .tay-app .tay-queue-strip button, .tay-app .tay-voice-drawer > summary { min-height: 44px; }
 }
+
+
+/* Tay Intelligence Lab: use available panel width, not the browser width. */
+.tay-intelligence-panel { display: grid; gap: 16px; container: tay-intelligence / inline-size; }
+.tay-intelligence-panel > label { display: grid; gap: 8px; }
+.tay-intelligence-panel textarea, .tay-intelligence-panel select { width: 100%; font-size: 16px; }
+.tay-intelligence-grid, .tay-intelligence-lessons { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.tay-intelligence-panel .tay-registry-card, .tay-intelligence-panel .tay-queue-card { min-width: 0; }
+.tay-intelligence-panel .tay-mode-switch { flex-wrap: wrap; }
+.tay-intelligence-panel button { min-height: 44px; }
+.tay-app .tay-sidecar-content .tay-intelligence-panel p { font-size: 14px; }
+.tay-intelligence-panel code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+@container tay-intelligence (min-width: 34rem) {
+  .tay-intelligence-grid, .tay-intelligence-lessons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Local samples remain in the existing Voice panel; no animated mic/waveform. */
+.tay-app .tay-local-voice-recorder { flex-basis: 100%; min-width: 0; display: grid; gap: 10px; margin-top: 10px; padding-top: 14px; border-top: 1px solid #dfbd7240; }
+.tay-app .tay-local-voice-recorder h3, .tay-app .tay-local-voice-recorder p { margin: 0; }
+.tay-app .tay-local-voice-recorder h3 { font-size: 14px; color: var(--tay-gold, #e8c88b); }
+.tay-app .tay-local-voice-recorder p { font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.tay-app .tay-local-recording-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.tay-app .tay-local-voice-recorder button, .tay-app .tay-local-voice-recorder a { min-height: 44px; display: inline-flex; align-items: center; }
+.tay-app .tay-local-voice-recorder a:focus-visible { outline: 2px solid #9bdfff; outline-offset: 3px; }
+.tay-app .tay-local-recording-preview { display: grid; gap: 10px; min-width: 0; }
+.tay-app .tay-local-recording-preview audio { width: 100%; max-width: 100%; min-width: 0; }
+.tay-app .tay-local-recording-indicator { color: #f3d8a4; }

@@ -1,0 +1,35 @@
+# Incidental voice transcripts: bounded browser candidate
+
+## Owner requirement
+
+Ignore incidental humming, singing, grunting, throat-clearing and filler-only transcription without replying or executing commands. Preserve meaningful words mixed with fillers, intentional requested singing/music, stop/cancel commands, distress context and accessibility hesitations. Do not shorten pauses or mistake transcript filtering for acoustic detection. Add no audio retention or permissions.
+
+## Implemented boundary
+
+This is a source-only change to the existing user-started browser **Speak request** path. `lib/voice-transcript-intent.ts` classifies text at the final recognition-result boundary in `components/voice-controls.tsx`, before the existing exact recorder-command parser or draft callback. It never submits the composer, generates a reply, starts recording, or speaks in response to ignored input.
+
+- Ignore empty text and a deliberately small whole-transcript allowlist: `uh`, `um`, `erm`, `hmm` and elongated variants, or marked notations such as `[humming]`, `(singing)`, `*grunting*` and `[throat clearing]`. Permitted punctuation/whitespace may separate those tokens.
+- Keep all meaningful or uncertain text exactly as received, including leading/trailing spaces, punctuation, fillers and speech hesitations. The comparison copy alone is normalized. Bare words such as “singing” are meaningful possible answers; they are not sound labels. Lyrics, unfamiliar notations, non-English words, questioning vocalizations, short acknowledgments/negations, uppercase acronyms, and transcripts over 512 characters are preserved.
+- Use at most six recent visible conversation messages and the current draft as read-only context. Music, distress and accessibility/exact-transcription cue words conservatively disable suppression. Missing context, over seven context entries, or any context entry over 4,000 characters also preserves nonempty text. These are safe opt-outs, not semantic diagnoses or intent guarantees. The current transcript is never replaced by context text.
+- Final segments in the same recognition batch are checked for those cues before any segment is filtered. A transient boolean retains the preserve decision until that recognition session ends; no extra transcript history is stored. Over seven final segments in one batch also conservatively preserves text. Interim text is not used to make the decision or invoke commands.
+- **Keep filler and sound transcriptions** is an explicit local escape hatch for exact transcription and accessibility. It does not grant microphone access. One in-memory flag in ChatShell survives panel close/reopen, switching workspace panels, and accepting dictation in the current conversation. Changing project/conversation/runtime session or reloading resets it; switching back does not restore an old flag. It is not an account preference or a saved setting. A standalone VoiceControls without the controlled parent prop has only panel-local state.
+- Suppression is quiet: no transcript callback, reply, recorder command, sound, or ignore-message announcement. A later final segment can still be accepted. Existing natural recognizer end, stop, and error behavior remains in charge of closing capture. No silence timer, amplitude threshold, VAD guess, pause timeout, automatic restart, or background listener is added.
+- Final result indexes are handled at most once per session. Explicit interim results are never delivered or parsed as commands. The existing final-only configuration remains; adapters that omit `isFinal` are accepted under that configuration. Old callbacks after stop/unmount cannot submit a transcript or end a newer session. Session-local state resets on every new start.
+
+Exact “Hey Tay, record and clone my voice. Start now” still opens the existing consent review only. It cannot start capture or cloning. Exact recorder stop/cancel phrases retain their existing behavior; plain stop/cancel or filler-prefixed requests remain intact in the draft. The filter never strips fillers to manufacture an exact command. Existing capture consent, local recorder lifetime, approval gates, and typed-message behavior are unchanged.
+
+## Important limits
+
+This is **not acoustic detection**. It receives a recognizer's text, not audio. If a browser turns incidental music into ordinary lyrics, mistakes a noise for a meaningful command, omits an annotation, or ends a turn during a pause, this filter cannot reconstruct the sound or determine intent. It deliberately preserves uncertain words rather than censoring them. Browser recognition may use an online service under its existing behavior; this change does not establish offline recognition, speaker identity, continuous conversation, or authorization from a transcript.
+
+Context coverage is bounded and English-oriented, matching the existing `en-US` recognizer setting. Earlier context outside the six visible messages, unstated distress/accessibility needs, and cues outside the explicit list cannot be inferred reliably. The conversation-local keep-all option provides a manual escape hatch but does not extend recognition time. No acoustic success rate or universal guarantee is claimed.
+
+This gate does not touch stored/typed messages, raw recording samples, native Android recognition, the preserved Mac voice bridge, providers, permissions, backend endpoints, sync, or retained audio. **Native/Mac parity and real-device/browser microphone, pause, interruption, screen-reader, and acoustic QA remain pending.** No deployment, publication, native build, or Mac installation is part of this change.
+
+## Verification
+
+Run `node --test scripts/test-voice-transcript-intent.cjs` for deterministic classifier and mounted React/DOM tests. They cover filler-only vs exact mixed words; intentional music and same-batch cues; stop/cancel and command safety; distress; accessibility hesitations; explicit interim/final handling; repeated starts/results/stops; stale callbacks; standalone panel unmount and override reset; and absence of new recording/network/storage work. Four added real-ChatShell regressions in `scripts/test-mobile-chat-shell.cjs` cover silent suppression, repeated dictation and panel reopen, reload, web A → B → A and project changes, and desktop A → B → A/project/unloaded transitions. Tests use fake browser recognition and cannot validate acoustic behavior.
+
+The existing recorder and mounted ChatShell regressions, typecheck, lint, and full launch/security gates must also pass in the final integrated candidate. Aggregate script/workflow wiring is owned by the integration task. Focused passes alone do not certify those aggregate gates.
+
+Rollback: remove the helper/test, this note, the four added ChatShell test cases, ChatShell's `voiceScope` and in-memory preference state/effect plus its context/controlled props, and the filter/checkbox/final-result lifecycle changes in VoiceControls together. Restore the prior VoiceControls conversation key when removing `voiceScope`. No data migration or remote rollback is required.

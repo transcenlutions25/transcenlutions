@@ -1,8 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./workspace-overrides.css";
 import "./tay-workspace.css";
 import "../public/transcenlutions-brand.css";
+import "./mobile-chat.css";
+import "./writing-actions.css";
+
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", interactiveWidget: "resizes-content" };
 
 export const metadata: Metadata = {
   title: "Tay | Transcenlutions Command Room",

@@ -1,3 +1,4 @@
+import { guidedConversationReply } from "./conversation-response";
 import type { TayActionType, TayIntent, TayResponse } from "./types";
 import { looksLikeBuyerReply } from "./buyer-replies";
 import { looksLikeFounderFocusRequest } from "./founder-os";
@@ -40,7 +41,10 @@ const revenueTerms = [
 
 export function createTayResponse(userText: string): TayResponse {
   const normalized = userText.trim().toLowerCase();
-  const intent = detectIntent(normalized);
+  // Explicit conversation requests do not become build tasks merely because
+  // the person mentions their work. Keep destructive-action checks first.
+  const conversation = hasBlockedGovernanceTerm(normalized) ? null : guidedConversationReply(normalized);
+  const intent = conversation ? "clarify_request" : detectIntent(normalized);
   const actionType = mapIntentToAction(intent);
   const id = `tay-${Date.now()}`;
 
@@ -48,15 +52,15 @@ export function createTayResponse(userText: string): TayResponse {
     id,
     userText,
     intent,
-    message: createMessage(intent),
+    message: conversation ?? createMessage(intent),
     action: createGovernedAction(
       intent,
       actionType,
       normalized,
-      createActionTitle(intent),
-      createActionSummary(intent, userText),
+      conversation ? "Conversation only" : createActionTitle(intent),
+      conversation ? "A guided reply; no work was performed." : createActionSummary(intent, userText),
     ),
-    nextStep: createNextStep(intent),
+    nextStep: conversation ? "Continue the conversation." : createNextStep(intent),
     shouldLogImmediately:
       intent === "clarify_request" || intent === "unsupported_request",
   };

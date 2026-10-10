@@ -1,0 +1,7 @@
+# Native output, local SDK configuration and signing material never belong in source.
+/build/
+local.properties
+*.apk
+*.aab
+*.jks
+*.keystore

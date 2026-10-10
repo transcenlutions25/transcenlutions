@@ -20,7 +20,8 @@
     "security:dependencies": "node scripts/security-dependencies.mjs",
     "security:secrets": "bash scripts/security-secrets.sh",
     "security": "npm run test:security && npm run security:dependencies && npm run security:secrets",
-    "test:mobile": "node scripts/test-mobile-composer-intent.cjs && node scripts/check-mobile-workspace.mjs && node --test scripts/test-mobile-chat-shell.cjs && node scripts/check-mobile-styles.mjs"
+    "test:mobile": "node scripts/test-mobile-composer-intent.cjs && node scripts/check-mobile-workspace.mjs && node --test scripts/test-mobile-chat-shell.cjs && node scripts/check-mobile-styles.mjs",
+    "test:intelligence": "tsc lib/conversation-intelligence.ts scripts/test-conversation-intelligence.ts --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .intelligence-test && node .intelligence-test/scripts/test-conversation-intelligence.js && node -e \"require('fs').rmSync('.intelligence-test',{recursive:true,force:true})\" && node --test scripts/test-intelligence-workspace.cjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

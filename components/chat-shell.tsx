@@ -98,6 +98,8 @@ import { SalesPanel } from "./sales-panel";
 import { SessionLog } from "./session-log";
 import { SystemStack } from "./system-stack";
 import { WorkspaceFrame } from "./workspace-frame";
+import { ConversationIntelligencePanel } from "./conversation-intelligence-panel";
+import { createConversationIntelligenceDraft, type ConversationIntelligenceDraft } from "../lib/conversation-intelligence";
 import { AssetsPanel, DesktopQueuePanel, MomentumPanel, ProjectsPanel, ReusableReply, WebQueuePanel } from "./workspace-tools";
 import { useDesktopRuntime, callDesktop, type DesktopState, type DesktopItem } from "../lib/use-desktop-runtime";
 import { addQueuedRequest, newWorkspaceId, readWorkspaceState, recordMomentum, workspaceStorageKey,
@@ -213,6 +215,7 @@ export function ChatShell({
   const [momentumEnabled, setMomentumEnabled] = useState(false);
   const [dependency, setDependency] = useState("");
   const [search, setSearch] = useState("");
+  const [intelligenceDrafts, setIntelligenceDrafts] = useState<Record<string, ConversationIntelligenceDraft>>({});
   const [selectedResult, setSelectedResult] = useState<DesktopItem | null>(null);
   const [previewRoute, setPreviewRoute] = useState("/privacy");
   const [browserUrl, setBrowserUrl] = useState("https://github.com/transcenlutions25/transcenlutions");
@@ -858,10 +861,17 @@ export function ChatShell({
   const displayMessages: ChatMessage[] = desktopEnabled
     ? (desktop.state?.messages ?? []).map((message, index) => ({ id: message.id || `legacy-${index}`, role: message.role === "user" ? "user" : "tay", text: message.content, contextAgentId: message.agent_id }))
     : messages;
+  // This is a local UI scope, not authentication. A workspace remount discards
+  // transient Lab data; a future account boundary must remount this workspace.
+  const intelligenceScope = desktopEnabled
+    ? desktop.state && desktop.project.trim() && desktop.state.session_id.trim()
+      ? JSON.stringify(["desktop", desktop.project, desktop.state.session_id]) : null
+    : JSON.stringify(["web", selectedProject, threadId]);
+  const intelligenceDraft = intelligenceScope ? intelligenceDrafts[intelligenceScope] ?? createConversationIntelligenceDraft() : null;
   const title = displayMessages.find(message => message.role === "user")?.text.slice(0, 56) || "What's the move?";
   const submission = composerIntent(intent);
   const canSteer = submission.canSteer;
-  const sidecarLabels: Record<string, string> = { controls: "Conversation controls", voice: "Voice controls", agent: "Agent & activity", queue: "Command queue", projects: "Projects", assets: "Workspace Library", explore: "Explore", launch: "Launch & deployment", revenue: "Revenue", sales: "Sales", fulfillment: "Fulfillment", founder: "Founder operations", governance: "Governance", memory: "Memory", feedback: "Feedback", settings: "Settings", browser: "Browser", preview: "Preview", tools: "Mac tools", momentum: "Crowne Momentum", result: "Queue result", scheduled: "Scheduled", plugins: "Plugins" };
+  const sidecarLabels: Record<string, string> = { intelligence: "Intelligence Lab", controls: "Conversation controls", voice: "Voice controls", agent: "Agent & activity", queue: "Command queue", projects: "Projects", assets: "Workspace Library", explore: "Explore", launch: "Launch & deployment", revenue: "Revenue", sales: "Sales", fulfillment: "Fulfillment", founder: "Founder operations", governance: "Governance", memory: "Memory", feedback: "Feedback", settings: "Settings", browser: "Browser", preview: "Preview", tools: "Mac tools", momentum: "Crowne Momentum", result: "Queue result", scheduled: "Scheduled", plugins: "Plugins" };
   const existingBusy = executionStatus === "running" || desktop.busy;
 
   async function reviseWriting(request: WritingRevisionRequest) {
@@ -894,7 +904,7 @@ export function ChatShell({
       <div className="tay-header-controls"><label className="tay-agent-picker">Agent<select aria-label="Active agent" value={agentRuntime.session.activeAgentId} disabled={existingBusy} onChange={event => setAgentRuntime(runtime => selectRuntimeAgent(runtime, event.target.value as AgentId))}>
         {(Object.keys(agentRegistry) as AgentId[]).map(id => <option key={id} value={id} disabled={desktopEnabled && id === "rory"}>{agentRegistry[id].name}{id === "kj" ? " · Ascended Forge" : ""}{desktopEnabled && id === "rory" ? " · safety setup required" : ""}</option>)}</select></label>
       <div className="tay-mode-switch" role="group" aria-label="Conversation mode">{["chat", "plan", "execute", "self-dev"].map(value => <button key={value} type="button" aria-pressed={mode === value} onClick={() => { if (value === "self-dev") { openPanel(desktopEnabled ? "tools" : "plugins"); return; } setMode(value); }}>{value === "self-dev" ? "Self-dev" : value[0].toUpperCase() + value.slice(1)}</button>)}</div>
-      {["preview", "browser", "agent"].map(key => <button key={key} type="button" aria-pressed={sidecarOpen && sidecarKey === key} onClick={() => openPanel(key)}>{sidecarLabels[key]}</button>)}
+      {["intelligence", "preview", "browser", "agent"].map(key => <button key={key} type="button" aria-pressed={sidecarOpen && sidecarKey === key} onClick={() => openPanel(key)}>{sidecarLabels[key]}</button>)}
       <button type="button" aria-label="Pin this conversation" aria-pressed={pinned.includes(desktopEnabled ? desktop.state?.session_id || "" : threadId)} disabled={desktopEnabled && !desktop.state} onClick={() => { const id = desktopEnabled ? desktop.state!.session_id : threadId; setPinned(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]); }}>☆</button>
       <details className="tay-search"><summary>Search conversation</summary><input type="search" aria-label="Search conversation" placeholder="Find a message" value={search} onChange={event => setSearch(event.target.value)} /></details>
       </div>
@@ -934,6 +944,10 @@ export function ChatShell({
       ? <DesktopQueuePanel items={desktop.state?.items || []} busy={desktop.busy} command={desktop.command} steer={() => { setIntent("steer"); composerRef.current?.focus(); }} onView={item => { setSelectedResult(item); setSidecarKey("result"); }} />
       : <WebQueuePanel queue={queue} onUpdate={setQueue} onStart={startQueued} busy={existingBusy} /> : null}
     {sidecarKey === "result" && selectedResult ? <ReusableReply id={`desktop:${desktop.project}:${selectedResult.id}:result`} text={selectedResult.result?.answer || ""} revise={reviseWriting} /> : null}
+    {sidecarKey === "intelligence" ? intelligenceDraft && intelligenceScope ? <ConversationIntelligencePanel
+      key={intelligenceScope} draft={intelligenceDraft} onDraftChange={patch => setIntelligenceDrafts(current => ({
+        ...current, [intelligenceScope]: { ...(current[intelligenceScope] ?? createConversationIntelligenceDraft()), ...patch },
+      }))} /> : <section className="panel"><h2>Intelligence Lab</h2><p role="status">Wait for this conversation to load before editing its Lab draft.</p></section> : null}
     {sidecarKey === "projects" ? <ProjectsPanel projects={projects} onChange={setProjects} /> : null}
     {sidecarKey === "assets" ? <AssetsPanel /> : null}
     {sidecarKey === "momentum" ? <MomentumPanel events={momentum} enabled={momentumEnabled} onEnabledChange={setMomentumEnabled} /> : null}
@@ -956,7 +970,7 @@ export function ChatShell({
           let originalRecord: string | null = null; let unavailable = false;
           try { writing = Object.fromEntries(Object.keys(localStorage).filter(key => key.startsWith("tay:writing-")).map(key => [key, localStorage.getItem(key)])); originalRecord = localStorage.getItem(workspaceStorageKey); }
           catch { unavailable = true; }
-          const data = JSON.stringify({ version: 1, conversations: [snapshot, ...threadCache.current.filter(item => item.id !== threadId)], projects, momentum, currentDesktopDraft: desktopEnabled ? input : undefined, writing, liveWriting: getLiveWritingSnapshots(), originalRecord }, null, 2);
+          const data = JSON.stringify({ version: 1, conversations: [snapshot, ...threadCache.current.filter(item => item.id !== threadId)], projects, momentum, currentDesktopDraft: desktopEnabled ? input : undefined, writing, liveWriting: getLiveWritingSnapshots(), intelligenceDrafts, originalRecord }, null, 2);
           const url = URL.createObjectURL(new Blob([data], { type: "application/json" })); const link = document.createElement("a"); link.href = url; link.download = "tay-workspace-export.json"; document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
           setNotice(unavailable ? "Current workspace exported. Browser writing storage was unavailable; export important blocks individually." : "Workspace export created.");
         } catch { setNotice("Workspace export failed. Copy or export important writing blocks individually before closing."); }
@@ -983,6 +997,7 @@ export function ChatShell({
   return <WritingPersistenceContext.Provider value={{ isPaused: () => !storageWritable.current, onBlocked: pauseWritingPersistence }}><WorkspaceFrame conversationTitle={title} mobileTitle={activeAgentName(agentRuntime)}
     onMobileControlsOpen={() => openPanel("controls")} mobileControlsOpen={sidecarOpen && sidecarKey === "controls"}
     mobileHeaderAction={<button className="tay-icon-button" type="button" aria-label="Open voice controls" onClick={() => openPanel("voice")}><Mic size={21} aria-hidden="true" /></button>} sidecarTitle={sidecarLabels[sidecarKey] || "Workspace"}
+    sidecarContentKey={sidecarKey === "intelligence" ? `intelligence:${intelligenceScope ?? "loading"}` : sidecarKey}
     sidecarOpen={sidecarOpen} onSidecarOpenChange={setSidecarOpen} sidecar={sidecar}
     navigation={<>
       <div className="tay-privacy-controls"><button aria-pressed={desktopEnabled} type="button" onClick={() => openPanel("plugins")}>{desktopEnabled ? "● Offline" : "Private alpha"}</button><button type="button" onClick={() => openPanel("plugins")}>Connections</button></div>
@@ -990,7 +1005,7 @@ export function ChatShell({
       <p className="tay-nav-label">Your personal workspace</p><button className="tay-new-conversation" type="button" disabled={existingBusy} onClick={newConversation}>＋ New conversation</button>
       <details className="tay-nav-group"><summary>Pinned</summary>{pinned.length ? (desktopEnabled ? desktop.state?.sessions.filter(session => pinned.includes(session.id)).map(session => <button disabled={desktop.busy} key={session.id} onClick={() => desktop.switchSession(session.id)}>Conversation · {new Date(session.created * 1000).toLocaleDateString()}</button>) : [snapshot, ...savedThreads.filter(item => item.id !== threadId)].filter(item => pinned.includes(item.id)).map(item => <button disabled={existingBusy} key={item.id} onClick={() => { threadCache.current = [snapshot, ...threadCache.current.filter(entry => entry.id !== threadId)]; setSavedThreads(threadCache.current); restoreConversation(item); }}>{item.title}</button>)) : <p>Pin a conversation using the star above.</p>}</details>
       <details className="tay-nav-group"><summary>Projects</summary>{desktopEnabled ? desktop.projects.map(path => <button disabled={desktop.busy} key={path} aria-current={path === desktop.project ? "true" : undefined} onClick={() => { desktop.switchProject(path); setDependency(""); }}>{path.split("/").at(-1)}</button>) : projects.map(project => <button key={project.id} disabled={existingBusy} aria-current={project.id === selectedProject ? "true" : undefined} onClick={() => { if (project.id !== selectedProject) { newConversation(); setSelectedProject(project.id); } }}>{project.name}</button>)}<button onClick={() => openPanel("projects")}>Manage projects</button></details>
-      {[["scheduled", "Scheduled"], ["plugins", "Plugins"], ["explore", "Explore"], ["assets", "Workspace Library"]].map(([key, label]) => <button key={key} className="tay-nav-link" onClick={() => openPanel(key)}>{label}<span aria-hidden="true">›</span></button>)}
+      {[["intelligence", "Intelligence Lab"], ["scheduled", "Scheduled"], ["plugins", "Plugins"], ["explore", "Explore"], ["assets", "Workspace Library"]].map(([key, label]) => <button key={key} className="tay-nav-link" onClick={() => openPanel(key)}>{label}<span aria-hidden="true">›</span></button>)}
       <details className="tay-nav-group"><summary>Recent</summary>{desktopEnabled ? desktop.state?.sessions.map(session => <button key={session.id} disabled={desktop.busy} aria-current={session.id === desktop.state?.session_id ? "true" : undefined} onClick={() => { desktop.switchSession(session.id); setDependency(""); }}>Conversation · {new Date(session.created * 1000).toLocaleString()}</button>) : [snapshot, ...savedThreads.filter(item => item.id !== threadId)].map(item => <button key={item.id} disabled={existingBusy} aria-current={item.id === threadId ? "true" : undefined} onClick={() => { if (item.id === threadId) return; threadCache.current = [snapshot, ...threadCache.current.filter(entry => entry.id !== threadId)]; setSavedThreads(threadCache.current); restoreConversation(item); }}>{item.title}</button>)}</details>
     </>}
     railFooter={<><span>{desktopEnabled ? "● On your Mac" : "● Test workspace"}</span><button className="tay-nav-link" onClick={() => openPanel("settings")}>Settings</button></>}

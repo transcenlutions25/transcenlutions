@@ -336,3 +336,18 @@
   .tay-app .tay-mode-switch button, .tay-app .tay-search summary,
   .tay-app .tay-queue-strip button, .tay-app .tay-voice-drawer > summary { min-height: 44px; }
 }
+
+
+/* Tay Intelligence Lab: use available panel width, not the browser width. */
+.tay-intelligence-panel { display: grid; gap: 16px; container: tay-intelligence / inline-size; }
+.tay-intelligence-panel > label { display: grid; gap: 8px; }
+.tay-intelligence-panel textarea, .tay-intelligence-panel select { width: 100%; font-size: 16px; }
+.tay-intelligence-grid, .tay-intelligence-lessons { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.tay-intelligence-panel .tay-registry-card, .tay-intelligence-panel .tay-queue-card { min-width: 0; }
+.tay-intelligence-panel .tay-mode-switch { flex-wrap: wrap; }
+.tay-intelligence-panel button { min-height: 44px; }
+.tay-app .tay-sidecar-content .tay-intelligence-panel p { font-size: 14px; }
+.tay-intelligence-panel code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+@container tay-intelligence (min-width: 34rem) {
+  .tay-intelligence-grid, .tay-intelligence-lessons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

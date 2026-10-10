@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tay Command</string>
+    <!-- Empty until a reviewed authenticated native adapter is integrated. No secrets here. -->
+    <string name="tay_api_origin" translatable="false"></string>
+    <style name="TayTheme" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#dfbd72</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowBackground">#0a0710</item>
+        <item name="android:colorControlHighlight">#80613d75</item>
+    </style>
+</resources>

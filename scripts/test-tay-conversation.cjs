@@ -13,7 +13,17 @@ require.extensions['.ts'] = (module, filename) => {
 const { createTayResponse } = require('../lib/tay-core.ts');
 const { guidedConversationReply } = require('../lib/conversation-response.ts');
 const fixtures = JSON.parse(fs.readFileSync(path.join(__dirname, '../integrations/tay-desktop/tests/fixtures/conversation-acceptance.json'), 'utf8'));
-for (const fixture of fixtures) {
+const guidedFixtures = fixtures.filter(fixture => fixture.evaluation_surface === 'guided_and_model');
+const modelOnlyFixtures = fixtures.filter(fixture => fixture.evaluation_surface === 'model_runtime_only');
+assert.equal(guidedFixtures.length, 10);
+assert.equal(modelOnlyFixtures.length, 2);
+assert.equal(guidedFixtures.length + modelOnlyFixtures.length, fixtures.length);
+for (const fixture of modelOnlyFixtures) {
+  // Rubric examples are not canned production answers or mock model passes.
+  assert.equal(guidedConversationReply(fixture.prompt), null);
+  assert.ok(fixture.acceptable_example);
+}
+for (const fixture of guidedFixtures) {
   const response = createTayResponse(fixture.prompt);
   assert.ok(response.message.includes(fixture.guided_contains), fixture.id);
   assert.equal(response.action.type, 'none', fixture.id + ': conversation must not become a task');
@@ -41,4 +51,4 @@ for (const [request, action] of [
 assert.equal(guidedConversationReply('The page copy says "Who are you?"'), null);
 assert.equal(guidedConversationReply('The test failed, so fix the build'), null);
 assert.ok(!String(guidedConversationReply("Tell me what's done; I haven't checked yet.")).includes("can't honestly"));
-console.log(`Tay conversation fixtures passed: ${fixtures.length} guided replies plus routing and governance regressions. No model behavior was tested.`);
+console.log(`Tay conversation fixtures passed: ${guidedFixtures.length} guided replies plus routing and governance regressions. ${modelOnlyFixtures.length} model-only cases remain unevaluated for response quality.`);

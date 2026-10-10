@@ -146,7 +146,7 @@ class ConversationContextTests(unittest.TestCase):
             assemble(current)
 
     def test_acceptance_scenarios_are_real_input_fixtures_not_mock_model_passes(self):
-        self.assertEqual(len(FIXTURES), 10)
+        self.assertEqual(len(FIXTURES), 12)
         for fixture in FIXTURES:
             with self.subTest(fixture=fixture['id']):
                 messages = assemble(objective(message=fixture['prompt']), history=fixture['history'])
@@ -157,6 +157,34 @@ class ConversationContextTests(unittest.TestCase):
                 self.assertIn('normally one to three short sentences', messages[0]['content'])
                 self.assertIn('never depend only on color', messages[0]['content'])
                 self.assertIn('not evidence of a product called "My Learn"', messages[0]['content'])
+
+    def test_result_first_and_user_independence_policy_reaches_model_without_example_leakage(self):
+        examples = [f for f in FIXTURES if f['evaluation_surface'] == 'model_runtime_only']
+        self.assertEqual(len(examples), 2)
+        for fixture in examples:
+            with self.subTest(fixture=fixture['id']):
+                messages = assemble(objective(message=fixture['prompt']))
+                system = messages[0]['content']
+                self.assertIn("solve today's problem", system)
+                self.assertIn('Answer the actual need first', system)
+                self.assertIn("supports the user's independence", system)
+                self.assertIn('Respect "just answer" or "no lesson"', system)
+                self.assertIn('without a tutorial, teaching offer, or slogan', system)
+                self.assertIn('claims of superiority, or invented learning and progress', system)
+                self.assertNotIn(fixture['acceptable_example'], json.dumps(messages))
+                self.assertTrue(messages[-1]['content'].endswith(REQUEST_LABEL + fixture['prompt']))
+
+    def test_growing_policy_or_thread_guidance_reduces_optional_data_not_current_request(self):
+        current = objective(message='q' * 16000, steering=['latest direction ' + 's' * 1900])
+        records = [objective(str(i), 'prior request ' + 'r' * 1000, status='completed', updated=i)
+                   for i in range(6)]
+        messages = assemble_messages(IDENTITIES['tay'], 'Trusted thread guidance ' + 'g' * 1400, current,
+                                     objectives=records,
+                                     references=[{'name': f'file-{i}.txt', 'text': 'x' * 40000} for i in range(5)])
+        self.assertLessEqual(sum(len(m['content']) for m in messages), MAX_INPUT_CHARS)
+        self.assertIn(current['payload']['message'], messages[-1]['content'])
+        self.assertTrue(messages[-1]['content'].endswith(current['payload']['steering'][-1]))
+        self.assertGreater(context(messages).get('omitted_references', 0), 0)
 
 
 class BridgeConversationTests(unittest.TestCase):

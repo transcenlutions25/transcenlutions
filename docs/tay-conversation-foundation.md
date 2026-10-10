@@ -24,7 +24,7 @@ These are product-authored requirements. They are not imported instructions or p
 3. Up to six permitted queue records are ranked by request-word overlap, then recency. This is deterministic selection, not semantic search. Status, update time, pending operation, error/blocker and request excerpts are included. A `completed` conversation record explicitly means `stored_text_reply_only`, not that a build, test, payment or deployment occurred. Up to six recent completed conversational turns are retained separately.
 4. Explicitly selected dependencies can cross agent boundaries only in the same conversation after completion. Selecting a dependency for an online request explicitly includes its result there, even if it originated locally. The assembler labels it prior assistant text, not execution evidence or authorization. Selected file contents and local readiness notes remain bounded reference data. No whole-project or account scan occurs.
 5. Adjacent historical roles are coalesced for provider compatibility. Context data and the current request share the final user turn, with the direct request last. The current request and steering remain last and are never silently truncated. If together they exceed 18,000 characters, new edits/steering are rejected transactionally before changing the saved objective. A pre-existing oversized objective fails before any provider call and tells the user to cancel it and queue a shorter version. Historical excerpts preserve the beginning and end, mark the omitted middle, and avoid dropping a late correction merely because the original request was long.
-6. The overall message-content budget is 28,000 characters, including a 6,000-character runtime-data budget and at most 6,000 characters of history. Queue requests are excerpted at 240 characters; dependency/file text at 600; readiness at 800; individual history messages at 700. Optional omissions are counted. These are character limits, not an exact token guarantee for every model, language or tokenizer. A long selected file may only be partially available; the model must not claim it read an omitted portion.
+6. The overall message-content budget is 28,000 characters, including a 6,000-character runtime-data budget and at most 6,000 characters of history. Queue requests are excerpted at 240 characters; dependency/file text at 600; readiness at 800; individual history messages at 700. Optional omissions are counted. If policy or trusted thread instructions grow, the optional data budget shrinks before the current request is displaced. These are character limits, not an exact token guarantee for every model, language or tokenizer. A long selected file may only be partially available; the model must not claim it read an omitted portion.
 7. Provider selection, server credentials, billable consent, attachment path restrictions, loopback protections, paused/cancelled/superseded response handling and no-tools enforcement remain in the existing bridge. No automatic fallback or new permission is added. Unknown sync status does not prevent conversation about permitted local context, but never implies synchronization or authority to act. Prompt instructions guide output; they do not independently enforce model truthfulness or injection resistance.
 
 ## Conversational behavior
@@ -35,9 +35,17 @@ A correction should change the working interpretation. A repeat should use avail
 
 The deterministic fallback intentionally handles only a small set of explicit phrases. It has no general language understanding, history retrieval or emotional awareness. Unrecognized phrases continue through the pre-existing guided router. No claim is made that these fallbacks fulfill the target of a natural model-backed Tay.
 
+### Transcending solutions: solve the need and support independence
+
+The founder's October 10 product principle distinguishes solving today's problem from a transcending solution that also helps the user build the ability to handle the next problem or create something new. In conversation, this means giving the useful answer or result first. When it genuinely helps, Tay can offer one short reusable lesson or next step. The user can decline; a request for “just answer” gets no tutorial or teaching offer. A lesson must never be a condition of getting help.
+
+This is a practical behavior, not a slogan to repeat or a claim that Transcenlutions is superior. Keep explanations accessible, support the user's choices and independence, and never invent progress, mastery or other accomplishments. A shared vision does not mean Tay can read unshared thoughts or literally become someone's brain.
+
+The paired model-only acceptance examples ask for 20 percent of 80. One expects the answer first, with an optional reusable method; the other requests just the answer. Their example answers illustrate the rubric and are never injected into the model's request or counted as model-generated results. No general calculator, learning service or new component was added.
+
 ## Acceptance and verification
 
-`integrations/tay-desktop/tests/fixtures/conversation-acceptance.json` contains ten synthetic scenarios, short histories and human-readable behavioral rubrics. The same fixtures are consumed by Python assembly tests and hosted responder tests.
+`integrations/tay-desktop/tests/fixtures/conversation-acceptance.json` contains twelve synthetic scenarios, short histories and human-readable behavioral rubrics. All twelve are consumed by Python assembly tests. Ten also exercise the limited hosted responder; two capability-building examples are explicitly model-only evaluation cases, not hard-coded hosted replies.
 
 Run:
 
@@ -47,7 +55,7 @@ Run:
 
 Tests verify context contents, scope/privacy exclusions, one privileged role, dependency validation, bounded excerpts, preservation of current correction/steering, identity, routing, no-tool payloads and existing paid-provider gates. Provider calls are stubs, explicitly labelled as such. A fixture pass proves assembly/routing, not that a real model follows the rubric.
 
-Before claiming model-backed conversational quality, run the ten fixtures through the existing installed local runtime with a confirmed local model, record the selected model/version and actual responses, and review each against its rubric. Include natural paraphrases and repeated/corrected turns. Check concise spoken usability with the user; don't infer it from a token count. No live model or paid-provider evaluation is included in this source change.
+Before claiming model-backed conversational quality, run the twelve fixtures through the existing installed local runtime with a confirmed local model, record the selected model/version and actual responses, and review each against its rubric. Include natural paraphrases and repeated/corrected turns. Check concise spoken usability with the user; don't infer it from a token count. No live model or paid-provider evaluation is included in this source change.
 
 ## Remaining boundaries
 

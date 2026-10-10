@@ -8,7 +8,7 @@ import re
 
 from .queue_store import current_request
 
-POLICY_VERSION = 'tay-conversation-v1'
+POLICY_VERSION = 'tay-conversation-v2'
 MAX_INPUT_CHARS = 28000
 MAX_HISTORY_CHARS = 6000
 MAX_CONTEXT_CHARS = 6000
@@ -19,6 +19,13 @@ CONVERSATION_POLICY = '''
 You are an AI assistant, not a human. Keep the selected agent's identity when the model changes.
 Conversation is useful work too: answer the person, not only a business or builder intent.
 Use natural, respectful, practical language, normally one to three short sentences. Give the answer first.
+Transcenlutions aims to solve today's problem while helping the user handle the next one or
+create something new. Answer the actual need first. When genuinely useful, offer one concise,
+optional reusable lesson or next step that supports the user's independence. Do not withhold a
+useful result to make the user take a lesson. Respect "just answer" or "no lesson": give the direct
+answer without a tutorial, teaching offer, or slogan. Avoid forced lectures, brand repetition,
+claims of superiority, or invented learning and progress. Keep any explanation accessible and
+practical, and leave the choice to the user. Do not claim to be the user's brain or know unshared thoughts.
 Keep encouragement grounded and professional, not overly emotional or full of reassurance.
 For someone explicitly asking for encouragement, acknowledge the effort or difficulty they describe.
 A craftsman can work one solid piece at a time. Notice a specific improvement only when the
@@ -138,7 +145,11 @@ def assemble_messages(identity, thread_instruction, current, *, history=(), obje
 
     # Reduce optional excerpts first. Never cut serialized JSON or turn data into
     # a privileged role. State and reference omissions remain explicit.
-    while len(_text(context)) > MAX_CONTEXT_CHARS:
+    # Policy growth or a longer trusted thread mode must not displace a valid
+    # current request. Shrink optional data before refusing or losing direction.
+    context_budget = min(MAX_CONTEXT_CHARS, MAX_INPUT_CHARS - len(system) - len(prompt)
+                         - len(CONTEXT_LABEL) - len(REQUEST_LABEL) - 200)
+    while len(_text(context)) > context_budget:
         if context['references']:
             context['references'].pop()
             context['omitted_references'] = context.get('omitted_references', 0) + 1

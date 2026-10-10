@@ -351,3 +351,15 @@
 @container tay-intelligence (min-width: 34rem) {
   .tay-intelligence-grid, .tay-intelligence-lessons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Local samples remain in the existing Voice panel; no animated mic/waveform. */
+.tay-app .tay-local-voice-recorder { flex-basis: 100%; min-width: 0; display: grid; gap: 10px; margin-top: 10px; padding-top: 14px; border-top: 1px solid #dfbd7240; }
+.tay-app .tay-local-voice-recorder h3, .tay-app .tay-local-voice-recorder p { margin: 0; }
+.tay-app .tay-local-voice-recorder h3 { font-size: 14px; color: var(--tay-gold, #e8c88b); }
+.tay-app .tay-local-voice-recorder p { font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.tay-app .tay-local-recording-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.tay-app .tay-local-voice-recorder button, .tay-app .tay-local-voice-recorder a { min-height: 44px; display: inline-flex; align-items: center; }
+.tay-app .tay-local-voice-recorder a:focus-visible { outline: 2px solid #9bdfff; outline-offset: 3px; }
+.tay-app .tay-local-recording-preview { display: grid; gap: 10px; min-width: 0; }
+.tay-app .tay-local-recording-preview audio { width: 100%; max-width: 100%; min-width: 0; }
+.tay-app .tay-local-recording-indicator { color: #f3d8a4; }

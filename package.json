@@ -12,7 +12,7 @@
     "smoke": "node scripts/smoke-test.mjs",
     "typecheck": "tsc --noEmit",
     "test:identity": "tsc lib/platform-identity.ts scripts/check-platform-identity.ts --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .identity-test && node .identity-test/scripts/check-platform-identity.js && node -e \"require('fs').rmSync('.identity-test',{recursive:true,force:true})\"",
-    "test:workspace": "node scripts/check-workspace.mjs && node scripts/check-writing-blocks.mjs && node scripts/check-desktop-bridge.mjs && node --test scripts/test-desktop-selection.cjs scripts/test-workspace-storage-guard.cjs scripts/test-writing-actions.cjs && npm run test:mobile",
+    "test:workspace": "node scripts/check-workspace.mjs && node scripts/check-writing-blocks.mjs && node scripts/check-desktop-bridge.mjs && node --test scripts/test-desktop-selection.cjs scripts/test-workspace-storage-guard.cjs scripts/test-writing-actions.cjs && npm run test:mobile && npm run test:voice",
     "test:apex": "node --test scripts/test-apex-provider-probe.cjs products/funnel-checklist/test.cjs lib/test-apex-payments.cjs lib/test-apex-public-checkout.cjs lib/test-apex-workflows.cjs lib/test-apex-browser.cjs products/funnel-checklist/test-ui.cjs",
     "test:workflows": "npm run test:apex && python3 -m unittest discover -s tools/apex-flow -p \"test_*.py\" && python3 -m unittest discover -s integrations/tay-desktop/tests -v && npm run smoke",
     "probe:apex-providers": "node scripts/apex-provider-probe.cjs",
@@ -21,7 +21,8 @@
     "security:secrets": "bash scripts/security-secrets.sh",
     "security": "npm run test:security && npm run security:dependencies && npm run security:secrets",
     "test:mobile": "node scripts/test-mobile-composer-intent.cjs && node scripts/check-mobile-workspace.mjs && node --test scripts/test-mobile-chat-shell.cjs && node scripts/check-mobile-styles.mjs",
-    "test:intelligence": "tsc lib/conversation-intelligence.ts scripts/test-conversation-intelligence.ts --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .intelligence-test && node .intelligence-test/scripts/test-conversation-intelligence.js && node -e \"require('fs').rmSync('.intelligence-test',{recursive:true,force:true})\" && node --test scripts/test-intelligence-workspace.cjs"
+    "test:intelligence": "tsc lib/conversation-intelligence.ts scripts/test-conversation-intelligence.ts --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .intelligence-test && node .intelligence-test/scripts/test-conversation-intelligence.js && node -e \"require('fs').rmSync('.intelligence-test',{recursive:true,force:true})\" && node --test scripts/test-intelligence-workspace.cjs",
+    "test:voice": "node --test scripts/test-local-voice-recorder.cjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

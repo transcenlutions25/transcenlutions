@@ -59,7 +59,7 @@ zip -q -j -0 "$OUT/unaligned.apk" "$OUT"/dex/classes*.dex
 unzip -tq "$OUT/tay-unsigned.apk"
 "$BT/aapt2" dump badging "$OUT/tay-unsigned.apk" | tee "$OUT/badging.txt"
 grep -Eq "^package: name='com.transcenlutions.tay' versionCode='1'" "$OUT/badging.txt"
-grep -Fx "sdkVersion:'31'" "$OUT/badging.txt"
+grep -Fx "minSdkVersion:'31'" "$OUT/badging.txt"
 grep -Fx "targetSdkVersion:'36'" "$OUT/badging.txt"
 grep -Eq "^launchable-activity: name='com.transcenlutions.tay.MainActivity'" "$OUT/badging.txt"
 python3 - "$OUT/tay-unsigned.apk" <<'PY'

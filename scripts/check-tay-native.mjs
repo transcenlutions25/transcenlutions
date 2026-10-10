@@ -35,6 +35,8 @@ try {
   assert.match(recipe, /types: \[opened, synchronize, reopened\]/); assert.match(recipe, /persist-credentials: false/);
   assert.doesNotMatch(recipe, /upload-artifact|actions\/cache|setup-gradle|pull_request_target:|push:|secrets\./);
   execFileSync('bash', ['-n', join(base, 'scripts/build-sdk.sh')]);
+  const build = readFileSync(join(base, 'scripts/build-sdk.sh'), 'utf8');
+  assert.match(build, /grep -Fx "minSdkVersion:'31'"/); // Observed Build Tools36 AAPT2 label.
   assert.throws(() => execFileSync('bash', [join(base, 'scripts/build-sdk.sh'), join(out, 'missing-sdk')],
     { env: { ...process.env, ANDROID_HOME: '' }, stdio: 'pipe' }), error => error.status === 1 && /already installed Android SDK/.test(String(error.stderr)));
   assert.equal(existsSync(join(out, 'missing-sdk')), false, 'No build output before required SDK check');

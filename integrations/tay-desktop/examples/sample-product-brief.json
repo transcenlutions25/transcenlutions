@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "product_id": "one-hour-workspace-reset",
+  "title": "The one-hour workspace reset",
+  "subtitle": "A practical checklist for turning a cluttered desk and scattered tasks into a usable work session.",
+  "audience": "An individual preparing a home or office workspace. Sample content only.",
+  "purpose": "Finish with a clear work surface, one written priority and a repeatable five-minute closing routine. This is a local product-builder demonstration, not a commercial offer.",
+  "sections": [
+    {
+      "heading": "Choose a useful finish line (5 minutes)",
+      "summary": "Decide what a better workspace means today before rearranging everything.",
+      "items": [
+        {"label": "Name the next real task", "detail": "Write one concrete result you want to produce after the reset, such as a first draft or a reviewed checklist. Keep this note visible."},
+        {"label": "Set a small boundary", "detail": "Choose one desk or work surface. Leave shared spaces and other people's belongings alone unless they have agreed."},
+        {"label": "Prepare three temporary places", "detail": "Use simple labels: keep here, move elsewhere, and review later. Do not discard important documents or anything you are unsure about."}
+      ]
+    },
+    {
+      "heading": "Make the physical space usable (20 minutes)",
+      "summary": "Aim for enough clear space to work comfortably, not a perfect-looking room.",
+      "items": [
+        {"label": "Remove only obvious distractions", "detail": "Move unrelated loose objects into the temporary places. Keep the tools needed for your chosen task within reach."},
+        {"label": "Check the working position", "detail": "Make room for your hands and materials, reduce visible glare where practical, and move loose cables away from paths. Do not open or repair electrical equipment."},
+        {"label": "Resolve the easy items", "detail": "Return familiar objects to their known places. Put uncertain items in the review-later group and write a time to revisit them."}
+      ]
+    },
+    {
+      "heading": "Reduce digital friction (20 minutes)",
+      "summary": "Use reversible changes and keep originals intact.",
+      "items": [
+        {"label": "Save work before closing anything", "detail": "Save open drafts and record browser tabs you need later. Do not delete files, reset settings or change another person's shared workspace."},
+        {"label": "Gather the next task's references", "detail": "Create a short list of the files and links you need. Check that you can open them. Leave passwords and private customer data out of the list."},
+        {"label": "Choose one capture place", "detail": "Use an existing note or notebook for incoming tasks during the work session. A new app or subscription is not required."}
+      ]
+    },
+    {
+      "heading": "Start and keep the reset (15 minutes)",
+      "summary": "A useful reset makes the next action easier and creates a small closing habit.",
+      "items": [
+        {"label": "Do a five-minute test", "detail": "Begin the real task named in section one. Note any missing tool, reference or obstacle you encounter, and fix the smallest reversible issue."},
+        {"label": "Write the next action", "detail": "Record the next visible step and the file or place where work will continue. Keep it specific enough to resume without reconstructing your plan."},
+        {"label": "Set a five-minute close", "detail": "At the end of your next work session, save the work, put tools back and write tomorrow's first action. Review this checklist after three sessions and adjust it."}
+      ]
+    }
+  ]
+}

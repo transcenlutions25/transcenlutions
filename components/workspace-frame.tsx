@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { createMobileOverlayHistory, mobileViewportBounds } from "../lib/mobile-workspace";
 import {
   useEffect,
   useId,
@@ -25,6 +26,10 @@ export interface WorkspaceFrameProps {
   sidecarOpen?: boolean;
   onSidecarOpenChange?: (open: boolean) => void;
   conversationTitle?: string;
+  mobileTitle?: string;
+  mobileHeaderAction?: ReactNode;
+  onMobileControlsOpen?: () => void;
+  mobileControlsOpen?: boolean;
   persistenceKey?: string;
 }
 
@@ -37,7 +42,7 @@ interface WorkspacePreferences {
 const defaultPreferences: WorkspacePreferences = {
   railWidth: 264,
   sidecarWidth: 420,
-  railCollapsed: false,
+  railCollapsed: true,
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -57,25 +62,40 @@ export function WorkspaceFrame({
   sidecarOpen: controlledSidecarOpen,
   onSidecarOpenChange,
   conversationTitle = "Tay Command",
+  mobileTitle = "Tay",
+  mobileHeaderAction,
+  onMobileControlsOpen,
+  mobileControlsOpen = false,
   persistenceKey = "tay.workspace.layout.v1",
 }: WorkspaceFrameProps) {
   const [preferences, setPreferences] = useState(defaultPreferences);
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [internalSidecarOpen, setInternalSidecarOpen] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerRequested, setDrawerOpen] = useState(false);
   const [mobile, setMobile] = useState(false);
-  const [maximized, setMaximized] = useState<"conversation" | "sidecar" | null>(null);
+  const [maximized, setMaximized] = useState<"sidecar" | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const workRef = useRef<HTMLDivElement>(null);
   const commandRef = useRef<HTMLElement>(null);
   const railRef = useRef<HTMLElement>(null);
   const sidecarRef = useRef<HTMLElement>(null);
+  const sidecarHeadingRef = useRef<HTMLHeadingElement>(null);
+  const previousSidecarTitleRef = useRef(sidecarTitle);
   const resizeRef = useRef<{ kind: "rail" | "sidecar"; origin: number; width: number } | null>(null);
+  const overlayHistoryRef = useRef<ReturnType<typeof createMobileOverlayHistory> | null>(null);
+  const focusPanelRef = useRef<"navigation" | "sidecar" | null>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const restoreFrameRef = useRef<number | null>(null);
+  const onSidecarChangeRef = useRef(onSidecarOpenChange);
+  onSidecarChangeRef.current = onSidecarOpenChange;
   const id = useId();
   const railId = `${id}-navigation`;
   const conversationId = `${id}-conversation`;
   const sidecarId = `${id}-sidecar`;
   const sidecarOpen = Boolean(sidecar) && (controlledSidecarOpen ?? internalSidecarOpen);
+  const drawerOpen = drawerRequested && !sidecarOpen;
+  const activePanel = mobile && drawerOpen ? "navigation" : sidecarOpen ? "sidecar" : null;
+  const activeOverlay = mobile ? activePanel : null;
 
   function changeSidecarOpen(open: boolean) {
     setInternalSidecarOpen(open);
@@ -118,6 +138,7 @@ export function WorkspaceFrame({
     const update = () => {
       setMobile(query.matches);
       if (!query.matches) setDrawerOpen(false);
+      else setMaximized(null);
     };
     update();
     query.addEventListener("change", update);
@@ -125,18 +146,102 @@ export function WorkspaceFrame({
   }, []);
 
   useEffect(() => {
-    if (workRef.current) workRef.current.inert = mobile && drawerOpen;
-    if (commandRef.current) commandRef.current.inert = mobile && (drawerOpen || sidecarOpen);
-  }, [mobile, drawerOpen, sidecarOpen]);
+    if (sidecarOpen) setDrawerOpen(false);
+  }, [sidecarOpen]);
 
   useEffect(() => {
-    if (!mobile || (!drawerOpen && !sidecarOpen)) return;
-    const element = drawerOpen ? railRef.current : sidecarRef.current;
+    if (!mobile) return;
+    const root = rootRef.current;
+    const viewport = window.visualViewport;
+    let frame = 0;
+    const measure = () => {
+      const bounds = mobileViewportBounds(viewport);
+      if (!root || !bounds) return;
+      root.style.setProperty("--tay-viewport-height", `${bounds.height}px`);
+      root.style.setProperty("--tay-viewport-offset-top", `${bounds.top}px`);
+    };
+    const schedule = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(measure);
+    };
+    measure();
+    viewport?.addEventListener("resize", schedule);
+    viewport?.addEventListener("scroll", schedule);
+    window.addEventListener("resize", schedule);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      viewport?.removeEventListener("resize", schedule);
+      viewport?.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      root?.style.removeProperty("--tay-viewport-height");
+      root?.style.removeProperty("--tay-viewport-offset-top");
+    };
+  }, [mobile]);
+
+  useEffect(() => {
+    const history = createMobileOverlayHistory(window, () => {
+      setDrawerOpen(false);
+      setInternalSidecarOpen(false);
+      onSidecarChangeRef.current?.(false);
+      setMaximized(null);
+    });
+    overlayHistoryRef.current = history;
+    return () => {
+      history.dispose();
+      overlayHistoryRef.current = null;
+      if (restoreFrameRef.current !== null) window.cancelAnimationFrame(restoreFrameRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    const focusBeforeInert = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    overlayHistoryRef.current?.update(Boolean(activeOverlay));
+    if (workRef.current) workRef.current.inert = mobile && drawerOpen;
+    if (commandRef.current) commandRef.current.inert = Boolean(activeOverlay);
+    if (railRef.current) railRef.current.inert = mobile && !drawerOpen;
+    if (sidecarRef.current) sidecarRef.current.inert = !sidecarOpen || (mobile && drawerOpen);
+
+    const previousOverlay = focusPanelRef.current;
+    const sidecarContentChanged = activePanel === "sidecar" && previousOverlay === "sidecar" && previousSidecarTitleRef.current !== sidecarTitle;
+    previousSidecarTitleRef.current = sidecarTitle;
+    focusPanelRef.current = activePanel;
+    if (restoreFrameRef.current !== null) {
+      window.cancelAnimationFrame(restoreFrameRef.current);
+      restoreFrameRef.current = null;
+    }
+    const visible = (control: HTMLElement) => control.isConnected && control.getClientRects().length > 0 && !control.closest('[inert], [aria-hidden="true"]');
+    if (!activePanel) {
+      if (previousOverlay) {
+        restoreFrameRef.current = window.requestAnimationFrame(() => {
+          if (focusPanelRef.current) return;
+          const previousFocus = returnFocusRef.current;
+          const focused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+          const intentionallyFocused = focused && focused !== document.body && focused !== document.documentElement
+            && visible(focused) && !focused.matches(":disabled")
+            && !railRef.current?.contains(focused) && !sidecarRef.current?.contains(focused);
+          // Voice completion and other actions can deliberately focus the composer
+          // after closing. Do not let generic opener restoration override that.
+          if (!intentionallyFocused) {
+            const target = previousFocus && visible(previousFocus) ? previousFocus : document.getElementById(conversationId);
+            target?.focus({ preventScroll: true });
+          }
+          returnFocusRef.current = null;
+          restoreFrameRef.current = null;
+        });
+      }
+      return;
+    }
+    const element = activePanel === "navigation" ? railRef.current : sidecarRef.current;
     if (!element) return;
-    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const selector = 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]';
-    const controls = () => Array.from(element.querySelectorAll<HTMLElement>(selector)).filter((control) => control.getClientRects().length > 0);
-    controls()[0]?.focus();
+    if (!previousOverlay) returnFocusRef.current = focusBeforeInert === document.body ? null : focusBeforeInert;
+    const selector = 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex="0"]';
+    const controls = () => Array.from(element.querySelectorAll<HTMLElement>(selector)).filter(visible);
+    // Keep the original opener through navigation → controls switches; never restore
+    // focus into the just-hidden drawer when the second dialog closes.
+    if (sidecarContentChanged) sidecarHeadingRef.current?.focus({ preventScroll: true });
+    else if (previousOverlay !== activePanel || !element.contains(document.activeElement)) (controls()[0] ?? element).focus({ preventScroll: true });
+    // A desktop sidecar participates in focus restoration, but is not a modal.
+    if (!mobile) return;
     function trap(event: globalThis.KeyboardEvent) {
       if (event.key !== "Tab") return;
       const available = controls();
@@ -145,6 +250,9 @@ export function WorkspaceFrame({
       if (!first || !last) {
         event.preventDefault();
         element?.focus();
+      } else if (!available.includes(document.activeElement as HTMLElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
       } else if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last.focus();
@@ -154,15 +262,8 @@ export function WorkspaceFrame({
       }
     }
     document.addEventListener("keydown", trap);
-    return () => {
-      document.removeEventListener("keydown", trap);
-      // React removes the background's inert state in the next effect setup.
-      // Restore focus after that update so the browser can accept it.
-      window.requestAnimationFrame(() => {
-        if (previousFocus?.isConnected) previousFocus.focus();
-      });
-    };
-  }, [mobile, drawerOpen, sidecarOpen]);
+    return () => document.removeEventListener("keydown", trap);
+  }, [mobile, drawerOpen, sidecarOpen, sidecarTitle, activePanel, activeOverlay, conversationId]);
 
   function widthLimits(kind: "rail" | "sidecar") {
     return kind === "rail"
@@ -211,8 +312,29 @@ export function WorkspaceFrame({
   }
 
   function closeOverlays(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key !== "Escape") return;
-    if (drawerOpen) setDrawerOpen(false);
+    if (event.key !== "Escape" || event.defaultPrevented || event.nativeEvent.isComposing) return;
+    const target = event.target instanceof Element ? event.target : null;
+    const details = target?.closest<HTMLDetailsElement>("details[open]");
+    const popover = target?.closest<HTMLElement>("[popover]");
+    // Native popovers own their Escape dismissal and focus return. Let their
+    // default action run unless an open disclosure is nested inside them.
+    if (popover && typeof popover.hidePopover === "function" && popover.matches(":popover-open")
+      && (!details || details.contains(popover))) {
+      event.stopPropagation();
+      return;
+    }
+    if (details && rootRef.current?.contains(details)) {
+      event.preventDefault();
+      event.stopPropagation();
+      details.open = false;
+      details.querySelector<HTMLElement>(":scope > summary")?.focus({ preventScroll: true });
+      return;
+    }
+    if (activeOverlay) {
+      event.preventDefault();
+      setDrawerOpen(false);
+      changeSidecarOpen(false);
+    } else if (drawerOpen) setDrawerOpen(false);
     else if (maximized) setMaximized(null);
     else if (sidecarOpen) changeSidecarOpen(false);
   }
@@ -226,7 +348,7 @@ export function WorkspaceFrame({
     <div ref={rootRef} className={`tay-app${preferences.railCollapsed ? " tay-rail-collapsed" : ""}${drawerOpen ? " tay-drawer-open" : ""}${sidecarOpen ? " tay-sidecar-open" : ""}${maximized ? ` tay-maximize-${maximized}` : ""}`} style={style} onKeyDown={closeOverlays}>
       <a className="tay-skip-link" href={`#${conversationId}`} onClick={() => setMaximized(null)}>Skip to conversation</a>
       {mobile && (drawerOpen || sidecarOpen) && <button className="tay-overlay-backdrop" aria-label={drawerOpen ? "Close navigation" : "Close workspace"} tabIndex={-1} onClick={() => drawerOpen ? setDrawerOpen(false) : changeSidecarOpen(false)} />}
-      <aside ref={railRef} id={railId} className="tay-rail" aria-label="Tay navigation" role={mobile && drawerOpen ? "dialog" : undefined} aria-modal={mobile && drawerOpen ? true : undefined} tabIndex={-1}>
+      <aside ref={railRef} id={railId} className="tay-rail" aria-label="Tay navigation" aria-hidden={mobile && !drawerOpen ? true : undefined} role={mobile && drawerOpen ? "dialog" : undefined} aria-modal={mobile && drawerOpen ? true : undefined} tabIndex={-1}>
         <div className="tay-rail-brand-row">
           <div className="tay-brand"><strong>TRANSCENLUTIONS</strong><span>TAY COMMAND</span></div>
           <Crown className="tay-brand-compact" size={25} aria-label="Tay Command" />
@@ -244,10 +366,12 @@ export function WorkspaceFrame({
           <header className="tay-command-header">
             <div className="tay-command-title-row">
               <button className="tay-icon-button tay-mobile-menu" type="button" aria-label="Open navigation" aria-expanded={drawerOpen} aria-controls={railId} onClick={() => { setDrawerOpen(true); if (sidecarOpen) changeSidecarOpen(false); }}><Menu size={21} /></button>
-              <h1>{conversationTitle}</h1>
+              <h1 className="tay-desktop-title">{conversationTitle}</h1>
+              <button className="tay-mobile-title" type="button" aria-label="Conversation controls" aria-expanded={mobileControlsOpen} aria-controls={sidecar ? sidecarId : undefined} disabled={!sidecar && !onMobileControlsOpen} onClick={() => { setDrawerOpen(false); if (onMobileControlsOpen) onMobileControlsOpen(); else changeSidecarOpen(true); }}><Crown size={22} aria-hidden="true" /><span className="tay-mobile-agent-name">{mobileTitle}</span></button>
+              {mobileHeaderAction && <div className="tay-mobile-header-action">{mobileHeaderAction}</div>}
               <div className="tay-pane-controls">
                 {sidecar && <button className="tay-icon-button" type="button" aria-label={sidecarOpen ? "Close workspace panel" : "Open workspace panel"} aria-expanded={sidecarOpen} aria-controls={sidecarId} onClick={() => changeSidecarOpen(!sidecarOpen)}><PanelRightOpen size={18} /></button>}
-                {sidecarOpen && !mobile && <button className="tay-icon-button" type="button" aria-label={maximized === "conversation" ? "Restore split workspace" : "Maximize conversation"} aria-pressed={maximized === "conversation"} onClick={() => setMaximized((value) => value === "conversation" ? null : "conversation")}>{maximized === "conversation" ? <Minimize2 size={17} /> : <Maximize2 size={17} />}</button>}
+                {sidecarOpen && !mobile && <button className="tay-icon-button" type="button" aria-label="Maximize conversation" onClick={() => changeSidecarOpen(false)}><Maximize2 size={17} /></button>}
               </div>
             </div>
             {header && <div className="tay-command-tools">{header}</div>}
@@ -257,8 +381,8 @@ export function WorkspaceFrame({
         </section>
         {sidecar && <>
           <div className="tay-resizer tay-sidecar-resizer" role="separator" tabIndex={sidecarOpen ? 0 : -1} aria-label="Resize workspace panel" aria-orientation="vertical" aria-controls={`${conversationId} ${sidecarId}`} aria-valuemin={300} aria-valuemax={widthLimits("sidecar").max} aria-valuenow={clamp(preferences.sidecarWidth, 300, widthLimits("sidecar").max)} aria-valuetext={`${Math.round(preferences.sidecarWidth)} pixels. Use left and right arrows to resize.`} onPointerDown={(event) => startResize(event, "sidecar")} onPointerMove={moveResize} onPointerUp={endResize} onPointerCancel={endResize} onLostPointerCapture={endResize} onKeyDown={(event) => keyboardResize(event, "sidecar")} />
-          <aside ref={sidecarRef} id={sidecarId} className="tay-sidecar" aria-label={sidecarTitle} role={mobile && sidecarOpen ? "dialog" : undefined} aria-modal={mobile && sidecarOpen ? true : undefined} tabIndex={-1}>
-            <header className="tay-sidecar-header"><h2>{sidecarTitle}</h2><div className="tay-pane-controls">{!mobile && <button className="tay-icon-button" type="button" aria-label={maximized === "sidecar" ? "Restore split workspace" : "Maximize workspace panel"} aria-pressed={maximized === "sidecar"} onClick={() => setMaximized((value) => value === "sidecar" ? null : "sidecar")}>{maximized === "sidecar" ? <Minimize2 size={17} /> : <Maximize2 size={17} />}</button>}<button className="tay-icon-button" type="button" aria-label="Close workspace panel" onClick={() => changeSidecarOpen(false)}><X size={19} /></button></div></header>
+          <aside ref={sidecarRef} id={sidecarId} className="tay-sidecar" aria-label={sidecarTitle} aria-hidden={!sidecarOpen || (mobile && drawerOpen) ? true : undefined} role={mobile && sidecarOpen ? "dialog" : undefined} aria-modal={mobile && sidecarOpen ? true : undefined} tabIndex={-1}>
+            <header className="tay-sidecar-header"><h2 ref={sidecarHeadingRef} tabIndex={-1}>{sidecarTitle}</h2><div className="tay-pane-controls">{!mobile && <button className="tay-icon-button" type="button" aria-label={maximized === "sidecar" ? "Restore split workspace" : "Maximize workspace panel"} aria-pressed={maximized === "sidecar"} onClick={() => setMaximized((value) => value === "sidecar" ? null : "sidecar")}>{maximized === "sidecar" ? <Minimize2 size={17} /> : <Maximize2 size={17} />}</button>}<button className="tay-icon-button" type="button" aria-label="Close workspace panel" onClick={() => changeSidecarOpen(false)}><X size={19} /></button></div></header>
             {sidecarToolbar && <div className="tay-sidecar-toolbar">{sidecarToolbar}</div>}
             <div className="tay-sidecar-content">{sidecar}</div>
           </aside>

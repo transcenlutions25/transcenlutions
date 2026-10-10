@@ -2,6 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  ArrowUp,
+  Mic,
+  Plus,
+  X,
   Bot,
   BrainCircuit,
   Crown,
@@ -38,6 +42,7 @@ import {
 } from "../lib/agent-runtime";
 import { requestAgentActionPolicy } from "../lib/agent-policy-client";
 import { VoiceControls } from "./voice-controls";
+import { resolveComposerIntent, type ComposerIntent } from "../lib/composer-intent";
 import { recordOperatingGraphEvent } from "../lib/operating-graph-client";
 import { appendMessage, agentRegistry, type AgentId } from "../lib/agent-foundation";
 import {
@@ -97,8 +102,9 @@ import { AssetsPanel, DesktopQueuePanel, MomentumPanel, ProjectsPanel, ReusableR
 import { useDesktopRuntime, callDesktop, type DesktopState, type DesktopItem } from "../lib/use-desktop-runtime";
 import { addQueuedRequest, newWorkspaceId, readWorkspaceState, recordMomentum, workspaceStorageKey,
   type QueuedRequest, type WorkspaceProject, type MomentumEvent } from "../lib/workspace-state";
+import { createWorkspaceStorageGuard, type WorkspaceStorageGuard, type WorkspaceStorageBlockReason } from "../lib/workspace-storage-guard";
 import type { WritingRevisionRequest } from "../lib/writing-block";
-import { WritingBlock } from "./writing-block";
+import { WritingBlock, WritingPersistenceContext, getLiveWritingSnapshots } from "./writing-block";
 
 interface ChatMessage {
   id: string;
@@ -191,7 +197,7 @@ export function ChatShell({
 }: ChatShellProps) {
   const desktop = useDesktopRuntime(desktopEnabled);
   const [mode, setMode] = useState("chat");
-  const [intent, setIntent] = useState<"send" | "queue" | "steer">("send");
+  const [intent, setIntent] = useState<ComposerIntent>("send");
   const [sidecarKey, setSidecarKey] = useState("agent");
   const [sidecarOpen, setSidecarOpen] = useState(false);
   const [notice, setNotice] = useState("");
@@ -217,6 +223,9 @@ export function ChatShell({
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const desktopDraftScope = useRef("");
   const storageWritable = useRef(true);
+  const workspaceWriter = useRef<WorkspaceStorageGuard | null>(null);
+  const workspaceBaseline = useRef<string | null>(null);
+  const conversationBaseline = useRef<string | null>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
   const followConversation = useRef(true);
   const [input, setInput] = useState("");
@@ -277,6 +286,26 @@ export function ChatShell({
   const feedbackInsights = createFeedbackInsights(feedbackEntries);
 
   useEffect(() => {
+    if (notice !== "Conversation restored from this browser.") return;
+    const timer = window.setTimeout(() => setNotice(current => current === notice ? "" : current), 6000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
+  useEffect(() => {
+    const field = composerRef.current;
+    if (!field) return;
+    const resize = () => {
+      field.style.height = "auto";
+      const compact = window.matchMedia("(max-width: 900px)").matches;
+      const limit = Math.min(compact ? 120 : 160, window.innerHeight * .25);
+      field.style.height = `${Math.min(Math.max(field.scrollHeight, 44), limit)}px`;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, [input]);
+
+  useEffect(() => {
     const scroller = messageListRef.current?.closest(".tay-conversation");
     if (!scroller) return;
     const update = () => { followConversation.current = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 140; };
@@ -296,6 +325,7 @@ export function ChatShell({
   };
 
   function restoreConversation(saved: SavedConversation) {
+    setSearch("");
     mirrored.current = saved.messages.length; traced.current = 0;
     setThreadId(saved.id); setSelectedProject(saved.projectId); setMessages(saved.messages); setQueue(saved.queue);
     const restored = selectRuntimeAgent(createAgentRuntime(), saved.agentId);
@@ -318,15 +348,29 @@ export function ChatShell({
   }
 
   useEffect(() => {
+    let mounted = true;
+    workspaceBaseline.current = null; conversationBaseline.current = null;
+    const blockedMessages: Record<WorkspaceStorageBlockReason, string> = {
+      conflict: "This workspace changed in another tab. Saves are paused to protect both copies. Your current work stays in this tab; export it before reloading.",
+      unreadable: "An unreadable workspace record was preserved. Your current work stays in this tab; export it before closing.",
+      "storage-unavailable": "Your work is kept in this tab. Browser storage is full or blocked; export a copy before closing.",
+      "lock-unavailable": "This browser cannot safely coordinate workspace saving. Your work stays in this tab; export it before closing.",
+      "invalid-write": "This workspace could not be safely saved. Your current work stays in this tab; export it before closing.",
+    };
+    const onStorage = (event: StorageEvent) => workspaceWriter.current?.observeStorage(event);
     try {
-      const saved = readWorkspaceState();
-      if (!saved && localStorage.getItem(workspaceStorageKey)) {
-        storageWritable.current = false; setStorageError("An unreadable workspace record was preserved. Your current work stays in this tab; export it before closing.");
+      const initialRaw = localStorage.getItem(workspaceStorageKey);
+      workspaceWriter.current = createWorkspaceStorageGuard({ storage: localStorage, key: workspaceStorageKey, initialRaw,
+        locks: navigator.locks, onBlocked: reason => { if (mounted) { storageWritable.current = false; setStorageError(blockedMessages[reason]); } } });
+      window.addEventListener("storage", onStorage);
+      const saved = readWorkspaceState(initialRaw);
+      if (!saved && initialRaw) {
+        storageWritable.current = false; workspaceWriter.current?.stop("unreadable"); setStorageError("An unreadable workspace record was preserved. Your current work stays in this tab; export it before closing.");
       }
       if (saved) {
         const conversations = Array.isArray(saved.conversations) ? saved.conversations.filter(validConversation) : [];
         if (!Array.isArray(saved.conversations) || conversations.length !== saved.conversations.length) {
-          storageWritable.current = false; setStorageError("Some saved conversations could not be read. Their original storage was preserved; export your current work before closing.");
+          storageWritable.current = false; workspaceWriter.current?.stop("unreadable"); setStorageError("Some saved conversations could not be read. Their original storage was preserved; export your current work before closing.");
         }
         threadCache.current = conversations; setSavedThreads(conversations);
         const current = conversations.find(item => item.id === saved.activeThreadId);
@@ -339,17 +383,32 @@ export function ChatShell({
       }
     } catch { storageWritable.current = false; setStorageError("This browser could not restore your workspace. Its original record was preserved; export your current work before closing."); }
     setHydrated(true);
+    return () => { mounted = false; window.removeEventListener("storage", onStorage); workspaceWriter.current?.dispose(); workspaceWriter.current = null; };
     // Hydration happens once; current state must not overwrite persisted work before it is restored.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (!hydrated) return;
-    if (!desktopEnabled) threadCache.current = [snapshot, ...threadCache.current.filter(item => item.id !== threadId)];
-    if (!storageWritable.current) return;
-    try { localStorage.setItem(workspaceStorageKey, JSON.stringify({ version: 1, activeThreadId: threadId,
-      conversations: threadCache.current, projects, pinned, momentum, momentumEnabled })); setStorageError(""); }
-    catch { setStorageError("Your work is kept in this tab. Browser storage is full or blocked; export a copy before closing."); }
+    try {
+      // Opening a second tab is a read, not an edit. Keep the saved order/timestamp
+      // until meaningful conversation state changes; Date.now() alone must not save.
+      const conversationState = JSON.stringify({ ...snapshot, updated: 0 });
+      const baseline = conversationBaseline.current;
+      const interrupted = baseline === null && snapshot.executionStatus === "failed"
+        && threadCache.current.find(item => item.id === threadId)?.executionStatus === "running";
+      conversationBaseline.current = conversationState;
+      if (!desktopEnabled && (interrupted || baseline !== null && baseline !== conversationState
+        || !threadCache.current.some(item => item.id === threadId))) {
+        threadCache.current = [snapshot, ...threadCache.current.filter(item => item.id !== threadId)];
+      }
+      const next = JSON.stringify({ version: 1, activeThreadId: threadId,
+        conversations: threadCache.current, projects, pinned, momentum, momentumEnabled });
+      const previous = workspaceBaseline.current;
+      workspaceBaseline.current = next;
+      if (previous === null && !interrupted || previous === next || !storageWritable.current) return;
+      void workspaceWriter.current?.queueWrite(next);
+    } catch { workspaceWriter.current?.stop("invalid-write"); storageWritable.current = false; setStorageError("Your work is kept in this tab. Browser storage is full or blocked; export a copy before closing."); }
     // Snapshot includes the dependencies below; no derived snapshot dependency is used.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, desktopEnabled, threadId, selectedProject, messages, queue, agentRuntime, mode, input, activeResponse, activeResponseAgentId, result, executionStatus, logEntries, memoryEntries, feedbackEntries, projects, pinned, momentum, momentumEnabled]);
@@ -375,10 +434,23 @@ export function ChatShell({
     } catch { setStorageError("Your draft remains in this tab. Browser storage is unavailable; copy it before closing."); }
   }, [hydrated, desktopEnabled, desktop.project, desktop.state, input]);
 
+  function pauseWritingPersistence() {
+    if (!storageWritable.current) return;
+    storageWritable.current = false;
+    workspaceWriter.current?.stop("conflict");
+    setStorageError("Saves are paused to protect this workspace and its writing. Your current work stays in this tab; export it before reloading.");
+  }
+
   function openPanel(key: string) { setSidecarKey(key); setSidecarOpen(true); }
+  function revealConversation() {
+    setSearch(""); setSidecarOpen(false); followConversation.current = true;
+    window.requestAnimationFrame(() => messageListRef.current?.closest<HTMLElement>(".tay-conversation")?.focus({ preventScroll: true }));
+  }
+  useEffect(() => { setSearch(""); }, [desktop.project, desktop.state?.session_id]);
 
   function newConversation() {
     if (actionLock.current || desktop.busy) { setNotice("Wait for the current operation before changing conversations."); return; }
+    setSearch("");
     if (desktopEnabled) { void desktop.newSession().then(() => { setInput(""); setIntent("send"); setDependency(""); requestDraft.current = null; }).catch(() => {}); return; }
     setInput(""); setIntent("send"); setDependency(""); requestDraft.current = null;
     threadCache.current = [snapshot, ...threadCache.current.filter(item => item.id !== threadId)];
@@ -397,45 +469,62 @@ export function ChatShell({
     if (!item || item.paused) return;
     setQueue(current => current.filter(request => request.id !== id)); setMode(item.mode);
     proposeRequest(item.text, item.agentId, item.mode);
+    revealConversation();
   }
 
-  const submitRequest = (request: string, chosenIntent = intent) => {
-    const text = request.trim(); if (!text) return;
+  const composerIntent = (chosenIntent: ComposerIntent, atSubmission = false) => resolveComposerIntent(chosenIntent, desktopEnabled ? {
+    runtime: "desktop", loaded: Boolean(desktop.state), busy: desktop.busy, submitting: atSubmission && submitting.current,
+    agentEnabled: agentRuntime.session.activeAgentId !== "rory",
+    hasActiveObjective: Boolean(desktop.state?.items.some(item => item.status === "active")),
+    queuedCount: desktop.state?.items.filter(item => item.status === "queued").length ?? 0,
+    hasDependency: Boolean(dependency),
+  } : {
+    runtime: "web", actionBusy: actionLock.current || executionStatus === "running",
+    response: activeResponse, hasResult: Boolean(result), queuedCount: queue.length,
+  });
+
+  const submitRequest = (request: string, chosenIntent: ComposerIntent = intent, consumeComposer = true) => {
+    const text = request.trim(); if (!text || submitting.current) return false;
+    const submission = composerIntent(chosenIntent, true);
+    if (!submission.canSubmit) { setNotice(submission.reason); return false; }
     if (desktopEnabled) {
       if (!desktop.state || desktop.busy || submitting.current || agentRuntime.session.activeAgentId === "rory") {
-        setNotice("Wait for the Mac conversation to load, or choose an enabled agent. Your draft remains here."); return;
+        setNotice("Wait for the Mac conversation to load, or choose an enabled agent. Your draft remains here."); return false;
       }
       const active = desktop.state.items.find(item => item.status === "active");
-      if (chosenIntent === "steer" && !active) { setNotice("There is no active objective to steer."); return; }
+      if (chosenIntent === "steer" && !active) { setNotice("There is no active objective to steer."); return false; }
       const draftKey = JSON.stringify([desktop.project, desktop.state.session_id, text, agentRuntime.session.activeAgentId, mode, dependency, chosenIntent, chosenIntent === "steer" ? active?.id : null]);
       if (requestDraft.current?.key !== draftKey) requestDraft.current = { key: draftKey, id: newWorkspaceId() };
       const requestId = requestDraft.current.id;
       const pendingKey = `tay:desktop-pending:v1:${desktop.project}:${desktop.state.session_id}`;
       if (chosenIntent !== "steer") {
         try { localStorage.setItem(pendingKey, JSON.stringify(requestDraft.current)); }
-        catch { setNotice("The browser could not preserve this request's retry ID. Your draft remains here; export it before retrying."); return; }
+        catch { setNotice("The browser could not preserve this request's retry ID. Your draft remains here; export it before retrying."); return false; }
       }
       submitting.current = true;
       const operation = chosenIntent === "steer" ? desktop.command(active!.id, "steer", { text })
         : desktop.enqueue(text, agentRuntime.session.activeAgentId, mode, dependency, requestId);
-      void operation.then(() => { setInput(current => current.trim() === text ? "" : current); setNotice(chosenIntent === "steer" ? "Steering saved. It takes effect after the current model response." : "Objective saved in the Mac queue."); requestDraft.current = null; if (chosenIntent !== "steer") { try { localStorage.removeItem(pendingKey); } catch { /* Confirmed queue acceptance remains durable on the Mac. */ } } setIntent("send"); }).catch(() => {
+      void operation.then(() => { setInput(current => consumeComposer && current.trim() === text ? "" : current); setNotice(chosenIntent === "steer" ? "Steering saved. It takes effect after the current model response." : "Objective saved in the Mac queue."); requestDraft.current = null; if (chosenIntent !== "steer") { try { localStorage.removeItem(pendingKey); } catch { /* Confirmed queue acceptance remains durable on the Mac. */ } } setIntent("send"); }).catch(() => {
         if (chosenIntent === "steer") setNotice("Steering confirmation was interrupted. Refresh and inspect the queue before submitting it again.");
       }).finally(() => { submitting.current = false; });
-      return;
+      return true;
     }
+    // Block duplicate submissions in the same event batch; a cleared draft prevents a later double tap.
+    submitting.current = true;
+    queueMicrotask(() => { submitting.current = false; });
     if (chosenIntent === "steer") {
-      if (!activeResponse || actionLock.current || result) { setNotice("Steer a proposed move before execution. Running work cannot be changed mid-action."); return; }
-      proposeRequest(`${activeResponse.userText}\nOwner steering: ${text}`, activeResponseAgentId); setIntent("send"); return;
+      if (!activeResponse || actionLock.current || result) { setNotice("Steer a proposed move before execution. Running work cannot be changed mid-action."); return false; }
+      proposeRequest(`${activeResponse.userText}\nOwner steering: ${text}`, activeResponseAgentId, mode, consumeComposer ? text : null); setIntent("send"); return true;
     }
-    const unresolved = activeResponse && !result && activeResponse.action.permissionStatus !== "blocked" && activeResponse.action.type !== "none";
-    if (chosenIntent === "queue" || actionLock.current || unresolved || queue.length) {
+    if (submission.effectiveIntent === "queue") {
       setQueue(current => addQueuedRequest(current, { id: newWorkspaceId(), text, agentId: agentRuntime.session.activeAgentId, mode, paused: false }));
-      setInput(""); setNotice("Objective queued. Open Queue to start, edit, pause, or reorder it."); return;
+      setInput(current => consumeComposer && current.trim() === text ? "" : current); setNotice("Objective queued. Open Queue to start, edit, pause, or reorder it."); return true;
     }
-    proposeRequest(text);
+    proposeRequest(text, agentRuntime.session.activeAgentId, mode, consumeComposer ? text : null);
+    return true;
   };
 
-  const proposeRequest = (request: string, selectedAgent = agentRuntime.session.activeAgentId, selectedMode = mode) => {
+  const proposeRequest = (request: string, selectedAgent = agentRuntime.session.activeAgentId, selectedMode = mode, consumedDraft: string | null = null) => {
     const trimmed = request.trim();
     if (!trimmed) return;
 
@@ -455,7 +544,7 @@ export function ChatShell({
       setExecutionStatus("idle");
       setResult(null);
       setFeedbackDraft(null);
-      setInput("");
+      setInput(current => consumedDraft !== null && current.trim() === consumedDraft ? "" : current);
       setMessages((current) => [
         ...current,
         {
@@ -488,7 +577,7 @@ export function ChatShell({
     setExecutionStatus("idle");
     setResult(null);
     setFeedbackDraft(null);
-    setInput("");
+    setInput(current => consumedDraft !== null && current.trim() === consumedDraft ? "" : current);
     setMessages((current) => [
       ...current,
       {
@@ -770,8 +859,9 @@ export function ChatShell({
     ? (desktop.state?.messages ?? []).map((message, index) => ({ id: message.id || `legacy-${index}`, role: message.role === "user" ? "user" : "tay", text: message.content, contextAgentId: message.agent_id }))
     : messages;
   const title = displayMessages.find(message => message.role === "user")?.text.slice(0, 56) || "What's the move?";
-  const canSteer = desktopEnabled ? Boolean(activeDesktop) : Boolean(activeResponse && !result && executionStatus !== "running");
-  const sidecarLabels: Record<string, string> = { agent: "Agent & activity", queue: "Command queue", projects: "Projects", assets: "Workspace Library", explore: "Explore", launch: "Launch & deployment", revenue: "Revenue", sales: "Sales", fulfillment: "Fulfillment", founder: "Founder operations", governance: "Governance", memory: "Memory", feedback: "Feedback", settings: "Settings", browser: "Browser", preview: "Preview", tools: "Mac tools", momentum: "Crowne Momentum", result: "Queue result", scheduled: "Scheduled", plugins: "Plugins" };
+  const submission = composerIntent(intent);
+  const canSteer = submission.canSteer;
+  const sidecarLabels: Record<string, string> = { controls: "Conversation controls", voice: "Voice controls", agent: "Agent & activity", queue: "Command queue", projects: "Projects", assets: "Workspace Library", explore: "Explore", launch: "Launch & deployment", revenue: "Revenue", sales: "Sales", fulfillment: "Fulfillment", founder: "Founder operations", governance: "Governance", memory: "Memory", feedback: "Feedback", settings: "Settings", browser: "Browser", preview: "Preview", tools: "Mac tools", momentum: "Crowne Momentum", result: "Queue result", scheduled: "Scheduled", plugins: "Plugins" };
   const existingBusy = executionStatus === "running" || desktop.busy;
 
   async function reviseWriting(request: WritingRevisionRequest) {
@@ -797,12 +887,49 @@ export function ChatShell({
   const command = (text: string) => {
     const path = privateAlphaState.paths.find(item => createAlphaOnboardingCommand(item.id) === text);
     if (path) setSelectedAlphaPath(path.id);
-    submitRequest(text, "send");
+    if (submitRequest(text, "send", false)) revealConversation();
   };
+  const conversationControls = <>
+      <div className="tay-header-row"><strong>{title}</strong><span className="tay-runtime-label">{desktopEnabled ? "Offline · local Ollama" : "Private alpha · guided core"}</span></div>
+      <div className="tay-header-controls"><label className="tay-agent-picker">Agent<select aria-label="Active agent" value={agentRuntime.session.activeAgentId} disabled={existingBusy} onChange={event => setAgentRuntime(runtime => selectRuntimeAgent(runtime, event.target.value as AgentId))}>
+        {(Object.keys(agentRegistry) as AgentId[]).map(id => <option key={id} value={id} disabled={desktopEnabled && id === "rory"}>{agentRegistry[id].name}{id === "kj" ? " · Ascended Forge" : ""}{desktopEnabled && id === "rory" ? " · safety setup required" : ""}</option>)}</select></label>
+      <div className="tay-mode-switch" role="group" aria-label="Conversation mode">{["chat", "plan", "execute", "self-dev"].map(value => <button key={value} type="button" aria-pressed={mode === value} onClick={() => { if (value === "self-dev") { openPanel(desktopEnabled ? "tools" : "plugins"); return; } setMode(value); }}>{value === "self-dev" ? "Self-dev" : value[0].toUpperCase() + value.slice(1)}</button>)}</div>
+      {["preview", "browser", "agent"].map(key => <button key={key} type="button" aria-pressed={sidecarOpen && sidecarKey === key} onClick={() => openPanel(key)}>{sidecarLabels[key]}</button>)}
+      <button type="button" aria-label="Pin this conversation" aria-pressed={pinned.includes(desktopEnabled ? desktop.state?.session_id || "" : threadId)} disabled={desktopEnabled && !desktop.state} onClick={() => { const id = desktopEnabled ? desktop.state!.session_id : threadId; setPinned(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]); }}>☆</button>
+      <details className="tay-search"><summary>Search conversation</summary><input type="search" aria-label="Search conversation" placeholder="Find a message" value={search} onChange={event => setSearch(event.target.value)} /></details>
+      </div>
+  </>;
+  const voiceControls = desktopEnabled && !desktop.state
+    ? <p>Voice will be available when this conversation is connected.</p>
+    : <VoiceControls reply={displayMessages.filter(message => message.role === "tay").at(-1)?.text || ""}
+      onTranscript={text => { setInput(current => current ? `${current}\n${text}` : text); setSidecarOpen(false); window.requestAnimationFrame(() => composerRef.current?.focus()); }}
+      onListening={listening => setAgentRuntime(runtime => setRuntimeChannel(runtime, listening ? "voice" : "chat"))} />;
+  const sendOptions = <>
+    <div className="tay-send-intent" role="group" aria-label="Send behavior">
+      {(["send", "queue", "steer"] as const).map(value => <button key={value} type="button"
+        aria-pressed={submission.effectiveIntent === value} disabled={value === "steer" && !canSteer}
+        onClick={() => setIntent(value)}>{value[0].toUpperCase() + value.slice(1)}</button>)}
+    </div>
+    {submission.reason && <p className="tay-send-reason" role="status">{submission.reason}</p>}
+    {desktopEnabled ? <label>Start after<select aria-label="Queue dependency" value={dependency} onChange={event => setDependency(event.target.value)}><option value="">No dependency</option>{desktop.state?.items.filter(item => item.status !== "cancelled").map(item => <option key={item.id} value={item.id}>{item.payload.message.slice(0, 40)}</option>)}</select></label> : null}
+  </>;
+  const workspaceNotice = notice || storageError || desktop.error ? <div className="tay-notice" role={storageError || desktop.error ? "alert" : "status"}>
+        <span>{storageError || desktop.error || notice}{storageError ? <button type="button" onClick={() => openPanel("settings")}>Export options</button> : null}</span>
+        {!storageError && !desktop.error ? <button type="button" aria-label="Dismiss notice" onClick={() => setNotice("")}><X size={16} aria-hidden="true" /></button> : null}
+      </div> : null;
   const sidecar = <>
+    {sidecarOpen ? workspaceNotice : null}
     <label className="tay-tool-picker">Workspace tool<select aria-label="Workspace tool" value={sidecarKey} onChange={event => setSidecarKey(event.target.value)}>
       {Object.entries(sidecarLabels).filter(([key]) => desktopEnabled || !["tools", "result"].includes(key)).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
     </select></label>
+    {sidecarKey === "controls" ? <section className="panel tay-conversation-controls">{conversationControls}<h2>Send options</h2>{sendOptions}
+      <button type="button" onClick={() => openPanel("queue")}>Queue · {queuedCount} waiting</button>
+      <button type="button" onClick={() => openPanel("explore")}>Tools & starting points</button>
+      <button type="button" onClick={() => openPanel("voice")}>Voice controls</button>
+      <p>Tay can make mistakes. Review important work.</p>
+      <p>Keyboard: Enter to send, Shift+Enter for a new line, Alt+Enter to queue.</p>
+    </section> : null}
+    {sidecarOpen && sidecarKey === "voice" ? <section className="panel"><h2>Talk to Tay</h2><p>Dictate a request or listen to the latest reply. This uses your browser&apos;s available speech features.</p>{voiceControls}</section> : null}
     {sidecarKey === "queue" ? desktopEnabled
       ? <DesktopQueuePanel items={desktop.state?.items || []} busy={desktop.busy} command={desktop.command} steer={() => { setIntent("steer"); composerRef.current?.focus(); }} onView={item => { setSelectedResult(item); setSidecarKey("result"); }} />
       : <WebQueuePanel queue={queue} onUpdate={setQueue} onStart={startQueued} busy={existingBusy} /> : null}
@@ -829,7 +956,7 @@ export function ChatShell({
           let originalRecord: string | null = null; let unavailable = false;
           try { writing = Object.fromEntries(Object.keys(localStorage).filter(key => key.startsWith("tay:writing-")).map(key => [key, localStorage.getItem(key)])); originalRecord = localStorage.getItem(workspaceStorageKey); }
           catch { unavailable = true; }
-          const data = JSON.stringify({ version: 1, conversations: [snapshot, ...threadCache.current.filter(item => item.id !== threadId)], projects, momentum, currentDesktopDraft: desktopEnabled ? input : undefined, writing, originalRecord }, null, 2);
+          const data = JSON.stringify({ version: 1, conversations: [snapshot, ...threadCache.current.filter(item => item.id !== threadId)], projects, momentum, currentDesktopDraft: desktopEnabled ? input : undefined, writing, liveWriting: getLiveWritingSnapshots(), originalRecord }, null, 2);
           const url = URL.createObjectURL(new Blob([data], { type: "application/json" })); const link = document.createElement("a"); link.href = url; link.download = "tay-workspace-export.json"; document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
           setNotice(unavailable ? "Current workspace exported. Browser writing storage was unavailable; export important blocks individually." : "Workspace export created.");
         } catch { setNotice("Workspace export failed. Copy or export important writing blocks individually before closing."); }
@@ -853,10 +980,13 @@ export function ChatShell({
       {desktopEnabled ? <button onClick={() => openPanel("tools")}>Open Mac connections</button> : null}<button onClick={() => openPanel("governance")}>Review authority</button></section> : null}
   </>;
 
-  return <WorkspaceFrame conversationTitle={title} sidecarTitle={sidecarLabels[sidecarKey] || "Workspace"}
+  return <WritingPersistenceContext.Provider value={{ isPaused: () => !storageWritable.current, onBlocked: pauseWritingPersistence }}><WorkspaceFrame conversationTitle={title} mobileTitle={activeAgentName(agentRuntime)}
+    onMobileControlsOpen={() => openPanel("controls")} mobileControlsOpen={sidecarOpen && sidecarKey === "controls"}
+    mobileHeaderAction={<button className="tay-icon-button" type="button" aria-label="Open voice controls" onClick={() => openPanel("voice")}><Mic size={21} aria-hidden="true" /></button>} sidecarTitle={sidecarLabels[sidecarKey] || "Workspace"}
     sidecarOpen={sidecarOpen} onSidecarOpenChange={setSidecarOpen} sidecar={sidecar}
     navigation={<>
       <div className="tay-privacy-controls"><button aria-pressed={desktopEnabled} type="button" onClick={() => openPanel("plugins")}>{desktopEnabled ? "● Offline" : "Private alpha"}</button><button type="button" onClick={() => openPanel("plugins")}>Connections</button></div>
+      <details className="tay-nav-group"><summary>Operating intelligence</summary><a className="tay-nav-link" href="/acquisition">Acquisition & Funding</a><a className="tay-nav-link" href="/creative-intelligence">Creative Intelligence 2026</a></details>
       <p className="tay-nav-label">Your personal workspace</p><button className="tay-new-conversation" type="button" disabled={existingBusy} onClick={newConversation}>＋ New conversation</button>
       <details className="tay-nav-group"><summary>Pinned</summary>{pinned.length ? (desktopEnabled ? desktop.state?.sessions.filter(session => pinned.includes(session.id)).map(session => <button disabled={desktop.busy} key={session.id} onClick={() => desktop.switchSession(session.id)}>Conversation · {new Date(session.created * 1000).toLocaleDateString()}</button>) : [snapshot, ...savedThreads.filter(item => item.id !== threadId)].filter(item => pinned.includes(item.id)).map(item => <button disabled={existingBusy} key={item.id} onClick={() => { threadCache.current = [snapshot, ...threadCache.current.filter(entry => entry.id !== threadId)]; setSavedThreads(threadCache.current); restoreConversation(item); }}>{item.title}</button>)) : <p>Pin a conversation using the star above.</p>}</details>
       <details className="tay-nav-group"><summary>Projects</summary>{desktopEnabled ? desktop.projects.map(path => <button disabled={desktop.busy} key={path} aria-current={path === desktop.project ? "true" : undefined} onClick={() => { desktop.switchProject(path); setDependency(""); }}>{path.split("/").at(-1)}</button>) : projects.map(project => <button key={project.id} disabled={existingBusy} aria-current={project.id === selectedProject ? "true" : undefined} onClick={() => { if (project.id !== selectedProject) { newConversation(); setSelectedProject(project.id); } }}>{project.name}</button>)}<button onClick={() => openPanel("projects")}>Manage projects</button></details>
@@ -864,30 +994,29 @@ export function ChatShell({
       <details className="tay-nav-group"><summary>Recent</summary>{desktopEnabled ? desktop.state?.sessions.map(session => <button key={session.id} disabled={desktop.busy} aria-current={session.id === desktop.state?.session_id ? "true" : undefined} onClick={() => { desktop.switchSession(session.id); setDependency(""); }}>Conversation · {new Date(session.created * 1000).toLocaleString()}</button>) : [snapshot, ...savedThreads.filter(item => item.id !== threadId)].map(item => <button key={item.id} disabled={existingBusy} aria-current={item.id === threadId ? "true" : undefined} onClick={() => { if (item.id === threadId) return; threadCache.current = [snapshot, ...threadCache.current.filter(entry => entry.id !== threadId)]; setSavedThreads(threadCache.current); restoreConversation(item); }}>{item.title}</button>)}</details>
     </>}
     railFooter={<><span>{desktopEnabled ? "● On your Mac" : "● Test workspace"}</span><button className="tay-nav-link" onClick={() => openPanel("settings")}>Settings</button></>}
-    header={<>
-      <div className="tay-header-row"><strong>{title}</strong><span className="tay-runtime-label">{desktopEnabled ? "Offline · local Ollama" : "Private alpha · guided core"}</span></div>
-      <div className="tay-header-controls"><label className="tay-agent-picker">Agent<select aria-label="Active agent" value={agentRuntime.session.activeAgentId} disabled={existingBusy} onChange={event => setAgentRuntime(runtime => selectRuntimeAgent(runtime, event.target.value as AgentId))}>
-        {(Object.keys(agentRegistry) as AgentId[]).map(id => <option key={id} value={id} disabled={desktopEnabled && id === "rory"}>{agentRegistry[id].name}{id === "kj" ? " · Ascended Forge" : ""}{desktopEnabled && id === "rory" ? " · safety setup required" : ""}</option>)}</select></label>
-      <div className="tay-mode-switch" role="group" aria-label="Conversation mode">{["chat", "plan", "execute", "self-dev"].map(value => <button key={value} type="button" aria-pressed={mode === value} onClick={() => { if (value === "self-dev") { openPanel(desktopEnabled ? "tools" : "plugins"); return; } setMode(value); }}>{value === "self-dev" ? "Self-dev" : value[0].toUpperCase() + value.slice(1)}</button>)}</div>
-      {["preview", "browser", "agent"].map(key => <button key={key} type="button" aria-pressed={sidecarOpen && sidecarKey === key} onClick={() => openPanel(key)}>{sidecarLabels[key]}</button>)}
-      <button type="button" aria-label="Pin this conversation" aria-pressed={pinned.includes(desktopEnabled ? desktop.state?.session_id || "" : threadId)} disabled={desktopEnabled && !desktop.state} onClick={() => { const id = desktopEnabled ? desktop.state!.session_id : threadId; setPinned(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]); }}>☆</button>
-      <details className="tay-search"><summary>Search conversation</summary><input type="search" aria-label="Search conversation" placeholder="Find a message" value={search} onChange={event => setSearch(event.target.value)} /></details>
-      </div>
-    </>}
     composer={<>
-      <div className="tay-queue-strip"><button type="button" onClick={() => openPanel("queue")}>Queue · {queuedCount} waiting</button><span role="status">{activeDesktop ? `${activeDesktop.payload.agent_id.toUpperCase()} is thinking…` : executionStatus === "running" ? "Tay is working…" : "Ready for your next move"}</span></div>
-      {notice || storageError || desktop.error ? <p className="tay-notice" role={storageError || desktop.error ? "alert" : "status"}>{storageError || desktop.error || notice}</p> : null}
+      <div className="tay-queue-strip" data-active={queuedCount > 0 || Boolean(activeDesktop) || executionStatus === "running"}>
+        <button type="button" onClick={() => openPanel("queue")}>Queue · {queuedCount} waiting</button>
+        <span role="status">{activeDesktop ? `${activeDesktop.payload.agent_id.toUpperCase()} is thinking…` : executionStatus === "running" ? "Tay is working…" : "Ready for your next move"}</span>
+      </div>
+      {!sidecarOpen ? workspaceNotice : null}
       <form className="tay-command-composer" onSubmit={event => { event.preventDefault(); submitRequest(input); }}>
-        <textarea ref={composerRef} value={input} aria-label="Message Tay" readOnly={desktopEnabled && !desktop.state} placeholder={desktopEnabled && !desktop.state ? "Connecting to your Mac conversation…" : "Build, write, plan… What's the move?"} rows={3} onChange={event => setInput(event.target.value)} onKeyDown={event => {
-          if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); submitRequest(input, event.altKey ? "queue" : event.metaKey || event.ctrlKey ? "steer" : intent); }
-        }} />
-        <div className="tay-composer-bottom"><div className="tay-send-intent" role="group" aria-label="Send behavior"><button type="button" aria-pressed={intent === "send"} onClick={() => setIntent("send")}>Send</button><button type="button" aria-pressed={intent === "queue"} onClick={() => setIntent("queue")}>Queue</button><button type="button" disabled={!canSteer} aria-pressed={intent === "steer"} onClick={() => setIntent("steer")}>Steer</button></div>
-        <button type="button" onClick={() => openPanel("explore")}>＋ Tools</button>
-        {desktopEnabled ? <label>Start after<select aria-label="Queue dependency" value={dependency} onChange={event => setDependency(event.target.value)}><option value="">No dependency</option>{desktop.state?.items.filter(item => item.status !== "cancelled").map(item => <option key={item.id} value={item.id}>{item.payload.message.slice(0, 40)}</option>)}</select></label> : null}
-        <button className="tay-send-button" type="submit" disabled={!input.trim() || !hydrated || (desktopEnabled && (!desktop.state || desktop.busy))}>{intent === "steer" ? "Steer ↑" : intent === "queue" || activeDesktop || (activeResponse && !result) ? "Queue ↑" : "Send ↑"}</button></div>
-        <details className="tay-voice-drawer"><summary>Voice controls</summary>{desktopEnabled && !desktop.state ? <p>Voice will be available when this conversation is connected.</p> : <VoiceControls reply={displayMessages.filter(message => message.role === "tay").at(-1)?.text || ""} onTranscript={text => { setInput(current => current ? `${current}\n${text}` : text); composerRef.current?.focus(); }} onListening={listening => setAgentRuntime(runtime => setRuntimeChannel(runtime, listening ? "voice" : "chat"))} />}</details>
-      </form><p className="tay-composer-hint">Tay can make mistakes. Enter to send · Shift+Enter for a new line · Alt+Enter to queue</p>
+        <div className="tay-composer-input-row">
+          <button className="tay-mobile-composer-options tay-icon-button" type="button" aria-label="Message options and tools" onClick={() => openPanel("controls")}><Plus size={23} aria-hidden="true" /></button>
+          <textarea ref={composerRef} value={input} aria-label="Message Tay" readOnly={desktopEnabled && !desktop.state}
+            placeholder={desktopEnabled && !desktop.state ? "Connecting to your Mac…" : `Message ${activeAgentName(agentRuntime)}`}
+            rows={1} onChange={event => setInput(event.target.value)} onKeyDown={event => {
+              if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); submitRequest(input, event.altKey ? "queue" : event.metaKey || event.ctrlKey ? "steer" : intent); }
+            }} />
+          <button className="tay-send-button tay-mobile-send" type="submit" aria-label={submission.buttonLabel}
+            title={submission.buttonLabel} disabled={!input.trim() || !hydrated || !submission.canSubmit}>
+            {submission.effectiveIntent === "send" ? <ArrowUp size={23} aria-hidden="true" /> : submission.buttonLabel}
+          </button>
+        </div>
+      </form>
+      {submission.requestedIntent !== submission.effectiveIntent || !submission.canSubmit ? <p className="tay-mobile-send-reason" role="status">{submission.reason}</p> : null}
     </>}>
+      {search ? <div className="tay-search-status" role="status"><span>{displayMessages.filter(message => message.text.toLowerCase().includes(search.toLowerCase())).length} messages match “{search}”</span><button type="button" onClick={() => setSearch("")}>Clear search</button></div> : null}
       <div ref={messageListRef} className="tay-message-list" aria-label="Conversation messages" aria-live="polite">
         {displayMessages.filter(message => !search || message.text.toLowerCase().includes(search.toLowerCase())).map(message => <article key={message.id} className={`tay-message tay-message--${message.role}`}>
           <span className="tay-message-author">{message.role === "user" ? "You" : message.contextAgentId && Object.prototype.hasOwnProperty.call(agentRegistry, message.contextAgentId) ? agentRegistry[message.contextAgentId].name : "Tay"}</span>
@@ -896,9 +1025,10 @@ export function ChatShell({
           {message.artifact && message.artifactResponseId !== activeResponse?.id ? <WritingBlock id={`${message.artifactResponseId}:artifact`} title={message.artifact.title} kind="document"
             content={[message.artifact.title, message.artifact.subtitle, ...message.artifact.sections.map(section => `${section.heading}\n${section.items.map(item => `• ${item}`).join("\n")}`), message.artifact.careNote].join("\n\n")} /> : null}
         </article>)}
+        {search && !displayMessages.some(message => message.text.toLowerCase().includes(search.toLowerCase())) ? <p className="tay-no-results">No messages match this search. Clear it to show the conversation.</p> : null}
         {!displayMessages.length ? <section className="tay-welcome"><p className="eyebrow">Transcenlutions · Tay Command</p><h1>What&apos;s the move?</h1><p>Start with one clear objective. Plan the next step, organize the work and review what it needs to move forward.</p><button onClick={() => openPanel("explore")}>Explore starting points</button></section> : null}
-        {!desktopEnabled && activeResponse ? <><ActionCard response={activeResponse} executionStatus={executionStatus} result={result} feedbackDraft={feedbackDraft} onExecute={executeActiveAction} onApprove={() => resolveActiveApproval("approved")} onDecline={() => resolveActiveApproval("declined")} onFollowNextStep={command} onRateResult={rateResult} onChooseFeedbackCategory={chooseFeedbackCategory} onFeedbackNoteChange={updateFeedbackNote} />
-          {!result && executionStatus !== "running" ? <button className="tay-dismiss-action" type="button" onClick={() => { setActiveResponse(null); setNotice("Proposed move dismissed. Nothing was executed."); }}>Dismiss proposed move</button> : null}</> : null}
+        {!desktopEnabled && activeResponse ? <section className="tay-proposed-action" aria-label="Current proposed move"><ActionCard response={activeResponse} executionStatus={executionStatus} result={result} feedbackDraft={feedbackDraft} onExecute={executeActiveAction} onApprove={() => resolveActiveApproval("approved")} onDecline={() => resolveActiveApproval("declined")} onFollowNextStep={command} onRateResult={rateResult} onChooseFeedbackCategory={chooseFeedbackCategory} onFeedbackNoteChange={updateFeedbackNote} />
+          {!result && executionStatus !== "running" ? <button className="tay-dismiss-action" type="button" onClick={() => { setActiveResponse(null); setNotice("Proposed move dismissed. Nothing was executed."); }}>Dismiss proposed move</button> : null}</section> : null}
       </div>
-  </WorkspaceFrame>;
+  </WorkspaceFrame></WritingPersistenceContext.Provider>;
 }

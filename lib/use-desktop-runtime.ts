@@ -99,8 +99,16 @@ export function useDesktopRuntime(enabled: boolean) {
     } finally { pending.current--; if (guard === generation.current) setBusy(pending.current > 0); mutations.current++; }
   }, [project]);
 
-  const switchProject = (path: string) => { generation.current++; stateRef.current = null; setState(null); setSession(""); setProject(path); setBusy(false); };
-  const switchSession = (id: string) => { generation.current++; stateRef.current = null; setState(null); setSession(id); setBusy(false); };
+  const switchProject = (path: string) => {
+    // An unchanged selection cannot restart the polling effect. Keep its generation,
+    // loaded state and pending mutations intact when the current navigation item is clicked.
+    if (path === project) return;
+    generation.current++; stateRef.current = null; setState(null); setSession(""); setProject(path); setBusy(false);
+  };
+  const switchSession = (id: string) => {
+    if (id === (session || stateRef.current?.session_id)) return;
+    generation.current++; stateRef.current = null; setState(null); setSession(id); setBusy(false);
+  };
   const enqueue = (text: string, agentId: AgentId, mode: string, dependsOn = "", requestId = newWorkspaceId()) => change("runtime/enqueue", {
     message: text, agent_id: agentId, thread_mode: mode, mode: "local", privacy: "offline", model: "", files: [],
     request_id: requestId, depends_on: dependsOn ? [dependsOn] : [],

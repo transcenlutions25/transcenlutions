@@ -1,0 +1,219 @@
+/* Compact chat on phones. Desktop materials and the operating panels keep the Mac canon. */
+.tay-app .tay-mobile-title,
+.tay-app .tay-mobile-header-action,
+.tay-app .tay-mobile-composer-options,
+.tay-app .tay-mobile-send,
+.tay-app .tay-mobile-send-reason { display: none; }
+.tay-app .tay-composer-input-row { display: contents; }
+.tay-app .tay-composer-input-row textarea {
+  display: block; width: 100%; min-width: 0; min-height: 68px; max-height: 240px;
+  padding: 8px 2px; border: 0; border-radius: 6px; resize: none; overflow: auto;
+  background: #17101f; color: #f3ecf5; font: inherit; font-size: 16px; line-height: 1.5;
+}
+.tay-app .tay-composer-input-row textarea:focus { outline: 0; }
+.tay-app .tay-notice { display: flex; align-items: start; gap: 8px; }
+.tay-app .tay-notice > span { flex: 1; min-width: 0; }
+.tay-app .tay-notice > button { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 44px; min-height: 44px; margin: -6px -6px -6px 0; padding: 8px; background: transparent; border-color: transparent; box-shadow: none; }
+.tay-app .tay-send-reason { flex-basis: 100%; margin: 2px 0; font-size: 12px; line-height: 1.5; color: var(--tay-muted); }
+.tay-app .tay-conversation-controls .tay-header-row { justify-content: flex-start; }
+.tay-app .tay-conversation-controls .tay-header-controls { align-items: stretch; }
+.tay-app .tay-conversation-controls .tay-agent-picker { flex-basis: 100%; }
+.tay-app .tay-conversation-controls .tay-agent-picker select { flex: 1; max-width: none; }
+.tay-app .tay-conversation-controls .tay-search { width: 100%; }
+.tay-app .tay-conversation-controls .tay-search input { position: static; width: 100%; margin-top: 8px; }
+.tay-app .tay-nav-group > a.tay-nav-link { display: block; margin: 6px 0 0 8px; padding: 12px; min-height: 44px; color: #e9cf9d; border-radius: 9px; }
+.tay-app .tay-proposed-action { min-width: 0; max-width: 860px; }
+.tay-app .tay-proposed-action > .action-card { margin: 0; }
+.tay-app .tay-dismiss-action { width: 100%; margin-top: 8px; min-height: 44px; }
+
+@media (max-width: 900px) {
+  .tay-app {
+    position: fixed; top: var(--tay-viewport-offset-top, 0px); left: 0; right: 0;
+    height: var(--tay-viewport-height, 100dvh); width: 100%;
+    background: #f7f7fc; color: #211930; color-scheme: light;
+  }
+  .tay-app .tay-command-pane { background: #f7f7fc; }
+  .tay-app .tay-command-header {
+    padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
+    gap: 0; border-bottom: 1px solid #e3deed; background: #fcfbff;
+  }
+  .tay-app .tay-command-title-row { gap: 8px; min-height: 48px; }
+  .tay-app .tay-desktop-title,
+  .tay-app .tay-command-header > .tay-command-tools,
+  .tay-app .tay-command-title-row > .tay-pane-controls { display: none; }
+  .tay-app .tay-command-title-row .tay-icon-button {
+    width: 44px; height: 44px; min-height: 44px; padding: 10px;
+    color: #352153; background: transparent; border-color: transparent; box-shadow: none;
+  }
+  .tay-app .tay-mobile-title {
+    display: flex; flex: 1; align-items: center; justify-content: center; gap: 8px;
+    min-width: 0; min-height: 48px; padding: 4px; border: 0; border-radius: 12px;
+    background: transparent; color: #302046; box-shadow: none; font-size: 18px; font-weight: 700;
+  }
+  .tay-app .tay-mobile-title > svg { flex: 0 0 28px; color: #765d22; }
+  .tay-app .tay-mobile-agent-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .tay-app .tay-mobile-header-action { display: flex; flex: 0 0 auto; }
+  .tay-app .tay-command-pane :focus-visible { outline: 3px solid #7041ba; outline-offset: 2px; }
+  .tay-app .tay-conversation {
+    padding: 20px max(14px, env(safe-area-inset-right)) 22px max(14px, env(safe-area-inset-left));
+    scroll-padding-block: 20px; scrollbar-color: #a393b7 transparent;
+  }
+  .tay-app .tay-message-list { gap: 18px; }
+  .tay-app .tay-message {
+    width: fit-content; max-width: 94%; padding: 14px 16px; border-radius: 20px;
+    border: 1px solid #e2ddeb; background: #fff; color: #211930; box-shadow: 0 2px 8px #30204605;
+  }
+  .tay-app .tay-message--user { background: #344fd2; color: #fff; border-color: #344fd2; border-bottom-right-radius: 7px; }
+  .tay-app .tay-message--tay { border-bottom-left-radius: 7px; }
+  .tay-app .tay-message-author { margin-bottom: 8px; color: #655378; font-size: 12px; }
+  .tay-app .tay-message--user .tay-message-author { color: #fff; }
+  .tay-app .tay-message > p { margin-bottom: 12px; font-size: 16px; line-height: 1.6; }
+  .tay-app .tay-message > p:last-child { margin-bottom: 0; }
+  .tay-app .tay-message > button { min-height: 44px; color: #392158; background: #eee9f6; border-color: #d5cbe5; box-shadow: none; }
+  .tay-app .tay-message--user > button { color: #fff; background: #ffffff18; border-color: #ffffff80; }
+  .tay-app .tay-welcome { min-height: 0; color: #594b69; }
+  .tay-app .tay-welcome h1 { color: #392158; }
+  .tay-app .tay-welcome p { color: #594b69; }
+  .tay-app .tay-welcome button { min-height: 44px; color: #392158; background: #eee9f6; }
+  .tay-app .tay-composer-dock {
+    padding: 8px max(10px, env(safe-area-inset-right)) calc(max(10px, env(safe-area-inset-bottom)) + var(--tay-host-badge-space, 0px)) max(10px, env(safe-area-inset-left));
+    border-top: 1px solid #ece7f2; background: #f7f7fc; max-height: 55%; overflow-y: auto;
+  }
+  .tay-app .tay-queue-strip[data-active=false] { display: none; }
+  .tay-app .tay-queue-strip { margin: 0 0 6px; flex-wrap: nowrap; }
+  .tay-app .tay-queue-strip button { min-height: 44px; background: #eee9f6; color: #392158; border-color: #d5cbe5; font-size: 12px; }
+  .tay-app .tay-queue-strip > span { color: #5b4a70; font-size: 12px; }
+  .tay-app .tay-command-composer { padding: 4px; border-radius: 28px; border: 1px solid #d6ccdf; background: #fff; box-shadow: 0 3px 15px #30204608; }
+  .tay-app .tay-command-composer:focus-within { border-color: #8050b6; box-shadow: 0 0 0 2px #8050b622; }
+  .tay-app .tay-composer-input-row { display: flex; align-items: flex-end; gap: 3px; min-width: 0; }
+  .tay-app .tay-mobile-composer-options {
+    display: inline-flex; flex: 0 0 44px; width: 44px; height: 44px; min-height: 44px;
+    padding: 10px; background: transparent; border-color: transparent; color: #4c306c; box-shadow: none;
+  }
+  .tay-app .tay-composer-input-row textarea {
+    flex: 1 1 0; width: 0; min-height: 44px; max-height: min(120px, 25dvh); padding: 10px 2px;
+    border: 0; border-radius: 0; background: #fff; color: #211930; font-size: 16px; line-height: 1.5;
+  }
+  .tay-app .tay-composer-input-row textarea::placeholder { color: #756783; opacity: 1; }
+  .tay-app .tay-mobile-send {
+    display: flex; align-items: center; justify-content: center; flex: 0 0 auto; min-width: 44px;
+    min-height: 44px; max-width: 90px; padding: 9px; margin: 0; border-radius: 23px;
+    background: #4032a0; border-color: #4032a0; color: #fff; font-size: 14px; box-shadow: none;
+  }
+  .tay-app .tay-command-composer > .tay-composer-bottom,
+  .tay-app .tay-command-composer > .tay-voice-drawer,
+  .tay-app .tay-composer-hint { display: none; }
+  .tay-app .tay-mobile-send-reason { display: block; margin: 6px 8px 0; font-size: 12px; line-height: 1.4; color: #58446a; }
+  .tay-app .tay-notice { margin: 0 0 6px; padding: 8px 10px; max-height: 20dvh; overflow: auto; color: #4d355d; border-color: #d6c6e4; background: #eee7f5; font-size: 13px; line-height: 1.5; }
+  .tay-app .tay-notice[role=alert] { color: #651f2b; border-color: #d9929e; background: #fff0f2; }
+  .tay-app .tay-notice > button { color: inherit; }
+  /* Drawers remain branded, scroll within the visible keyboard viewport, and keep their close action reachable. */
+  .tay-app.tay-drawer-open .tay-rail,
+  .tay-app.tay-sidecar-open .tay-sidecar {
+    top: var(--tay-viewport-offset-top, 0px); height: var(--tay-viewport-height, 100dvh); bottom: auto;
+    color: #f1eaf5; color-scheme: dark;
+  }
+  .tay-app .tay-rail-toggle { min-height: 44px; width: 44px; }
+  .tay-app .tay-conversation-controls .tay-header-controls { gap: 10px; }
+  .tay-app .tay-conversation-controls .tay-runtime-label { font-size: 13px; }
+  .tay-app .tay-conversation-controls .tay-header-controls button,
+  .tay-app .tay-conversation-controls .tay-search summary,
+  .tay-app .tay-conversation-controls .tay-send-intent button { min-height: 44px; font-size: 14px; }
+  .tay-app .tay-conversation-controls .tay-agent-picker { font-size: 14px; }
+  .tay-app .tay-conversation-controls .tay-agent-picker select { font-size: 16px; }
+  .tay-app .tay-conversation-controls .tay-send-intent { flex-wrap: wrap; }
+  .tay-app .tay-conversation-controls .tay-send-reason { font-size: 14px; }
+  .tay-app .tay-sidecar-content button, .tay-app .tay-sidecar-content select { min-height: 44px; }
+  .tay-app .tay-sidecar .tay-icon-button { min-height: 44px; width: 44px; }
+  .tay-app .tay-sidecar .voice-controls button { min-height: 44px; font-size: 14px; }
+  /* Governance stays in a distinct, readable royal card, adjacent to its own dismissal control. */
+  .tay-app .tay-proposed-action { padding: 12px; border: 1px solid #d9cce6; border-radius: 18px; background: #20142d; color: #f1eaf5; }
+  .tay-app .tay-proposed-action > .action-card { padding: 4px; border: 0; background: transparent; box-shadow: none; }
+  .tay-app .tay-proposed-action .facts { grid-template-columns: minmax(0, 1fr); }
+  .tay-app .tay-proposed-action .action-card__header, .tay-app .tay-proposed-action .approval-actions, .tay-app .tay-proposed-action .action-path { flex-wrap: wrap; }
+  .tay-app .tay-proposed-action .action-card__header h2 { min-width: 0; overflow-wrap: anywhere; }
+  .tay-app .tay-proposed-action p, .tay-app .tay-proposed-action dd { font-size: 14px; line-height: 1.6; }
+  .tay-app .tay-proposed-action button { min-height: 44px; }
+}
+
+/* Verified public Netlify HUD frame. Reserve room; never hide or modify host branding. */
+@media (max-width: 900px) {
+  body:has(> iframe#nl-badge-frame) .tay-app { --tay-host-badge-space: 72px; }
+  body:has(> iframe#nl-badge-frame) .tay-app .tay-sidecar-content { padding-bottom: calc(max(15px, env(safe-area-inset-bottom)) + 72px); }
+  body:has(> iframe#nl-badge-frame) .tay-app .tay-rail-footer { padding-bottom: 72px; }
+}
+
+@media (max-width: 900px) {
+  /* Keep editable/copyable output usable inside a light conversation bubble. */
+  .tay-app .tay-message--tay .writing-block {
+    padding: 0; border: 0; border-radius: 0; background: transparent; color: #211930;
+  }
+  .tay-app .tay-message--tay .writing-block__header { gap: 6px; margin-bottom: 8px; }
+  .tay-app .tay-message--tay .writing-block__header strong { color: #392158; }
+  .tay-app .tay-message--tay .writing-block__kind { color: #655378; }
+  .tay-app .tay-message--tay .writing-block__actions { gap: 4px; }
+  .tay-app .tay-message--tay .writing-block__actions > button,
+  .tay-app .tay-message--tay .writing-block__menu > summary {
+    min-height: 44px; padding: 8px 10px; color: #4a286c; border-color: #d8cce5; background: #f4effa; box-shadow: none;
+  }
+  .tay-app .tay-message--tay .writing-block__editor {
+    min-height: 3em; height: auto; max-height: none; padding: 4px 0; border: 0;
+    border-radius: 0; background: #fff; color: #211930; line-height: 1.6;
+    /* Latest engines fit text; older ones retain the existing rows/resize fallback. */
+    field-sizing: content;
+  }
+  .tay-app .tay-message--tay .writing-block__editor:focus { outline: 2px solid #8050b6; outline-offset: 3px; }
+  .tay-app .tay-message--tay .writing-block__status { margin: 8px 0 0; min-height: 0; color: #655378; font-size: 12px; }
+  .tay-app .tay-message--tay .writing-block__menu-content { color: #f1eaf5; color-scheme: dark; }
+}
+
+@media (max-width: 900px) {
+  /* The entire drawer scrolls on short/keyboard viewports; navigation never shrinks to zero. */
+  .tay-app.tay-drawer-open .tay-rail { overflow-y: auto; overscroll-behavior: contain; }
+  .tay-app.tay-drawer-open .tay-navigation { flex: 0 0 auto; min-height: auto; overflow: visible; }
+  .tay-app.tay-drawer-open .tay-rail-brand-row { position: sticky; top: 0; z-index: 1; background: #21182d; }
+}
+
+/* Shared conversation-first layout: explicit tracks also fix the zero-width collapsed desktop pane. */
+.tay-app > .tay-rail { grid-column: 1; }
+.tay-app > .tay-rail-resizer { grid-column: 2; }
+.tay-app > .tay-work-area { grid-column: 3; }
+.tay-app .tay-message--tay .writing-block__editor { min-height: 3em; height: auto; field-sizing: content; }
+.tay-app .tay-search-status { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; font-size: 13px; color: var(--tay-muted); }
+.tay-app .tay-search-status > span { min-width: 0; overflow-wrap: anywhere; }
+.tay-app .tay-search-status button { min-height: 44px; font-size: 13px; }
+.tay-app .tay-no-results { padding: 12px 0; color: var(--tay-muted); }
+body:has(> iframe#nl-badge-frame) .tay-app { --tay-host-badge-space: 72px; }
+body:has(> iframe#nl-badge-frame) .tay-app .tay-sidecar-content { padding-bottom: calc(max(15px, env(safe-area-inset-bottom)) + 72px); }
+@media (max-width: 900px) {
+  .tay-app > .tay-work-area { grid-column: 1; }
+  .tay-app .tay-search-status, .tay-app .tay-no-results { color: #594b69; }
+  .tay-app .tay-search-status button { background: #eee9f6; color: #392158; border-color: #d5cbe5; }
+}
+@media (min-width: 901px) {
+  .tay-app .tay-command-header { gap: 0; padding: 8px 20px; }
+  .tay-app .tay-command-title-row { min-height: 48px; }
+  .tay-app .tay-desktop-title, .tay-app .tay-command-header > .tay-command-tools { display: none; }
+  .tay-app .tay-mobile-title {
+    display: flex; flex: 1; align-items: center; justify-content: center; gap: 9px;
+    min-width: 0; min-height: 48px; padding: 4px 10px; border: 0; border-radius: 12px;
+    background: transparent; color: #f1d49c; box-shadow: none; font-size: 18px; font-weight: 650;
+  }
+  .tay-app .tay-mobile-agent-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .tay-app .tay-mobile-header-action { display: flex; flex: 0 0 auto; }
+  .tay-app .tay-command-title-row .tay-icon-button { width: 44px; min-height: 44px; }
+  .tay-app .tay-conversation { padding-top: 22px; padding-bottom: 22px; }
+  .tay-app .tay-composer-dock { padding: 8px 20px calc(12px + var(--tay-host-badge-space, 0px)); max-height: 45%; overflow-y: auto; }
+  .tay-app .tay-queue-strip[data-active=false] { display: none; }
+  .tay-app .tay-command-composer { padding: 5px; border-radius: 28px; }
+  .tay-app .tay-composer-input-row { display: flex; align-items: flex-end; gap: 5px; }
+  .tay-app .tay-mobile-composer-options { display: inline-flex; flex: 0 0 44px; min-height: 44px; width: 44px; padding: 10px; border-color: transparent; background: transparent; box-shadow: none; }
+  .tay-app .tay-composer-input-row textarea { flex: 1 1 0; width: 0; min-height: 44px; padding: 10px 2px; max-height: min(160px, 25dvh); }
+  .tay-app .tay-mobile-send { display: flex; align-items: center; justify-content: center; flex: 0 0 auto; min-width: 44px; min-height: 44px; padding: 9px; border-radius: 22px; font-size: 14px; }
+  .tay-app .tay-mobile-send-reason { display: block; margin: 6px 8px 0; font-size: 12px; line-height: 1.5; color: var(--tay-muted); }
+}
+
+/* Explicit readable placeholder contrast in both chat themes. */
+@media (min-width: 901px) {
+  .tay-app .tay-composer-input-row textarea::placeholder { color: #c4b6d1; opacity: 1; }
+}

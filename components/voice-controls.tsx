@@ -42,6 +42,7 @@ export function VoiceControls({ onTranscript, onListening, reply }: {
         recognition.current.abort();
       }
       window.speechSynthesis?.cancel();
+      callbacks.current.onListening(false);
     };
   }, []);
 

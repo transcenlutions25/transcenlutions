@@ -911,7 +911,7 @@ export function ChatShell({
   </>;
   const voiceControls = desktopEnabled && !desktop.state
     ? <p>Voice will be available when this conversation is connected.</p>
-    : <VoiceControls reply={displayMessages.filter(message => message.role === "tay").at(-1)?.text || ""}
+    : <VoiceControls key={desktopEnabled ? JSON.stringify(["desktop", desktop.project, desktop.state?.session_id]) : JSON.stringify(["web", selectedProject, threadId])} reply={displayMessages.filter(message => message.role === "tay").at(-1)?.text || ""}
       onTranscript={text => { setInput(current => current ? `${current}\n${text}` : text); setSidecarOpen(false); window.requestAnimationFrame(() => composerRef.current?.focus()); }}
       onListening={listening => setAgentRuntime(runtime => setRuntimeChannel(runtime, listening ? "voice" : "chat"))} />;
   const sendOptions = <>

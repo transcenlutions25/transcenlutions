@@ -201,7 +201,7 @@ test('mobile header, plus, and voice open the genuine controls in WorkspaceFrame
   await closeControls();
   await click(q('[aria-label="Open voice controls"]'));
   assert.equal(dialog().getAttribute('aria-label'), 'Voice controls');
-  assert.match(dialog().textContent, /Voice capture unavailable in this browser\. Typing is available\./);
+  assert.match(dialog().textContent, /Speech-to-text is unavailable in this browser\. Typing is available\./);
   assert.equal(button('Speak request', dialog()).disabled, true);
   assert.equal(button('Read latest reply', dialog()).disabled, true);
 });
@@ -627,6 +627,70 @@ for (const exit of ['close X', 'maximize conversation', 'switch content']) test(
   assertSpeechStopped(fixture);
   assert.equal(host.querySelector('.voice-controls'), null);
   assert.equal(field().value, 'Desktop draft before voice');
+});
+
+// Reuse the real recorder controller, replacing only browser media boundaries.
+const recordingModule = require('../lib/local-voice-recorder.ts');
+const actualRecorderEnvironment = recordingModule.browserRecorderEnvironment;
+const actualRecordingSupport = recordingModule.localRecordingSupport;
+function fakeLocalRecording() {
+  const fixture = { stops: 0, captures: 0, revoked: [], urls: 0 };
+  const track = { enabled: true, readyState: 'live', stop() { fixture.stops++; }, addEventListener() {}, removeEventListener() {} };
+  recordingModule.localRecordingSupport = () => null;
+  recordingModule.browserRecorderEnvironment = () => ({
+    getUserMedia: async () => { fixture.captures++; return { getTracks: () => [track], getAudioTracks: () => [track] }; },
+    createStartCue: () => ({ play: async () => {}, cancel() {} }),
+    supportsMimeType: type => type === 'audio/webm;codecs=opus',
+    createRecorder: (_, mimeType) => ({ state: 'inactive', mimeType,
+      start() { this.state = 'recording'; },
+      stop() { this.state = 'inactive'; queueMicrotask(() => { this.ondataavailable?.({ data: new Blob(['fixture'], { type: mimeType }) }); this.onstop?.(); }); },
+    }),
+    now: () => 1000, setTimeout, clearTimeout,
+    createObjectURL: () => `blob:local-fixture-${++fixture.urls}`,
+    revokeObjectURL: url => fixture.revoked.push(url),
+  });
+  return fixture;
+}
+afterEach(() => {
+  recordingModule.browserRecorderEnvironment = actualRecorderEnvironment;
+  recordingModule.localRecordingSupport = actualRecordingSupport;
+});
+async function startLocalRecording() {
+  await click(q('[aria-label="Open voice controls"]'));
+  await click(q('.tay-local-voice-recorder input[type=checkbox]', dialog()));
+  await click(button('Record my voice', dialog()));
+  assert.match(dialog().textContent, /Recording now/);
+}
+for (const exit of ['close X', 'Back', 'switch content']) test(`local sample stops on mobile ${exit} and preserves draft without submitting`, async () => {
+  const fixture = fakeLocalRecording(); await mount(); await change(field(), 'Keep this draft');
+  await startLocalRecording();
+  if (exit === 'close X') await closeControls();
+  else if (exit === 'Back') await browserBackInJsdom();
+  else await change(q('[aria-label="Workspace tool"]', dialog()), 'controls');
+  assert.equal(fixture.stops, 1); assert.equal(fixture.captures, 1); assert.equal(fixture.urls, 0);
+  assert.equal(field().value, 'Keep this draft'); assert.equal(policyCalls.length, 0); assert.equal(desktopCalls.length, 0);
+  assert.equal(state().input, 'Keep this draft');
+});
+for (const exit of ['maximize conversation', 'new conversation']) test(`local sample stops across desktop ${exit}`, async () => {
+  const fixture = fakeLocalRecording(); await viewport(1280); await mount();
+  await change(field(), 'Preserved previous draft'); await startLocalRecording();
+  if (exit === 'maximize conversation') await click(q('[aria-label="Maximize conversation"]'));
+  else await click(button('＋ New conversation'));
+  assert.equal(fixture.stops, 1); assert.equal(fixture.urls, 0); assert.equal(fixture.captures, 1);
+  if (exit === 'maximize conversation') assert.equal(field().value, 'Preserved previous draft');
+  else {
+    assert.equal(field().value, '');
+    assert.ok(JSON.parse(localStorage.getItem(workspaceStorageKey)).conversations.some(item => item.input === 'Preserved previous draft'));
+    assert.equal(q('.tay-local-voice-recorder input[type=checkbox]').checked, false, 'new conversation never carries recording consent');
+  }
+});
+test('local sample stops on desktop runtime session replacement even if Voice panel remains open', async () => {
+  const fixture = fakeLocalRecording(); desktop.state = desktopState();
+  await viewport(1280); await mount({ desktopEnabled: true }); await startLocalRecording();
+  desktop.state = { ...desktopState(), session_id: 'next-session' };
+  await act(async () => root.render(React.createElement(ChatShell, { ...props, desktopEnabled: true })));
+  assert.equal(fixture.stops, 1); assert.equal(fixture.captures, 1); assert.equal(fixture.urls, 0);
+  assert.equal(q('.tay-local-voice-recorder input[type=checkbox]').checked, false);
 });
 
 test('accepted voice transcript appends to the draft and keeps composer focus after overlay restoration', async () => {

@@ -1,0 +1,145 @@
+.root {
+  --presence-ink: #f1d49c;
+  --presence-button: #24192d;
+  --presence-edge: #aa8950;
+  --presence-focus: #c6a7ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  column-gap: 0.5rem;
+  row-gap: 0.25rem;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  color: var(--presence-ink);
+  vertical-align: middle;
+}
+
+.root[data-tone="light"] {
+  --presence-ink: #302046;
+  --presence-button: #fff;
+  --presence-edge: #675174;
+  --presence-focus: #7041ba;
+}
+
+.root .identity,
+.root .identityButton {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+  min-height: 44px;
+  color: inherit;
+}
+
+.root .identityButton {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.root .name {
+  display: inline-block;
+  flex: 0 0 auto;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.root .art {
+  display: block;
+  flex: 0 0 1.875rem;
+  width: 1.875rem;
+  height: 44px;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.root[data-size="roomy"] .art {
+  flex-basis: 4rem;
+  width: 4rem;
+  height: 96px;
+}
+
+.root .image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform-origin: 50% 98%;
+  animation: standingSway 50s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.root[data-motion="playing"] .image {
+  animation-play-state: running;
+}
+
+.root .motionButton {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 5rem;
+  min-height: 44px;
+  padding: 0.375rem 0.5rem;
+  margin: 0;
+  border: 1px solid var(--presence-edge);
+  border-radius: 9px;
+  background: var(--presence-button);
+  color: var(--presence-ink);
+  box-shadow: none;
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.root .motionButton:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.root .motionButton:focus-visible,
+.root .identityButton:focus-visible {
+  outline: 3px solid var(--presence-focus);
+  outline-offset: 2px;
+}
+
+.root .visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Hold the approved standing pose for 47 seconds; then one quiet 3-second sway.
+ * Only the cutout moves. This does not animate feet, face, hat, or readable text. */
+@keyframes standingSway {
+  0%, 94%, 100% { transform: rotate(0deg); }
+  96% { transform: rotate(-0.6deg); }
+  98% { transform: rotate(0.6deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root .image { animation: none !important; transform: none !important; }
+}
+
+@media (forced-colors: active) {
+  .root { --presence-ink: CanvasText; --presence-button: Canvas; --presence-edge: ButtonText; --presence-focus: Highlight; }
+  .root[data-tone="light"] { --presence-ink: CanvasText; --presence-button: Canvas; --presence-edge: ButtonText; --presence-focus: Highlight; }
+}

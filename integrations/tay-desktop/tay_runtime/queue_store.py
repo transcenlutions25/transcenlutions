@@ -6,9 +6,22 @@ import uuid
 from contextlib import contextmanager
 from pathlib import Path
 
+
 TERMINAL = {'completed', 'cancelled', 'failed'}
 AGENTS = {'tay', 'dawn', 'kj'}
 MODES = {'local', 'free', 'router', 'openai', 'claude', 'perplexity'}
+MAX_CURRENT_CHARS = 18000
+
+
+def current_request(payload):
+    """Keep the current instruction intact; also validate before saving steering."""
+    prompt = payload['message']
+    steering = payload.get('steering', [])
+    if steering:
+        prompt += '\nOwner steering, in order (latest takes precedence for this objective):\n' + '\n'.join(steering)
+    if len(prompt) > MAX_CURRENT_CHARS:
+        raise ValueError('This objective has too much text. Shorten the new direction. If it is already saved, cancel it and queue a shorter version; no instruction was dropped.')
+    return prompt
 
 
 class QueueStore:
@@ -208,6 +221,9 @@ class QueueStore:
                     data['steering'].append(text.strip())
                 else:
                     data['message'] = text.strip()
+                # Reject oversized cumulative directions transactionally, before
+                # changing the saved payload, revision, events or active claim.
+                current_request(data)
                 revision += 1
             elif operation == 'assign':
                 if state not in {'queued', 'paused', 'failed'} or agent_id not in AGENTS:

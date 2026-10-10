@@ -738,3 +738,6 @@ assert.equal(
 );
 console.log("Agent session regressions passed: sticky selection, explicit routing, traced handoffs, shared channel session, invalid agent rejection.");
 console.log("Agent authority regressions passed: scoped capabilities, approval gates, child-safe boundary, unknown-action denial, chat gating.");
+
+// Exercise the existing hosted responder's bounded conversational fallbacks.
+require('./test-tay-conversation.cjs');

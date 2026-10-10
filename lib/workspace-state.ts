@@ -31,8 +31,7 @@ export function completedToday(events: MomentumEvent[], date = new Date()) {
   return events.filter(event => new Date(event.at).toDateString() === date.toDateString()).length;
 }
 
-export function readWorkspaceState(): Record<string, unknown> | null {
-  const raw = localStorage.getItem(workspaceStorageKey);
+export function readWorkspaceState(raw: string | null = localStorage.getItem(workspaceStorageKey)): Record<string, unknown> | null {
   if (!raw) return null;
   const value: unknown = JSON.parse(raw);
   if (!value || typeof value !== "object" || Array.isArray(value) || (value as Record<string, unknown>).version !== 1) return null;

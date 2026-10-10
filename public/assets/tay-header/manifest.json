@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "agentId": "tay",
+  "asset": {
+    "filename": "TayCommand-fullbody-Kangol-gray-patch-v2.png",
+    "width": 1024,
+    "height": 1536,
+    "mimeType": "image/png",
+    "bytes": 1727605,
+    "sha256": "427ae508d23e794f92bd9a011793172a5f2f76999d19fe079e7c37e8c9e4015b",
+    "provenance": "Owner-approved Kangol full-body standing-pose artwork; original bytes retained.",
+    "derivative": false
+  },
+  "motion": {
+    "id": "standing-sway-v1",
+    "kind": "whole-cutout-transform",
+    "cycleMilliseconds": 50000,
+    "motionMilliseconds": 3000,
+    "maxRotationDegrees": 0.6,
+    "origin": [0.5, 0.98],
+    "keyframes": [
+      { "offset": 0, "rotationDegrees": 0 },
+      { "offset": 0.94, "rotationDegrees": 0 },
+      { "offset": 0.96, "rotationDegrees": -0.6 },
+      { "offset": 0.98, "rotationDegrees": 0.6 },
+      { "offset": 1, "rotationDegrees": 0 }
+    ],
+    "reducedMotion": "static",
+    "requiresVisibleDocumentAndElement": true,
+    "pauseSupported": true,
+    "notImplemented": ["walking", "limb motion", "hat tipping", "facial animation", "speech sync"]
+  }
+}

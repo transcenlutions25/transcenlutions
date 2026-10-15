@@ -31,7 +31,7 @@ export async function publishYouTube(
       headers: {
         authorization: `Bearer ${token}`,
         "content-type": "application/json; charset=UTF-8",
-        "x-upload-content-length": String(media.bytes.byteLength),
+        "x-upload-content-length": String(media.buffer.byteLength),
         "x-upload-content-type": media.contentType,
       },
       body: JSON.stringify(metadata),
@@ -46,9 +46,9 @@ export async function publishYouTube(
     headers: {
       authorization: `Bearer ${token}`,
       "content-type": media.contentType,
-      "content-length": String(media.bytes.byteLength),
+      "content-length": String(media.buffer.byteLength),
     },
-    body: media.bytes,
+    body: media.buffer,
   });
   const result = await responseJson(uploaded, "YouTube");
   const videoId = externalId(result, "id");

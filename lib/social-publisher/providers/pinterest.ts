@@ -49,7 +49,7 @@ export async function publishPinterest(
     for (const [key, value] of Object.entries(uploadParameters)) {
       if (typeof value === "string" || typeof value === "number") form.append(key, String(value));
     }
-    form.append("file", new Blob([media.bytes], { type: media.contentType }), "video.mp4");
+    form.append("file", new Blob([media.buffer], { type: media.contentType }), "video.mp4");
     const upload = await fetch(uploadUrl, { method: "POST", body: form });
     if (!upload.ok) throw new Error(`Pinterest media upload failed with HTTP ${upload.status}.`);
     await waitForPinterestMedia(mediaId, token);

@@ -9,7 +9,7 @@ function allowedMediaHosts(): Set<string> {
   );
 }
 
-export async function loadMedia(urlValue: string): Promise<{ bytes: Uint8Array; contentType: string }> {
+export async function loadMedia(urlValue: string): Promise<{ buffer: ArrayBuffer; contentType: string }> {
   const url = new URL(urlValue);
   const allowed = allowedMediaHosts();
   if (allowed.size === 0 || !allowed.has(url.hostname.toLowerCase())) {
@@ -26,5 +26,5 @@ export async function loadMedia(urlValue: string): Promise<{ bytes: Uint8Array; 
   const buffer = await response.arrayBuffer();
   if (buffer.byteLength > limit) throw new Error("Media exceeds the configured publishing size limit.");
   const contentType = response.headers.get("content-type")?.split(";")[0]?.trim() || "application/octet-stream";
-  return { bytes: new Uint8Array(buffer), contentType };
+  return { buffer, contentType };
 }

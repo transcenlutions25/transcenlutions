@@ -22,7 +22,7 @@ export async function uploadLinkedInVideo(
   const init = await fetch("https://api.linkedin.com/rest/videos?action=initializeUpload", {
     method: "POST",
     headers: linkedInHeaders(token, version),
-    body: JSON.stringify({ initializeUploadRequest: { owner, fileSizeBytes: media.bytes.byteLength } }),
+    body: JSON.stringify({ initializeUploadRequest: { owner, fileSizeBytes: media.buffer.byteLength } }),
   });
   const value = asRecord((await responseJson(init, "LinkedIn")).value);
   const video = typeof value.video === "string" ? value.video : "";
@@ -37,10 +37,14 @@ export async function uploadLinkedInVideo(
     const item = instructions[index];
     const uploadUrl = typeof item.uploadUrl === "string" ? item.uploadUrl : "";
     const first = typeof item.firstByte === "number" ? item.firstByte : index * CHUNK_SIZE;
-    const last = typeof item.lastByte === "number" ? item.lastByte : Math.min(media.bytes.byteLength - 1, first + CHUNK_SIZE - 1);
-    if (!uploadUrl || first < 0 || last < first || last >= media.bytes.byteLength) throw new Error("LinkedIn returned invalid upload instructions.");
-    const part = media.bytes.slice(first, last + 1);
-    const response = await fetch(uploadUrl, { method: "PUT", body: part, headers: { "content-type": "application/octet-stream" } });
+    const last = typeof item.lastByte === "number" ? item.lastByte : Math.min(media.buffer.byteLength - 1, first + CHUNK_SIZE - 1);
+    if (!uploadUrl || first < 0 || last < first || last >= media.buffer.byteLength) throw new Error("LinkedIn returned invalid upload instructions.");
+    const part = media.buffer.slice(first, last + 1);
+    const response = await fetch(uploadUrl, {
+      method: "PUT",
+      body: part,
+      headers: { "content-type": "application/octet-stream" },
+    });
     if (!response.ok) throw new Error(`LinkedIn media upload failed with HTTP ${response.status}.`);
     const etag = response.headers.get("etag")?.replace(/^"|"$/g, "");
     if (!etag) throw new Error("LinkedIn media upload did not return an ETag.");

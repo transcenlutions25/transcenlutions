@@ -21,3 +21,4 @@ tsconfig.tsbuildinfo
 __pycache__/
 *.py[cod]
 integrations/tay-desktop/runtime-state/
+.participation-test/

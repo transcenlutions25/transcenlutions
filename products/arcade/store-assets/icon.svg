@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Transcenlutions Arcade icon</title>
+  <desc id="desc">The Arcade crown identity on an opaque square royal blue and black background.</desc>
+  <defs>
+    <linearGradient id="background" x2="1" y2="1">
+      <stop stop-color="#25284c"/>
+      <stop offset="1" stop-color="#0b0e1c"/>
+    </linearGradient>
+    <linearGradient id="gold" x2="1" y2="1">
+      <stop stop-color="#ffe4aa"/>
+      <stop offset="1" stop-color="#c29b50"/>
+    </linearGradient>
+  </defs>
+  <!-- The store applies its own mask. The complete square remains opaque. -->
+  <rect width="512" height="512" fill="url(#background)"/>
+  <circle cx="256" cy="256" r="184" fill="none" stroke="#8e83ba" stroke-opacity=".25" stroke-width="2"/>
+  <path d="m105 176 91 65 60-127 60 127 91-65-42 182H147Z" fill="none" stroke="url(#gold)" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M154 389h204" stroke="#efcb7b" stroke-width="15" stroke-linecap="round"/>
+  <rect x="234" y="272" width="44" height="44" rx="9" fill="#9ab9ff"/>
+</svg>

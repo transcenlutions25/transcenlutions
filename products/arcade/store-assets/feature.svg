@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500" role="img" aria-labelledby="title desc">
+  <title id="title">Transcenlutions Arcade</title>
+  <desc id="desc">Make room for play. Original geometric motifs represent Crown Grid, Prism Sort, Orbit Link, and Lumen Run.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#161a30"/>
+      <stop offset=".52" stop-color="#0c101d"/>
+      <stop offset="1" stop-color="#181124"/>
+    </linearGradient>
+    <radialGradient id="halo">
+      <stop stop-color="#6849a8" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#6849a8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x2="1" y2="1">
+      <stop stop-color="#ffe4aa"/>
+      <stop offset="1" stop-color="#c29b50"/>
+    </linearGradient>
+    <linearGradient id="track" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#1b2642" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#223450" stop-opacity=".68"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="500" fill="url(#background)"/>
+  <ellipse cx="803" cy="251" rx="305" ry="305" fill="url(#halo)"/>
+  <ellipse cx="765" cy="246" rx="220" ry="192" fill="none" stroke="#a4a0ce" stroke-opacity=".10"/>
+  <ellipse cx="765" cy="246" rx="268" ry="155" fill="none" stroke="#bfa0ec" stroke-opacity=".09" transform="rotate(-24 765 246)"/>
+  <path d="M506 62v375" stroke="#aaa5c7" stroke-opacity=".14"/>
+
+  <!-- Brand: the same crown outline used by the app, with original type. -->
+  <g transform="translate(57 62) scale(.082)">
+    <path d="m105 176 91 65 60-127 60 127 91-65-42 182H147Z" fill="none" stroke="url(#gold)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M154 389h204" stroke="#efcb7b" stroke-width="18" stroke-linecap="round"/>
+  </g>
+  <g font-family="DejaVu Sans, sans-serif">
+    <text x="106" y="91" fill="#f0cd85" font-size="18" font-weight="600" letter-spacing="2.2">TRANSCENLUTIONS</text>
+    <text x="55" y="207" fill="#f5f0e7" font-size="88" font-weight="700" letter-spacing="2">ARCADE</text>
+    <text x="59" y="256" fill="#dcc7a0" font-size="26" font-weight="400">Make room for play.</text>
+    <path d="M59 290h370" stroke="#b8a8cf" stroke-opacity=".19"/>
+    <text x="59" y="332" fill="#c8cbde" font-size="18">Crown Grid</text>
+    <text x="250" y="332" fill="#c8cbde" font-size="18">Prism Sort</text>
+    <text x="59" y="371" fill="#c8cbde" font-size="18">Orbit Link</text>
+    <text x="250" y="371" fill="#c8cbde" font-size="18">Lumen Run</text>
+    <text x="59" y="431" fill="#91afd8" font-size="11" letter-spacing="2.7">PLACE · SORT · CONNECT · RUN</text>
+  </g>
+
+  <!-- Abstract block motif: brand colors and simple original geometry. -->
+  <g transform="translate(567 77) rotate(-8 69 65)">
+    <g fill="#242c44" stroke="#ffffff" stroke-opacity=".07">
+      <rect width="142" height="142" rx="20" fill="#151d30"/>
+      <rect x="14" y="14" width="25" height="25" rx="5"/>
+      <rect x="44" y="14" width="25" height="25" rx="5"/>
+      <rect x="74" y="14" width="25" height="25" rx="5"/>
+      <rect x="104" y="14" width="25" height="25" rx="5"/>
+      <rect x="14" y="44" width="25" height="25" rx="5"/>
+      <rect x="44" y="44" width="25" height="25" rx="5"/>
+      <rect x="74" y="44" width="25" height="25" rx="5"/>
+      <rect x="104" y="44" width="25" height="25" rx="5"/>
+      <rect x="14" y="74" width="25" height="25" rx="5"/>
+      <rect x="44" y="74" width="25" height="25" rx="5"/>
+      <rect x="74" y="74" width="25" height="25" rx="5"/>
+      <rect x="104" y="74" width="25" height="25" rx="5"/>
+      <rect x="14" y="104" width="25" height="25" rx="5"/>
+      <rect x="44" y="104" width="25" height="25" rx="5"/>
+      <rect x="74" y="104" width="25" height="25" rx="5"/>
+      <rect x="104" y="104" width="25" height="25" rx="5"/>
+    </g>
+    <g fill="#83aaff">
+      <rect x="14" y="14" width="25" height="25" rx="5"/>
+      <rect x="44" y="14" width="25" height="25" rx="5"/>
+      <rect x="14" y="44" width="25" height="25" rx="5"/>
+    </g>
+    <g fill="#bda0f3">
+      <rect x="104" y="44" width="25" height="25" rx="5"/>
+      <rect x="74" y="74" width="25" height="25" rx="5"/>
+      <rect x="104" y="74" width="25" height="25" rx="5"/>
+    </g>
+    <g fill="#f0cd85">
+      <rect x="14" y="104" width="25" height="25" rx="5"/>
+      <rect x="44" y="104" width="25" height="25" rx="5"/>
+      <rect x="74" y="104" width="25" height="25" rx="5"/>
+    </g>
+  </g>
+
+  <!-- Symbol-sorting motif. The same four color/symbol pairs as the game. -->
+  <g transform="translate(777 79)">
+    <g fill="#ffffff" fill-opacity=".025" stroke="#aeb7d1" stroke-opacity=".64" stroke-width="2">
+      <path d="M0 0v112a17 17 0 0 0 34 0V0"/>
+      <path d="M48 0v112a17 17 0 0 0 34 0V0"/>
+      <path d="M96 0v112a17 17 0 0 0 34 0V0"/>
+    </g>
+    <g stroke="none">
+      <rect x="5" y="96" width="24" height="22" rx="5" fill="#83aaff"/>
+      <rect x="5" y="70" width="24" height="22" rx="5" fill="#bda0f3"/>
+      <rect x="5" y="44" width="24" height="22" rx="5" fill="#f0cd85"/>
+      <rect x="5" y="18" width="24" height="22" rx="5" fill="#86d7b8"/>
+      <rect x="53" y="96" width="24" height="22" rx="5" fill="#bda0f3"/>
+      <rect x="53" y="70" width="24" height="22" rx="5" fill="#f0cd85"/>
+      <rect x="53" y="44" width="24" height="22" rx="5" fill="#83aaff"/>
+      <rect x="101" y="96" width="24" height="22" rx="5" fill="#86d7b8"/>
+      <rect x="101" y="70" width="24" height="22" rx="5" fill="#83aaff"/>
+      <rect x="101" y="44" width="24" height="22" rx="5" fill="#bda0f3"/>
+      <rect x="101" y="18" width="24" height="22" rx="5" fill="#f0cd85"/>
+    </g>
+    <g fill="#171b2a">
+      <circle cx="17" cy="107" r="4"/><circle cx="65" cy="55" r="4"/><circle cx="113" cy="81" r="4"/>
+      <path d="m17 75 6 6-6 6-6-6Z M65 101l6 6-6 6-6-6Z M113 49l6 6-6 6-6-6Z"/>
+      <path d="m17 23 6 11H11Z M113 101l6 11h-12Z"/>
+      <path d="m17 48 2 4 5 1-4 3 1 5-4-3-4 3 1-5-4-3 5-1Z M65 74l2 4 5 1-4 3 1 5-4-3-4 3 1-5-4-3 5-1Z M113 22l2 4 5 1-4 3 1 5-4-3-4 3 1-5-4-3 5-1Z"/>
+    </g>
+  </g>
+
+  <!-- A turning light path, without presenting an invented gameplay screen. -->
+  <g transform="translate(570 286)">
+    <g fill="#232b43" stroke="#aeb7d1" stroke-opacity=".13">
+      <rect x="0" y="0" width="40" height="40" rx="10"/>
+      <rect x="48" y="0" width="40" height="40" rx="10"/>
+      <rect x="96" y="0" width="40" height="40" rx="10"/>
+      <rect x="0" y="48" width="40" height="40" rx="10"/>
+      <rect x="48" y="48" width="40" height="40" rx="10"/>
+      <rect x="96" y="48" width="40" height="40" rx="10"/>
+      <rect x="0" y="96" width="40" height="40" rx="10"/>
+      <rect x="48" y="96" width="40" height="40" rx="10"/>
+      <rect x="96" y="96" width="40" height="40" rx="10"/>
+    </g>
+    <path d="M20 20h48v48h48v48H68" fill="none" stroke="url(#gold)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M20 68v48M116 20v10" fill="none" stroke="#657caa" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="20" cy="20" r="6" fill="#fff0bf"/>
+    <circle cx="68" cy="116" r="6" fill="#fff0bf"/>
+  </g>
+
+  <!-- Three lanes, a player marker, an energy spark, and distinct barriers. -->
+  <g transform="translate(767 280)">
+    <path d="M45 0h60l46 143H0Z" fill="url(#track)"/>
+    <path d="M45 0 0 143M105 0l46 143M65 0 51 143M85 0l15 143" fill="none" stroke="#88a1d7" stroke-opacity=".57" stroke-width="1.5"/>
+    <path d="M34 38h84M20 82h112M7 122h138" stroke="#91aedc" stroke-opacity=".20"/>
+    <path d="m75 23 7 10-7 10-7-10Z M75 59l7 10-7 10-7-10Z" fill="#f0cd85"/>
+    <rect x="36" y="46" width="22" height="17" rx="4" fill="#c980a2" stroke="#f1a4b9" stroke-width="1.5"/>
+    <path d="m42 51 10 7m0-7-10 7" stroke="#ffd5e1" stroke-width="1.5"/>
+    <rect x="107" y="99" width="25" height="20" rx="4" fill="#c980a2" stroke="#f1a4b9" stroke-width="1.5"/>
+    <path d="m113 104 13 10m0-10-13 10" stroke="#ffd5e1" stroke-width="1.5"/>
+    <path d="m75 93-15 34 15-8 15 8Z" fill="#a9cdff" stroke="#edf6ff" stroke-width="2"/>
+    <path d="M75 105v14" stroke="#edf6ff" stroke-width="2"/>
+  </g>
+  <g fill="#f0cd85" fill-opacity=".65">
+    <path d="m939 237 2 7 7 2-7 2-2 7-2-7-7-2 7-2Z"/>
+    <circle cx="730" cy="47" r="2"/>
+    <circle cx="532" cy="260" r="2"/>
+  </g>
+</svg>

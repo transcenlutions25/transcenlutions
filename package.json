@@ -18,6 +18,8 @@
     "test:workflows": "npm run test:apex && python3 -m unittest discover -s tools/apex-flow -p \"test_*.py\" && python3 -m unittest discover -s integrations/tay-desktop/tests -v && npm run smoke",
     "probe:apex-providers": "node scripts/apex-provider-probe.cjs",
     "test:security": "node scripts/check-security.mjs",
+    "test:arcade": "node products/arcade/test-engine.mjs && node products/arcade/test-ui.mjs && node products/arcade/test-offline.mjs",
+    "build:arcade": "node products/arcade/build-offline.mjs",
     "security:dependencies": "node scripts/security-dependencies.mjs",
     "security:secrets": "bash scripts/security-secrets.sh",
     "security": "npm run test:security && npm run security:dependencies && npm run security:secrets"

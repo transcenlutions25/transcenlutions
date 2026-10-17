@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Transcenlutions Arcade</string>
+    <string name="recovery_message">The arcade display closed. Reopen it to play again.</string>
+    <string name="reopen_arcade">Reopen arcade</string>
+</resources>

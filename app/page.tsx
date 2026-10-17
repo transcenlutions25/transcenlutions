@@ -33,6 +33,7 @@ export default function Page() {
         <strong>Operating intelligence</strong>
         <Link href="/acquisition" style={intelligenceLinkStyle}>Acquisition & Funding</Link>
         <Link href="/creative-intelligence" style={intelligenceLinkStyle}>Creative Intelligence 2026</Link>
+        <Link href="/arcade" style={intelligenceLinkStyle}>Arcade</Link>
       </nav>
       <ChatShell
         desktopEnabled={Boolean(desktopBridgeUrl())}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="arcade_background">#070811</color>
+    <color name="arcade_purple">#32246B</color>
+    <color name="arcade_gold">#E8C76B</color>
+</resources>

@@ -70,4 +70,4 @@ The full searchable report and machine-readable data are delivered separately un
 
 The exports contain all 100 ranked records, package-specific source links, metadata, separate usage evidence and original concept directions. Their rank sequence, package uniqueness and 100 distinct concept entries were checked; the report's search, filters and exports were exercised. The raw research exports are not duplicated in this repository.
 
-See the [arcade product record](../../products/arcade/README.md) and [release record](../releases/arcade-2026-10-17.md). **Source publication, remote CI, web deployment, Android artifact publication and Google Play submission remain PENDING** until the release coordinator records the corresponding evidence.
+See the [arcade product record](../../products/arcade/README.md), [release record](../releases/arcade-2026-10-17.md), and [release PR 78](https://github.com/transcenlutions25/transcenlutions/pull/78). Source is published for review and the web preview has been exercised. Final CI, production, Android artifacts and Google Play each require their own recorded outcome; the research is not evidence that an app was published.

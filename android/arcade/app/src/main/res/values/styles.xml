@@ -6,7 +6,6 @@
         <item name="android:windowBackground">@color/arcade_background</item>
         <item name="android:colorAccent">@color/arcade_gold</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
         <item name="android:statusBarColor">@color/arcade_background</item>
         <item name="android:navigationBarColor">@color/arcade_background</item>
     </style>

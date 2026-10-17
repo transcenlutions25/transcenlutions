@@ -15,10 +15,22 @@ assert.equal(moveQueuedRequest(queue, "objective-2", -1)[1].id, "objective-2");
 assert.equal(moveQueuedRequest(queue, "missing", -1), queue);
 assert.equal(moveQueuedRequest(queue, "objective-0", -1), queue);
 assert.equal(queue[0].id, "objective-0", "reordering does not mutate the original queue");
-let events = recordMomentum([], "verified-move", "2026-10-04T14:00:00Z");
-assert.equal(recordMomentum(events, "verified-move"), events, "repeat execution cannot farm progress");
-assert.equal(completedToday(events, new Date("2026-10-04T18:00:00Z")), 1);
-assert.equal(completedToday(events, new Date("2026-10-05T18:00:00Z")), 0);
+// Momentum belongs to the user's local calendar day, not the UTC date in its stored timestamp.
+const completedAt = new Date(2026, 9, 4, 14).toISOString();
+const reportDate = new Date(2026, 9, 4, 18);
+const nextDay = new Date(2026, 9, 5, 18);
+const events = recordMomentum([], "verified-move", completedAt);
+assert.equal(recordMomentum(events, "verified-move", nextDay.toISOString()), events, "repeat execution cannot farm progress on another day");
+assert.equal(events[0].at, completedAt, "repeated execution preserves the original completion timestamp");
+assert.equal(completedToday(events, reportDate), 1);
+assert.equal(completedToday(events, nextDay), 0);
+const boundaryEvents = [
+  new Date(2026, 9, 3, 23, 59, 59, 999),
+  new Date(2026, 9, 4, 0, 0, 0, 0),
+  new Date(2026, 9, 4, 23, 59, 59, 999),
+  new Date(2026, 9, 5, 0, 0, 0, 0),
+].map((at, index) => ({ id: `boundary-${index}`, at: at.toISOString() }));
+assert.equal(completedToday(boundaryEvents, reportDate), 2, "today includes both local day boundaries and excludes adjacent days");
 globalThis.localStorage = { getItem: () => JSON.stringify({ version: 1, conversations: [] }) };
 assert.equal(readWorkspaceState().version, 1);
 globalThis.localStorage.getItem = () => JSON.stringify({ version: 99 });

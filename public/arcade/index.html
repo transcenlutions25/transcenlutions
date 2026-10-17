@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a0b16">
+  <meta name="description" content="Four original Transcenlutions games. Place, sort, connect, and run at your own pace.">
+  <title>Transcenlutions Arcade</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./arcade.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to games</a>
+  <div class="ambient" aria-hidden="true"></div>
+  <header class="topbar">
+    <button class="brand" id="brand-home" aria-label="Transcenlutions Arcade home">
+      <svg class="crown" viewBox="0 0 40 40" aria-hidden="true"><path d="M6 12l9 7 5-12 5 12 9-7-4 20H10Z"/><path d="M11 36h18"/></svg>
+      <span><span class="wordmark">TRANSCENLUTIONS</span><span class="brand-sub">ARCADE <span class="edition">01</span></span></span>
+    </button>
+    <div class="top-actions"><span class="local-badge"><i></i> Your progress, on this device</span><button id="settings-open" class="icon-button" aria-label="Open display and sound settings" title="Settings">⚙</button></div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" aria-label="Arcade navigation">
+      <div class="sidebar-label">YOUR ARCADE</div>
+      <button class="nav-item active" data-nav="home"><span aria-hidden="true">⌂</span> All games</button>
+      <div class="nav-games" id="nav-games"></div>
+      <div class="sidebar-bottom"><span class="tiny-crown" aria-hidden="true">♛</span><strong>A little play.<br>A clearer mind.</strong><p>Four original games.<br>One place to unwind.</p><button class="text-button" id="progress-open">Your progress <span aria-hidden="true">↗</span></button></div>
+    </aside>
+    <main id="main" tabindex="-1">
+      <section id="home-view" aria-labelledby="home-title">
+        <div class="hero">
+          <div class="hero-copy"><span class="eyebrow">THE TRANSCENLUTIONS COLLECTION</span><h1 id="home-title">Make room<br>for <em>play.</em></h1><p>A quick challenge. A quiet reset.<br>Find your flow, one good move at a time.</p><button class="primary-button" id="hero-play">Play Crown Grid <span aria-hidden="true">↗</span></button><span class="hero-note">No account needed · Built for touch &amp; keyboard</span></div>
+          <div class="hero-art" aria-hidden="true"><div class="orbital orbit-one"></div><div class="orbital orbit-two"></div><div class="floating-label"><i></i> FIND YOUR NEXT GOOD MOVE</div><div class="hero-board" id="hero-board"></div><div class="floating-score"><span>MAKE SPACE</span><strong>+ 120</strong><span>Keep the possibilities open.</span></div><span class="hero-star star-a">✦</span><span class="hero-star star-b">✧</span></div>
+        </div>
+        <div class="section-heading"><div><span class="eyebrow">PICK YOUR PACE</span><h2>What feels good today?</h2></div><span class="game-count">04 games</span></div>
+        <div class="game-cards" id="game-cards"></div>
+        <section class="daily-strip" aria-labelledby="daily-title"><div class="daily-symbol" aria-hidden="true">◈</div><div><span class="eyebrow">A FRESH START, EVERY DAY</span><h2 id="daily-title">Today's Crown Grid</h2><p>The same starting challenge for everyone. Your score stays on this device.</p></div><button class="secondary-button" id="daily-play">Play daily <span aria-hidden="true">↗</span></button></section>
+        <footer class="site-footer"><span>Original games by Transcenlutions · v1.0</span><div><button class="text-button" id="about-open">About &amp; controls</button><a href="./privacy.html" id="privacy-link">Privacy</a></div></footer>
+      </section>
+      <section id="game-view" hidden aria-labelledby="game-title">
+        <div class="game-topline"><button id="back-home" class="text-button">← All games</button><span class="game-mode" id="game-mode">FREE PLAY</span></div>
+        <div class="game-heading"><div><span class="eyebrow" id="game-kicker"></span><h1 id="game-title"></h1><p id="game-subtitle"></p></div><button class="secondary-button compact" id="game-help">How to play</button></div>
+        <div class="play-layout"><div class="play-main"><div id="game-stats" class="game-stats" aria-label="Game statistics"></div><div id="game-stage" class="game-stage"></div><div id="game-controls" class="game-controls"></div><p id="game-message" class="game-message" role="status" aria-live="polite"></p></div><aside class="play-notes"><span class="eyebrow">YOUR NEXT MOVE</span><h2 id="note-title"></h2><p id="note-copy"></p><div id="note-extra"></div><div class="note-rule"></div><span class="eyebrow">MADE FOR YOUR PACE</span><p>Pause whenever you need. Large controls and visible symbols keep every move clear.</p><button class="text-button" id="game-save">Save &amp; return home ↗</button></aside></div>
+      </section>
+    </main>
+  </div>
+  <dialog id="modal" aria-labelledby="modal-title"><div class="modal-heading"><h2 id="modal-title"></h2><button id="modal-close" class="icon-button" aria-label="Close dialog">×</button></div><div id="modal-body"></div><div id="modal-actions" class="modal-actions"></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <noscript><div class="noscript">Please enable JavaScript to play these games.</div></noscript>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>

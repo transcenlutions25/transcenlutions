@@ -1,6 +1,7 @@
 // Recovered scope, not a claim that every service is connected.
 // Source and dependencies: docs/canon/MASTER_CANON_AND_SYSTEM_MAP.md.
 export const futureModules = [
+  { title: "Transcenlutions Arcade", status: "Available · four local games", text: "Crown Grid, Prism Sort, Orbit Link and Lumen Run are playable at /arcade. Scores and progress stay on the device. Original browser and Android gameplay shares one source; Google Play publication and automatic account-library registration require separate verification." },
   { title: "Tay Command workspace", status: "Available · local workspace", text: "Conversation, Queue and Steer, project references, writing blocks and workspace exports share the Mac Tay design. Hosted replies use guided Tay Core; private Mac state stays on the Mac." },
   { title: "Business Command & Founder Console", status: "Available · planning tools", text: "Business priorities, offers, sales, fulfillment and founder focus sit beside the conversation. Drafts and plans do not imply outside actions were performed." },
   { title: "Shared platform services", status: "Partial · foundation", text: "Identity and tenants, organizations, agents, authority, workflows, integrations, the Operating Graph, audit, memory, events, finance and model routing form one shared core. Authenticated durable services remain to be completed." },

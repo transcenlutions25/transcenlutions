@@ -1,0 +1,24 @@
+{
+  "id": "transcenlutions.arcade",
+  "version": "1.0.0",
+  "title": "Transcenlutions Arcade",
+  "owner": "Transcenlutions",
+  "type": "interactive-game-collection",
+  "entryPoint": "/arcade/index.html",
+  "games": ["Crown Grid", "Prism Sort", "Orbit Link", "Lumen Run"],
+  "actions": ["play", "pause", "restart", "undo-puzzle-move", "save-local-progress", "export-progress"],
+  "formats": ["web", "standalone-html-export", "android-debug-apk", "unsigned-android-app-bundle"],
+  "storage": "Browser/WebView local storage only. No cloud synchronization.",
+  "accountEntitlements": "Not implemented or required for this freely accessible prototype. This does not grant account or admin authority.",
+  "instructions": "Open the entry point, choose a game and use its How to play control. Settings provides larger text, contrast, reduced motion and sound. Progress offers a portable JSON export.",
+  "compatibility": {
+    "web": "Modern browsers with JavaScript and ES modules. No external runtime assets. Service worker offline caching is scoped to the arcade path.",
+    "standaloneHtml": "Generated with npm run build:arcade. One file with all styles, game code, and assets embedded. Local saving depends on browser file-origin behavior.",
+    "android": "API 26+ wrapper with bundled assets; API 36 target. Test APK uses debug signing; unsigned AAB requires production signing. Actual device behavior must be tested.",
+    "agentChats": "Authorized agents can reference the product contract, code, gameplay instructions and JSON export. No automatic authenticated account-library integration or universal in-chat runtime is claimed.",
+    "androidExport": "Copyable JSON text is shown in the app because native blob downloads are not enabled. Browser edition offers a JSON file."
+  },
+  "monetization": "No ads, purchases, payment SDK, or price configured. Commercial release terms require a separate verified setup.",
+  "provenance": "Original code and geometric visuals developed for Transcenlutions. Common genre mechanics informed by a dated market study; no competitor code, artwork, audio, level data, logos or descriptions included.",
+  "publication": "Track build, preview, Android test and Google Play release separately in docs/releases/arcade-2026-10-17.md."
+}

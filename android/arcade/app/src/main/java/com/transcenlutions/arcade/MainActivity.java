@@ -319,6 +319,9 @@ public final class MainActivity extends Activity {
     }
 
     @Override
+    // Only a fallback for Android 8–12L. Android 13+ uses the registered
+    // OnBackInvokedDispatcher callback above, including gesture navigation.
+    @SuppressLint("GestureBackNavigation")
     @SuppressWarnings("deprecation")
     public void onBackPressed() {
         handleBack();

@@ -63,6 +63,8 @@ android {
     lint {
         abortOnError true
         checkReleaseBuilds true
+        // Print every finding in CI, including when lint stops the build.
+        textReport true
     }
 }
 

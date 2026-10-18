@@ -34,6 +34,8 @@ jobs:
       - run: npm ci
       - run: npm audit --omit=dev --audit-level=high
       - run: npm run typecheck
+      - run: node scripts/test-online-provider.cjs
+      - run: node scripts/test-shared-conversations.cjs
       - run: npm run test:identity
       - run: npm run test:workspace
       - run: npm run test:arcade

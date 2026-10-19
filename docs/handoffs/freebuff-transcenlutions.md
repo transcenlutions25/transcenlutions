@@ -9,8 +9,8 @@ email, publishing and voice remain unconfigured.
 
 | Pickup item | Value |
 | --- | --- |
-| Final commit | `HEAD` of `feat/tay-consolidated-workspace` (see §14 for the SHA recorded at handoff) |
-| Draft pull request | Opened against `main`; link recorded in §14 |
+| Final commit | `3e5cf149519c772cd5d4185d375db3c0000ed17a` (branch head before this document's own commit; see §14) |
+| Draft pull request | <https://github.com/transcenlutions25/transcenlutions/pull/80> |
 | Runs on | This Mac only — no verified hosted deployment |
 | Password toggle | Implemented and verified (HTTP + production build, mouse + keyboard) |
 | Build / tests | `next build` exit 0; typecheck, lint, `test:tay`, `test:workspace`, `test:security`, `security:dependencies` all pass |
@@ -355,15 +355,25 @@ edge runtime.
 
 ## 14. GitHub handoff
 
-The changes were committed on the isolated branch and pushed to
-`transcenlutions25/transcenlutions` without touching `main`. A draft pull
-request was opened against `main`. Merging, production migrations, production
-deployment and any spend remain separate approvals.
+- Repository: <https://github.com/transcenlutions25/transcenlutions> (public; unchanged visibility)
+- Branch: `feat/tay-consolidated-workspace`
+- Draft pull request: <https://github.com/transcenlutions25/transcenlutions/pull/80> (2 commits, 65 files, 0 deletions against `main`)
+- Commit recorded by the pull request: `3e5cf149519c772cd5d4185d375db3c0000ed17a`
+- Application commit below it: `4aef301e5f099c5796b94103c5bb620621f8f38b`
+
+`main` was not modified. Merging, production migrations, production deployment
+and any spend remain separate approvals.
+
+The HTTPS remote had no stored credential in this checkout, so the push used the
+existing SSH key (`git push git@github.com:transcenlutions25/transcenlutions.git
+feat/tay-consolidated-workspace`). The `origin` remote is still the HTTPS URL.
 
 Netlify deploys only its configured production branch (`main`); this repository
 has no branch-deploy rule, so pushing the feature branch does not release to
-production. Deploy-preview creation is a Netlify UI setting that could not be
-inspected from here — treat any generated preview URL as unverified.
+production. The checked-in workflows (`launch-gate.yml`, `security.yml`,
+`arcade-android.yml`) run checks only — none deploy — and `arcade-android.yml` is
+restricted to `main`. Deploy-preview creation is a Netlify UI setting that could
+not be inspected from here — treat any generated preview URL as unverified.
 
 No secrets, local databases, `.env` files, model weights, `node_modules` or
 build output were included. `git archive HEAD` was scanned with gitleaks before

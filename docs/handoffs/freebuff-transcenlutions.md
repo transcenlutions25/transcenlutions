@@ -118,8 +118,8 @@ preview client’s own overlay, not part of this app):
   `type="password"` ↔ `type="text"`, swaps the `Eye` / `EyeOff` icon and updates
   `aria-label` ("Show password" / "Hide password") and `aria-pressed`.
 - `type="button"` — toggling never submits the form, and the typed value is
-  preserved (verified: 27-character value unchanged across toggles, URL stayed
-  `/workspace`).
+  preserved (verified in the final build: a 23-character value unchanged across
+  two toggles, URL stayed `/workspace`).
 - The button is a real focusable control with a visible gold focus ring, so
   screen readers announce it as a labelled, pressed-state toggle.
 - Verified in the development build and again in the production build.
@@ -272,7 +272,7 @@ same time; both write to it. Stop the dev server before `npm run build`.
 | `npm run test:workspace` | pass (workspace, writing blocks, desktop bridge, social) |
 | `npm run test:security` | pass (payloads, approval forgery, prototype fields, edge coverage, signed bodies) |
 | `npm run security:dependencies` | production audit 0 affected; all-deps audit 7 affected via a disclosed build-only exception expiring 2026-10-20 |
-| `npm run security:secrets` | **could not run on macOS** — the script verifies the gitleaks tarball with GNU `sha256sum`, which macOS lacks. Worked around with gitleaks 8.30.1 (darwin_x64): 2 commits of history and the 342 files of this commit, **no leaks found**. A directory-mode scan reported 13 findings, all inside untracked build output (`.next/**`) and a vendored toolchain header — none in a tracked file |
+| `npm run security:secrets` | **could not run on macOS** — the script verifies the gitleaks tarball with GNU `sha256sum`, which macOS lacks. Worked around with gitleaks 8.30.1 (darwin_x64): the branch history and the 346 files of the final tree, **no leaks found**. A directory-mode scan reported 13 findings, all inside untracked build output (`.next/**`) and a vendored toolchain header — none in a tracked file |
 | `npm run build` | pass, exit 0; `/workspace` 12.5 kB route, 125 kB first load |
 | `npm run check:archil` | **expected failure**: `ARCHIL_API_KEY is not set`. Archil persistence is unwired and unverified (§9, §13) |
 

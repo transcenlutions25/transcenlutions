@@ -1,6 +1,6 @@
 /** Append-only audit trail for the Tay workspace. */
 import { getDatabase, type Database } from "./db";
-import { newId, now } from "./auth";
+import { newId, now } from "./accounts";
 import type { AuditEvent } from "./types";
 
 export function audit(

@@ -7,29 +7,14 @@
  * task runs, business records, and the vendored file-edit matcher.
  */
 import assert from "node:assert/strict";
-import { readFileSync, rmSync, mkdtempSync } from "node:fs";
+import { rmSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createRequire } from "node:module";
-
-const require = createRequire(import.meta.url);
-const ts = require("typescript");
-require.extensions[".ts"] = (module, filename) =>
-  module._compile(
-    ts.transpileModule(readFileSync(filename, "utf8"), {
-      compilerOptions: {
-        esModuleInterop: true,
-        module: ts.ModuleKind.CommonJS,
-        moduleResolution: ts.ModuleResolutionKind.NodeJs,
-        target: ts.ScriptTarget.ES2022,
-      },
-      fileName: filename,
-    }).outputText,
-    filename,
-  );
+import { requireSource as require } from "./tay-source-loader.mjs";
 
 const dataDir = mkdtempSync(join(tmpdir(), "tay-workspace-test-"));
 process.env.TAY_DATA_DIR = dataDir;
+process.env.TAY_OWNER_EMAIL = "owner@transcenlutions.test";
 process.env.TAY_MODEL_PROVIDER = "";
 delete process.env.TAY_OLLAMA_URL;
 delete process.env.TAY_MODEL_BASE_URL;
@@ -71,13 +56,13 @@ async function checkAsync(name, fn) {
 
 /* ------------------------------ identity ------------------------------ */
 
-const owner = accounts.bootstrapOwner(db, "owner@transcenlutions.test", "correct horse battery", "Founding Owner");
+const owner = accounts.provisionOwnerFromConsole(db, "correct horse battery", "Founding Owner");
 const member = accounts.createUser(db, "member@transcenlutions.test", "another long password", "Member User", "member");
 const stranger = accounts.createUser(db, "stranger@transcenlutions.test", "third long password", "Other User", "member");
 
 check("owner binding is immutable", () => {
   assert.equal(owner.isOwner, true);
-  assert.throws(() => accounts.bootstrapOwner(db, "second@example.com", "another password here", "Second"), /already exists/);
+  assert.throws(() => accounts.provisionOwnerFromConsole(db, "another password here", "Second"), /already exists/);
 });
 
 check("credential verification rejects bad passwords", () => {
@@ -378,7 +363,7 @@ check("a payment handoff only records a configured link", () => {
 
 /* ------------------------------- model -------------------------------- */
 
-check("no provider is reported as connected by default", async () => {
+await checkAsync("no provider is reported as connected by default", async () => {
   const status = await model.modelStatus(200);
   assert.equal(status.connected, false);
   assert.equal(status.provider, "none");
@@ -387,6 +372,7 @@ check("no provider is reported as connected by default", async () => {
 
 /* -------------------------------- done -------------------------------- */
 
+db.close();
 rmSync(dataDir, { recursive: true, force: true });
 
 if (failures.length > 0) {

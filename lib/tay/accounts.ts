@@ -3,15 +3,15 @@
  *
  * Identity is bound server-side to an immutable founding-owner record. Owner
  * authority is never inferred from a display name, email text, header, prompt
- * or client-supplied role: only the `users.is_owner` flag, set when the first
- * owner account is created (and only when it matches TAY_OWNER_EMAIL when that
- * variable is configured), can grant it.
+ * or client-supplied role. The protected operator console provisions the one
+ * owner record; later requests resolve its immutable ID from a valid session.
+ * Knowing the configured email is never permission to create that account.
  *
  * This module deliberately avoids `next/headers` so the whole flow can be tested
  * outside a request context; `auth.ts` adds the cookie-facing wrapper.
  */
 import { createHash, createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
-import { getDatabase, type Database } from "./db";
+import type { Database } from "./db";
 import { audit } from "./audit";
 import type { ProjectAccess, ProjectRecord, SessionIdentity, UserRecord, UserRole } from "./types";
 
@@ -107,42 +107,71 @@ export function ownerExists(db: Database): boolean {
   return (db.get<{ n: number }>("SELECT COUNT(*) AS n FROM users WHERE is_owner = 1")?.n ?? 0) > 0;
 }
 
+export class OwnerProvisioningError extends Error {}
+
 /**
- * Creates the founding owner. Only valid while no owner exists. The configured
- * TAY_OWNER_EMAIL, when present, must match exactly; this keeps the binding to
- * one verified address instead of "whoever signed up first" on a live host.
+ * Initial provisioning by the authorized server operator, never by a web
+ * request. Only scripts/provision-tay-owner.mjs calls this outside tests; this
+ * function is deliberately absent from the request-facing auth.ts exports.
+ *
+ * The console is the authorization boundary. TAY_OWNER_EMAIL identifies the
+ * intended account; it does not itself prove control of that email address.
+ * No existing user is promoted, replaced or reset, and no session is minted.
  */
-export function bootstrapOwner(db: Database, email: string, password: string, displayName: string): UserRecord {
-  if (ownerExists(db)) throw new Error("A founding owner already exists.");
-  const configured = process.env.TAY_OWNER_EMAIL?.trim().toLowerCase();
-  if (configured && configured !== email) {
-    throw new Error("The founding owner email does not match the configured owner identity.");
+export function provisionOwnerFromConsole(db: Database, password: string, displayName: string): UserRecord {
+  const email = normalizeEmail(process.env.TAY_OWNER_EMAIL);
+  if (!email) {
+    throw new OwnerProvisioningError("Set a valid TAY_OWNER_EMAIL in the protected server environment before provisioning.");
   }
-  if (!configured && process.env.NODE_ENV === "production") {
-    throw new Error("Set TAY_OWNER_EMAIL before creating the founding owner on a hosted deployment.");
+  if (!validatePassword(password)) {
+    throw new OwnerProvisioningError("The owner password must contain between 12 and 200 characters.");
   }
-  const { salt, hash } = hashPassword(password);
-  const user: UserRecord = {
-    id: newId("usr"),
-    email,
-    displayName: displayName.slice(0, 80),
-    role: "owner",
-    isOwner: true,
-    disabled: false,
-    createdAt: now(),
-  };
-  db.run(
-    "INSERT INTO users (id, email, display_name, role, is_owner, disabled, password_salt, password_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?)",
-    [user.id, user.email, user.displayName, user.role, 1, 0, salt, hash, user.createdAt],
-  );
-  audit(db, {
-    projectId: null,
-    actorId: user.id,
-    actorLabel: user.email,
-    kind: "owner_bootstrapped",
-    detail: { ownerBinding: configured ? "env_matched" : "local_first_owner" },
-  });
-  return user;
+  const name = displayName.trim();
+  if (name.length < 2 || name.length > 80 || /[\u0000-\u001f\u007f]/.test(name)) {
+    throw new OwnerProvisioningError("The owner display name must contain between 2 and 80 printable characters.");
+  }
+
+  // Serialize separate console processes as well as writes in this process.
+  // The owner row and its audit event either both commit or neither does.
+  db.run("BEGIN IMMEDIATE");
+  try {
+    if (ownerExists(db)) {
+      throw new OwnerProvisioningError("A founding owner already exists. Provisioning cannot change that account.");
+    }
+    if (getUserByEmail(db, email)) {
+      throw new OwnerProvisioningError("The configured email already has an account. Provisioning cannot promote or replace it.");
+    }
+    const { salt, hash } = hashPassword(password);
+    const user: UserRecord = {
+      id: newId("usr"),
+      email,
+      displayName: name,
+      role: "owner",
+      isOwner: true,
+      disabled: false,
+      createdAt: now(),
+    };
+    db.run(
+      "INSERT INTO users (id, email, display_name, role, is_owner, disabled, password_salt, password_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?)",
+      [user.id, user.email, user.displayName, user.role, 1, 0, salt, hash, user.createdAt],
+    );
+    audit(db, {
+      projectId: null,
+      actorId: user.id,
+      actorLabel: "Authorized server operator",
+      kind: "owner_provisioned",
+      detail: { ownerBinding: "operator_console", userId: user.id },
+    });
+    db.run("COMMIT");
+    return user;
+  } catch (error) {
+    try {
+      db.run("ROLLBACK");
+    } catch {
+      // Preserve the original failure if the connection itself has failed.
+    }
+    throw error;
+  }
 }
 
 export function createUser(db: Database, email: string, password: string, displayName: string, role: UserRole): UserRecord {

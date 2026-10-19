@@ -3,7 +3,26 @@
 Status: implemented and locally verified on 2026-10-19. Hosted deployment,
 multi-device sign-in and live commerce remain separate, unverified steps.
 
-This release consolidates the hosted Trancenlutions chat and the preserved
+## GitHub pickup corrections
+
+The follow-up to draft PR #80 preserves the password eye control and closes
+public first-owner creation. `POST /api/tay/bootstrap` now refuses all creation
+requests. Initial owner provisioning is an operator-only server-console step;
+matching an email address is never treated as proof of ownership. Existing
+accounts retain their IDs and credentials. Invitation acceptance now uses the
+password-manager `new-password` hint.
+
+The SQLite adapter is for a persistent Node server. Known serverless runtimes
+and Netlify builds reject it before creating any data directory. Storage-open
+failures render an unavailable screen; API requests return a safe HTTP 503.
+This is failure handling, not a working hosted database connection. No fallback
+to temporary or in-memory workspace storage is used. Full hosted operation
+still requires a verified durable database adapter and a reachable model.
+
+`npm run test:tay` includes the workspace, owner-provisioning, storage and
+password-control regressions, and is now part of the Launch gate.
+
+This release consolidates the hosted Transcenlutions chat and the preserved
 Tay Command workspace into one application at `/workspace`. Tay is the central
 assistant and orchestrator. One conversation surface owns most of the screen;
 the left navigation and the right preview panel are collapsible and resizable,
@@ -47,11 +66,11 @@ Upstream: <https://github.com/CodebuffAI/freebuff>, pinned commit
 - **Not reused:** the `@codebuff/sdk` (requires a Codebuff account, API key and
   hosted service), the vendored AI-SDK provider fork, and the model-specific
   agent prompts. Those cannot back an independent zero-cost application, and
-  the canonical Trancenlutions roster remains the authority for agent identity.
+  the canonical Transcenlutions roster remains the authority for agent identity.
 - **Design reference only:** Freebuff's propose-then-approve tools informed the
   approval queue shape. No code was copied from them.
 
-Trancenlutions' own recovered foundation is reused directly: the Agent
+Transcenlutions' own recovered foundation is reused directly: the Agent
 Foundation roster and action boundaries (`lib/agent-foundation.ts`,
 `docs/agent-authority-boundaries.md`), the governance term rules
 (`lib/governance.ts`) and the hardened request reader (`lib/request-security.ts`).
@@ -59,7 +78,8 @@ Foundation roster and action boundaries (`lib/agent-foundation.ts`,
 ## Architecture
 
 - `lib/tay/db.ts` — Node's built-in SQLite (`node:sqlite`), data in
-  `TAY_DATA_DIR` (default `.workspace-data`). No hosted database is required.
+  `TAY_DATA_DIR` (default `.workspace-data`) on a persistent Node server.
+  Serverless hosts are refused until a durable adapter is implemented.
 - `lib/tay/accounts.ts` — users, scrypt password hashes, sessions, immutable
   founding-owner binding, project access decisions.
 - `lib/tay/auth.ts` — HttpOnly cookie wrapper around `accounts.ts`.
@@ -83,8 +103,12 @@ Foundation roster and action boundaries (`lib/agent-foundation.ts`,
 
 ### Enforcement rules
 
-- Owner authority comes only from `users.is_owner`, set once during bootstrap.
-  On a hosted deployment `TAY_OWNER_EMAIL` must match that address.
+- Owner authority comes only from `users.is_owner`, set by the protected
+  operator-console provisioning command. It requires `TAY_OWNER_EMAIL`, creates
+  an immutable user ID, and never promotes or overwrites an existing account.
+  The email is a contact identifier, not identity proof. Operator access to
+  the server is the provisioning boundary. A transaction and a database unique
+  index permit only one founding owner; the public bootstrap route is disabled.
 - Every protected route resolves the signed-in user server-side. Project data is
   returned only to its owner, a recorded project member, or the founding owner.
 - New endpoints use `readJson`, which rejects cross-site origins, oversized
@@ -98,25 +122,38 @@ Foundation roster and action boundaries (`lib/agent-foundation.ts`,
 
 ```bash
 npm ci
+# In the same protected server-console session:
+export TAY_OWNER_EMAIL=you@example.com
+export TAY_OWNER_NAME="Founding owner"
+export TAY_SESSION_SECRET="$(openssl rand -hex 32)"
+# Set TAY_DATA_DIR to persistent storage for shared deployments.
+npm run provision:tay-owner        # hidden password entry; creates no session
 # optional, free: local model
 ollama serve                       # if not already running
 TAY_MODEL_PROVIDER=ollama TAY_MODEL=qwen2.5-coder:7b \
-TAY_OWNER_EMAIL=you@example.com \
-TAY_SESSION_SECRET="$(openssl rand -hex 32)" \
 npm run dev
 ```
 
-Open `http://localhost:3000/workspace`. With no owner, the page asks you to
-create the founding owner. Without a model provider, Tay still runs projects,
+Open `http://localhost:3000/workspace` and sign in with the provisioned account.
+Keep the same session secret across restarts. Without an owner, the page shows
+that setup is pending and provides no public account-creation form. Without a
+model provider, Tay still runs projects,
 plans, edits, approvals and task runs using its built-in structured writer.
+
+Only the founding owner or an explicitly authorized server operator should run
+provisioning. The command refuses a second owner and does not recover, rebind,
+or alter an existing account. It requires the normal installed project
+dependencies. For automation, `--password-stdin` accepts a protected pipe; do
+not put a password in command arguments, source files, or logs.
 
 ### Environment
 
 | Variable | Purpose |
 | --- | --- |
-| `TAY_DATA_DIR` | SQLite location. Keep out of source control. |
+| `TAY_DATA_DIR` | SQLite location on persistent local storage. Keep out of source control. A temporary serverless directory cannot supply durable storage. |
 | `TAY_SESSION_SECRET` | Hashes session tokens. Rotate to invalidate sessions. Required for any shared deployment. |
-| `TAY_OWNER_EMAIL` | Binds founding-owner creation to one verified address. Required in production. |
+| `TAY_OWNER_EMAIL` | Required contact identifier for protected console provisioning; does not verify an email address. |
+| `TAY_OWNER_NAME` | Optional display name for console provisioning; never grants authority. |
 | `TAY_PUBLIC_ORIGIN` | Canonical public origin (e.g. `https://tay.example.com`). When set, no Host or `X-Forwarded-*` header can change which origin is accepted. Required behind a proxy that rewrites the request host. |
 | `TAY_MODEL_PROVIDER` | `ollama` or `openai_compatible`. Unset means built-in drafts only. |
 | `TAY_MODEL` | Model name, e.g. `qwen2.5-coder:7b`. |
@@ -145,27 +182,30 @@ No value is exposed to the browser. `.env.example` contains empty templates.
 ```bash
 npm run typecheck
 npm run lint
-npm run test:tay       # 23 checks: identity, isolation, authority, approvals, flow, business
+npm run test:tay       # workspace + owner provisioning + storage + password control
 npm run smoke
 npm run test:workspace
 npm run build
 ```
 
-Request-level checks performed against the running app with a member session:
+Historical Freebuff request-level checks against its original local build:
 `GET /api/tay/projects` returned an empty list, the owner's project returned
 404, `GET /api/tay/admin` returned 403, and posting into the owner's project
-returned 404. A second bootstrap attempt returned 409.
+returned 404. Bootstrap now always refuses creation; see the pickup corrections.
 
-Origin checks against the running production build (pinned `TAY_PUBLIC_ORIGIN`):
+Historical Freebuff origin checks against its local production build (pinned `TAY_PUBLIC_ORIGIN`):
 same-origin sign-in 200, cross-origin sign-in 403, same-origin authenticated
 memory write 200, cross-origin authenticated write 403, forged
 `X-Forwarded-Host`/`X-Forwarded-Proto` 403, forged `Host` header 401 (no session
-for that host), and a second bootstrap 409.
+for that host). The historical second-bootstrap response was 409; the protected
+console flow replaces that public creation path.
 
 ## Known blockers and next steps
 
-1. **Hosted deployment is unverified.** Local Next.js and SQLite are proven; no
-   deployment target has been built or tested for this branch.
+1. **Hosted workspace remains unavailable.** PR #80 deployed to a Netlify preview
+   but `/workspace` returned 500. The follow-up handles unavailable storage;
+   it does not supply durable hosting. Exact original error details require
+   function logs.
 2. **No real payment collection.** Owner must configure Stripe and verify a
    test-mode purchase before any live offer is described as working.
 3. **No outbound email.** Invitation tokens are displayed once for manual
@@ -173,8 +213,8 @@ for that host), and a second bootstrap 409.
 4. **Voice is not connected.** Capability is listed as awaiting configuration.
 5. **Local model latency.** A full draft on this Mac takes about two minutes;
    streaming and progress tokens would improve perceived speed.
-6. **No self-serve password reset or email verification.** Owner bootstrap is
-   intentionally one-shot; account recovery is manual.
+6. **No self-serve password reset or email verification.** Initial owner
+   provisioning is operator-only; account recovery remains manual.
 7. **SQLite on serverless.** `node:sqlite` requires a persistent Node server or
    a mounted volume. Vercel/Netlify serverless functions will not persist it.
 8. **Rate limiting** for the new routes is not configured. The existing Netlify

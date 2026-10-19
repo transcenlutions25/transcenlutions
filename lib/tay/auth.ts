@@ -6,11 +6,36 @@ import type { SessionIdentity } from "./types";
 
 export const SESSION_COOKIE = "tay_session";
 
-export * from "./accounts";
+// Console-only owner provisioning is intentionally not exposed to routes.
+export {
+  AuthError,
+  authenticate,
+  countUsers,
+  createSession,
+  createUser,
+  getUserByEmail,
+  hashPassword,
+  loadProjectForUser,
+  newId,
+  normalizeEmail,
+  now,
+  ownerExists,
+  projectAccess,
+  publicUserProfile,
+  requireOwner,
+  revokeSession,
+  sessionIdentityFromToken,
+  signPayload,
+  tokenHash,
+  validatePassword,
+  verifyPassword,
+} from "./accounts";
+export type { ProjectRow } from "./accounts";
 
 export async function currentIdentity(): Promise<SessionIdentity | null> {
   const store = await cookies();
   const token = store.get(SESSION_COOKIE)?.value;
+  if (!token || token.length > 200) return null;
   return sessionIdentityFromToken(getDatabase(), token);
 }
 

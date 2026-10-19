@@ -2,10 +2,11 @@
  * Tay workspace persistence.
  *
  * Uses Node's built-in SQLite driver so the consolidated workspace needs no
- * native dependency and no hosted database to run. Data lives in a local file
- * outside source control (`TAY_DATA_DIR`, default `.workspace-data`).
+ * native dependency for a persistent Node server. Data lives in a local file
+ * outside source control (`TAY_DATA_DIR`, default `.workspace-data`). Serverless
+ * functions cannot use this adapter as shared, durable workspace storage.
  */
-import { DatabaseSync } from "node:sqlite";
+import type { DatabaseSync } from "node:sqlite";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 
@@ -209,6 +210,7 @@ CREATE INDEX IF NOT EXISTS idx_projects_owner ON projects (owner_id);
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages (conversation_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_approvals_project ON approvals (project_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_files_project ON project_files (project_id, path);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_single_owner ON users (is_owner) WHERE is_owner = 1;
 `;
 
 export interface Database {
@@ -218,7 +220,30 @@ export interface Database {
   close(): void;
 }
 
-let shared: { db: DatabaseSync; wrapper: Database } | null = null;
+/** Safe to show publicly; the underlying filesystem/runtime error stays private. */
+export class WorkspaceStorageError extends Error {
+  readonly status = 503;
+
+  constructor(cause?: unknown) {
+    super("Tay's workspace storage is unavailable. Please try again later.", { cause });
+    this.name = "WorkspaceStorageError";
+  }
+}
+
+let shared: Database | null = null;
+
+function assertPersistentRuntime(): void {
+  // The build flag survives Netlify's build-to-function environment boundary.
+  // Runtime signals also protect builds made outside the hosting service.
+  if (
+    process.env.TAY_SERVERLESS_BUILD === "1" ||
+    process.env.NETLIFY === "true" ||
+    Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME) ||
+    process.env.VERCEL === "1"
+  ) {
+    throw new WorkspaceStorageError();
+  }
+}
 
 function wrap(db: DatabaseSync): Database {
   return {
@@ -239,34 +264,40 @@ function wrap(db: DatabaseSync): Database {
 
 /** Opens the workspace database, creating the file and schema when needed. */
 export function openDatabase(file = path.join(DATA_DIR, "tay.sqlite")): Database {
-  mkdirSync(path.dirname(file), { recursive: true });
-  const db = new DatabaseSync(file);
-  db.exec("PRAGMA journal_mode = WAL;");
-  db.exec("PRAGMA foreign_keys = ON;");
-  db.exec(SCHEMA);
-  return wrap(db);
+  assertPersistentRuntime();
+  let db: DatabaseSync | undefined;
+  try {
+    // Load only when opening storage, so an unsupported runtime can render the
+    // unavailable state instead of failing while importing the sign-in page.
+    const { DatabaseSync: SqliteDatabase } = require("node:sqlite") as typeof import("node:sqlite");
+    mkdirSync(path.dirname(file), { recursive: true });
+    db = new SqliteDatabase(file);
+    db.exec("PRAGMA journal_mode = WAL;");
+    db.exec("PRAGMA foreign_keys = ON;");
+    db.exec(SCHEMA);
+    return wrap(db);
+  } catch (cause) {
+    try {
+      db?.close();
+    } catch {
+      // Preserve the original open/initialization failure.
+    }
+    throw new WorkspaceStorageError(cause);
+  }
 }
 
 /** Process-wide handle. Next.js may reload modules, so the handle is cached. */
 export function getDatabase(): Database {
+  assertPersistentRuntime();
   if (!shared) {
-    shared = { db: new DatabaseSync(filePath()), wrapper: null as unknown as Database };
-    const db = shared.db;
-    mkdirSync(DATA_DIR, { recursive: true });
-    db.exec("PRAGMA journal_mode = WAL;");
-    db.exec("PRAGMA foreign_keys = ON;");
-    db.exec(SCHEMA);
-    shared.wrapper = wrap(db);
+    // Cache only a completely initialized connection, never a failed attempt.
+    shared = openDatabase();
   }
-  return shared.wrapper;
-}
-
-function filePath() {
-  mkdirSync(DATA_DIR, { recursive: true });
-  return path.join(DATA_DIR, "tay.sqlite");
+  return shared;
 }
 
 /** Test hook: isolates any store that caches the connection. */
 export function resetDatabaseForTests() {
+  shared?.close();
   shared = null;
 }

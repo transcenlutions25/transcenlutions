@@ -1,5 +1,10 @@
 # Handoff: Freebuff-based Transcenlutions / Tay workspace
 
+> Historical Freebuff handoff. The [GitHub pickup review](tay-github-pickup.md)
+> supersedes the public owner-setup instructions and records the follow-up
+> password, owner-provisioning and storage-failure corrections. The original
+> local verification below does not establish hosted readiness.
+
 Branch: `feat/tay-consolidated-workspace`
 Repository: <https://github.com/transcenlutions25/transcenlutions> (public)
 Prepared: 2026-10-19; final verification run 2026-10-19 19:09–19:15 local time

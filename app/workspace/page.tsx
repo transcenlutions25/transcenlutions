@@ -3,11 +3,12 @@ import { TayAuth } from "../../components/tay/tay-auth";
 import { TayWorkspace } from "../../components/tay/tay-workspace";
 import type { ProjectSummary } from "../../components/tay/tay-types";
 import { currentIdentity, countUsers, ownerExists, projectAccess } from "../../lib/tay/auth";
-import { getDatabase } from "../../lib/tay/db";
+import { getDatabase, WorkspaceStorageError, type Database } from "../../lib/tay/db";
 import { listConversations, listProjectsForUser } from "../../lib/tay/projects";
 import { pendingApprovalCount } from "../../lib/tay/approvals";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export const metadata: Metadata = {
   title: "Tay workspace | Transcenlutions",
@@ -20,7 +21,24 @@ export const metadata: Metadata = {
  * visitor never receives project data or an owner interface.
  */
 export default async function WorkspacePage() {
-  const db = getDatabase();
+  let db: Database;
+  try {
+    db = getDatabase();
+  } catch (error) {
+    if (!(error instanceof WorkspaceStorageError)) throw error;
+    return (
+      <main className="tl-shell tl-auth">
+        <div className="tl-panel tl-panel-strong tl-auth-card">
+          <p className="tl-brand-mark">TRANSCENLUTIONS</p>
+          <h1 style={{ margin: "0.3rem 0 0.4rem", fontSize: "1.35rem" }}>Tay is temporarily unavailable</h1>
+          <p className="tl-small tl-muted" role="status">
+            Workspace storage needs attention before you can sign in or save work. Please try again later.
+          </p>
+          <a className="tl-button" href="/workspace">Try again</a>
+        </div>
+      </main>
+    );
+  }
   const identity = await currentIdentity();
 
   if (!identity) {

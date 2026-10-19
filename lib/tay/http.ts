@@ -1,6 +1,6 @@
 /** Shared HTTP boundary for the Tay workspace routes. */
 import { readJson as boundedReadJson, RequestError, requestError } from "../request-security";
-import { getDatabase } from "./db";
+import { getDatabase, WorkspaceStorageError } from "./db";
 import { AuthError, currentIdentity, loadProjectForUser } from "./auth";
 import type { ProjectRowInternal } from "./projects";
 import type { ProjectRecord, SessionIdentity, UserRecord } from "./types";
@@ -12,7 +12,7 @@ export function json(body: unknown, status = 200): Response {
 }
 
 export function fail(error: unknown): Response {
-  if (error instanceof RequestError || error instanceof AuthError) {
+  if (error instanceof RequestError || error instanceof AuthError || error instanceof WorkspaceStorageError) {
     return json({ ok: false, error: error.message }, error.status);
   }
   const message = error instanceof Error ? error.message : "Unexpected failure.";

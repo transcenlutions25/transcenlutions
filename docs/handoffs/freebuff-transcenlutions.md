@@ -9,7 +9,7 @@ email, publishing and voice remain unconfigured.
 
 | Pickup item | Value |
 | --- | --- |
-| Final commit | `3e5cf149519c772cd5d4185d375db3c0000ed17a` (branch head before this document's own commit; see §14) |
+| Final commit | Branch head of `feat/tay-consolidated-workspace`; the verified build is `3e5cf149519c772cd5d4185d375db3c0000ed17a` (see §14) |
 | Draft pull request | <https://github.com/transcenlutions25/transcenlutions/pull/80> |
 | Runs on | This Mac only — no verified hosted deployment |
 | Password toggle | Implemented and verified (HTTP + production build, mouse + keyboard) |
@@ -357,8 +357,9 @@ edge runtime.
 
 - Repository: <https://github.com/transcenlutions25/transcenlutions> (public; unchanged visibility)
 - Branch: `feat/tay-consolidated-workspace`
-- Draft pull request: <https://github.com/transcenlutions25/transcenlutions/pull/80> (2 commits, 65 files, 0 deletions against `main`)
-- Commit recorded by the pull request: `3e5cf149519c772cd5d4185d375db3c0000ed17a`
+- Draft pull request: <https://github.com/transcenlutions25/transcenlutions/pull/80> (65 files, 0 deletions against `main`)
+- Branch head at handoff: the commit that contains this document
+- Commit with the verified build: `3e5cf149519c772cd5d4185d375db3c0000ed17a`
 - Application commit below it: `4aef301e5f099c5796b94103c5bb620621f8f38b`
 
 `main` was not modified. Merging, production migrations, production deployment

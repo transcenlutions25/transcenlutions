@@ -1,10 +1,19 @@
 # Handoff: Freebuff-based Transcenlutions / Tay workspace
 
 Branch: `feat/tay-consolidated-workspace`
-Prepared: 2026-10-19
-Status: implemented and verified locally (Next.js production build). **No hosted
-URL has been verified for this branch.** Payments, email, publishing and voice
-remain unconfigured.
+Repository: <https://github.com/transcenlutions25/transcenlutions> (public)
+Prepared: 2026-10-19; final verification run 2026-10-19 19:09–19:15 local time
+Status: implemented, committed and verified locally against `next build` +
+`next start`. **No hosted URL has been verified for this branch.** Payments,
+email, publishing and voice remain unconfigured.
+
+| Pickup item | Value |
+| --- | --- |
+| Final commit | `HEAD` of `feat/tay-consolidated-workspace` (see §14 for the SHA recorded at handoff) |
+| Draft pull request | Opened against `main`; link recorded in §14 |
+| Runs on | This Mac only — no verified hosted deployment |
+| Password toggle | Implemented and verified (HTTP + production build, mouse + keyboard) |
+| Build / tests | `next build` exit 0; typecheck, lint, `test:tay`, `test:workspace`, `test:security`, `security:dependencies` all pass |
 
 This document is the pickup point for the work that consolidates the hosted
 Transcenlutions chat and the preserved Tay Command workspace into one
@@ -78,8 +87,13 @@ directory, in Chromium, with test accounts only.
 | Same-origin vs cross-origin writes | Working | See §6 |
 | Owner vs member permissions | Working | See §7 |
 
-Screenshots (test data only):
+Screenshots (test data only; the small “Freebuff” pill at the top left is the
+preview client’s own overlay, not part of this app):
 
+- `screenshots/12-final-signin-mobile.png` — final build, 390 px sign-in, password hidden, eye button inside the field
+- `screenshots/13-final-mobile-applied.png` — final build, 390 px, decided task and artifact
+- `screenshots/14-final-brand-drawer-320.png` — final build, 320 px drawer, wordmark on one line
+- `screenshots/15-final-desktop-applied.png` — final build, 1280 px, `Applied` chip, `Waiting on you (0)`, all five steps done
 - `screenshots/04-signin-password-hidden-mobile.png` — password hidden, eye button
 - `screenshots/05-brand-mobile-drawer.png` — wordmark in the 390 px drawer
 - `screenshots/06-production-workspace-empty.png` — production build, owner signed in
@@ -257,8 +271,32 @@ same time; both write to it. Stop the dev server before `npm run build`.
 | `npm run test:workspace` | pass (workspace, writing blocks, desktop bridge, social) |
 | `npm run test:security` | pass (payloads, approval forgery, prototype fields, edge coverage, signed bodies) |
 | `npm run security:dependencies` | production audit 0 affected; all-deps audit 7 affected via a disclosed build-only exception expiring 2026-10-20 |
-| `npm run security:secrets` | **could not run on macOS** — the script verifies the gitleaks tarball with GNU `sha256sum`, which macOS lacks. Worked around by running gitleaks 8.30.1 (darwin_x64) directly: git history and 342 working files, **no leaks found** |
+| `npm run security:secrets` | **could not run on macOS** — the script verifies the gitleaks tarball with GNU `sha256sum`, which macOS lacks. Worked around with gitleaks 8.30.1 (darwin_x64): 2 commits of history and the 342 files of this commit, **no leaks found**. A directory-mode scan reported 13 findings, all inside untracked build output (`.next/**`) and a vendored toolchain header — none in a tracked file |
 | `npm run build` | pass, exit 0; `/workspace` 12.5 kB route, 125 kB first load |
+| `npm run check:archil` | **expected failure**: `ARCHIL_API_KEY is not set`. Archil persistence is unwired and unverified (§9, §13) |
+
+The table above was re-run after the last source changes; the flow below was
+exercised again against that exact build on `http://localhost:3210` with a
+throw-away `TAY_DATA_DIR=/tmp/tay-final`:
+
+| Flow check | Result |
+| --- | --- |
+| Founding owner bootstrap | 200, owner created |
+| Second bootstrap (arbitrary new account) | 409, no owner path |
+| Sign-in sets session cookie | 200, `HttpOnly` + `Secure` present |
+| Turn → pending approval | `apr_…` `pending`; task `awaiting_approval`, `review:awaiting_approval`, `save:pending` |
+| Approve | decision response `status: applied`, `applied: true`, `error: null` |
+| Project bundle immediately after | approval `applied` + `appliedAt`, task `completed`, steps `done,done,done,done,done`, file + artifact `briefs/launch-final-verification.md`, result message recorded |
+| Browser UI after decision | chip `Applied`, `Waiting on you (0)`, plan `5/5 complete`, every step `Done`, no “Needs your decision” anywhere |
+| Same-origin sign-in / memory write | 200 / 200 |
+| Cross-origin sign-in / memory write | 403 / 403 |
+| Forged `X-Forwarded-Host` + `X-Forwarded-Proto` with forged `Origin` | 403, nothing written |
+| Forged `Host` header | 401 (no session for that host) |
+| Owner invites member → member accepts | 200 → 200 (`role: admin`, `isOwner: false`, only delegated scopes) |
+| Member `GET /api/tay/admin` | 403 |
+| Member `GET /api/tay/projects` | `[]`; owner project `404`; write into it `404` |
+| Password toggle | hidden by default (`type=password`), 44×44 button inside the field, click and Space both toggle to `type=text` and back, value preserved (23 chars), icon `eye`↔`eye-off`, `aria-label` and `aria-pressed` follow, URL stays `/workspace`, never submits |
+| Brand at 240 / 320 / 390 px | one line, `scrollWidth == clientWidth`, no overlap with the close button; 11.2 px font at 240 px, 17 px above ~320 px |
 
 Not run in this environment: `npm run test:apex` / `test:workflows` (they need
 `python3`; the Xcode command-line tools are not installed here) and the Netlify
@@ -286,7 +324,7 @@ edge runtime.
    `.gitignore`, `package.json` and the lockfile. Reverting the branch removes
    the workspace without touching user data.
 
-## 13. Remaining blockers (exact)
+## 13. Remaining blockers and unfinished work (exact)
 
 1. **No hosted deployment verified.** The app runs locally on this Mac only.
    There is no verified hosted URL for this branch.
@@ -304,3 +342,29 @@ edge runtime.
    only). The equivalent gitleaks scan passed when run directly.
 8. **Rate limiting** is not configured for the `/api/tay/**` routes.
 9. **No password reset or email verification.** Account recovery is manual.
+10. **Deployment adapter is not configured for this app.** `netlify.toml` runs
+    `next build` and publishes `.next` with no Next.js runtime plugin listed, and
+    `node:sqlite` cannot persist on serverless functions. Any hosting decision
+    (Node server + persistent volume, or a database swap) is a separate,
+    unapproved decision.
+11. **Not exercised here:** `npm run test:apex`, `npm run test:workflows`
+    (need `python3`), `npm run smoke`, the Netlify edge runtime, hosted auth, and
+    any multi-device or multi-user session behaviour.
+12. **Gallery:** `screenshots/01`–`03` were captured before the last UI changes
+    and are kept only as history; `screenshots/12`–`15` are the current build.
+
+## 14. GitHub handoff
+
+The changes were committed on the isolated branch and pushed to
+`transcenlutions25/transcenlutions` without touching `main`. A draft pull
+request was opened against `main`. Merging, production migrations, production
+deployment and any spend remain separate approvals.
+
+Netlify deploys only its configured production branch (`main`); this repository
+has no branch-deploy rule, so pushing the feature branch does not release to
+production. Deploy-preview creation is a Netlify UI setting that could not be
+inspected from here — treat any generated preview URL as unverified.
+
+No secrets, local databases, `.env` files, model weights, `node_modules` or
+build output were included. `git archive HEAD` was scanned with gitleaks before
+pushing: 342 files, no findings.

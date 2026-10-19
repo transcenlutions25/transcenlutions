@@ -4,8 +4,9 @@ Branch: `feat/tay-consolidated-workspace`
 Repository: <https://github.com/transcenlutions25/transcenlutions> (public)
 Prepared: 2026-10-19; final verification run 2026-10-19 19:09–19:15 local time
 Status: implemented, committed and verified locally against `next build` +
-`next start`. **No hosted URL has been verified for this branch.** Payments,
-email, publishing and voice remain unconfigured.
+`next start`. A Netlify deploy preview was created for this branch, but
+`/workspace` returned **HTTP 500** there (see §14), so **no working hosted URL
+exists yet**. Payments, email, publishing and voice remain unconfigured.
 
 | Pickup item | Value |
 | --- | --- |
@@ -326,8 +327,9 @@ edge runtime.
 
 ## 13. Remaining blockers and unfinished work (exact)
 
-1. **No hosted deployment verified.** The app runs locally on this Mac only.
-   There is no verified hosted URL for this branch.
+1. **No working hosted deployment.** The app runs locally on this Mac. A Netlify
+   deploy preview was built for this branch, but `/workspace` answers 500 there
+   (§14); the cause (serverless + `node:sqlite`) is suspected, not confirmed.
 2. **Payments are unconfigured.** `TAY_STRIPE_PAYMENT_LINK` is empty; invoice
    status stays `awaiting_configuration`; no charge is possible.
 3. **No outbound email.** Invitation tokens are shown once for manual delivery.
@@ -342,11 +344,12 @@ edge runtime.
    only). The equivalent gitleaks scan passed when run directly.
 8. **Rate limiting** is not configured for the `/api/tay/**` routes.
 9. **No password reset or email verification.** Account recovery is manual.
-10. **Deployment adapter is not configured for this app.** `netlify.toml` runs
-    `next build` and publishes `.next` with no Next.js runtime plugin listed, and
-    `node:sqlite` cannot persist on serverless functions. Any hosting decision
-    (Node server + persistent volume, or a database swap) is a separate,
-    unapproved decision.
+10. **Deployment target does not fit the app yet.** `netlify.toml` runs
+    `next build` and publishes `.next` with no declared Next.js runtime plugin;
+    the branch preview builds but its `/workspace` route returns 500, and
+    `node:sqlite` needs a long-running Node process or a mounted volume rather
+    than a serverless function. Hosting here needs a separate, approved
+    decision: a Node server with persistent storage, or a database swap.
 11. **Not exercised here:** `npm run test:apex`, `npm run test:workflows`
     (need `python3`), `npm run smoke`, the Netlify edge runtime, hosted auth, and
     any multi-device or multi-user session behaviour.
@@ -369,12 +372,29 @@ The HTTPS remote had no stored credential in this checkout, so the push used the
 existing SSH key (`git push git@github.com:transcenlutions25/transcenlutions.git
 feat/tay-consolidated-workspace`). The `origin` remote is still the HTTPS URL.
 
-Netlify deploys only its configured production branch (`main`); this repository
-has no branch-deploy rule, so pushing the feature branch does not release to
-production. The checked-in workflows (`launch-gate.yml`, `security.yml`,
-`arcade-android.yml`) run checks only — none deploy — and `arcade-android.yml` is
-restricted to `main`. Deploy-preview creation is a Netlify UI setting that could
-not be inspected from here — treat any generated preview URL as unverified.
+Pushing the branch did **not** release anything to production: Netlify builds
+production from `main` only, and `main` was not touched. The checked-in
+workflows (`launch-gate.yml`, `security.yml`, `arcade-android.yml`) run checks
+only — none deploy — and `arcade-android.yml` is restricted to `main`.
+
+However, the Netlify GitHub app **is** connected to project `tay-command` and did
+create a deploy preview for this branch. Checked on 2026-10-19:
+
+| Preview request | Result |
+| --- | --- |
+| `https://6ad6a4dd133e4f3f729748c6--tay-command.netlify.app/` | 200 |
+| `https://6ad6a4dd133e4f3f729748c6--tay-command.netlify.app/workspace` | **500**, Next error digest `4080282439` |
+| `https://tay-command.netlify.app/workspace` (production, `main`) | 404 — branch not released |
+
+The preview failure is consistent with the serverless runtime rejecting
+`node:sqlite` and the local SQLite data directory, but that diagnosis is
+unconfirmed: deployment logs are behind the Netlify dashboard. Do not describe
+this preview as working.
+
+GitHub checks on this commit all passed: `verify`, `desktop-runtime`,
+`Security regression`, `Secret scan`, `Dependency vulnerabilities` and
+`Deployed edge security` (launch-gate and security workflows), plus Netlify's
+redirect-rule check.
 
 No secrets, local databases, `.env` files, model weights, `node_modules` or
 build output were included. `git archive HEAD` was scanned with gitleaks before

@@ -52,6 +52,8 @@ jobs:
         env:
           GITHUB_SHA: ${{ github.sha }}
         run: python3 android/tay/verify-artifacts.py
+      - name: Include the official APK signing tool for owner-side final signing
+        run: cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" android/tay/build/release-artifacts/apksigner.jar
       - name: Upload Tay cloud Android builds
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:

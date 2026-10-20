@@ -4,9 +4,12 @@ Source: [draft PR #80](https://github.com/transcenlutions25/transcenlutions/pull
 `feat/tay-consolidated-workspace` at
 `6ee2d34c2d90ff48eae74b2f9eb8040a07f7775c`.
 
-Follow-up branch: `fix/tay-handoff-auth-storage`, intended as a draft PR against
-the Freebuff feature branch. This is a source repair and review; it is not a
-production release or a private-Mac installation.
+Follow-up branch: `fix/tay-handoff-auth-storage`, published as
+[draft PR #81](https://github.com/transcenlutions25/transcenlutions/pull/81)
+against `main`. It includes the original Freebuff handoff and these corrections
+so the existing Netlify preview workflow can assess the complete proposal.
+This is a source repair and review; it is not a production release or a
+private-Mac installation.
 
 ## What the pickup changes
 
@@ -93,13 +96,24 @@ Mac screenshots remain Freebuff's evidence.
 | Apex Python suite | 2 pass |
 | Security request/authority regression | Pass |
 | Production dependency audit | Zero affected runtime packages |
+| Development dependency audit | Blocked after the existing exception expired on 2026-10-20 |
 | Secret scan | No findings in 120 reachable commits or tracked working files |
 
-The existing development-only dependency exception remains unchanged: seven
-dependency-chain entries trace to the build-tool advisory recorded in
-`security/dependency-exception.json`, expiring 2026-10-20T00:00:00Z. The security
-gate passed under that existing exception; this patch does not resolve or
-extend it.
+The first local security run passed while the existing development-only braces
+exception was still valid. GitHub correctly rejected that exception after
+2026-10-20T00:00:00Z. The full audit reports seven affected entries in the
+development dependency chains; the production dependency audit is clean.
+As checked on 2026-10-20, [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
+lists braces through 3.0.3 as affected and provides no patched version.
+
+Dependency replacement was investigated but did not establish a supported
+narrow fix. Removing the unused Tailwind compiler would still leave the Next
+ESLint plugin's fast-glob/micromatch/braces chain. A candidate glob substitution
+changed which project directories lint rules inspect, including symlink and
+brace-pattern cases, so it was rejected. The existing dependency versions,
+audit gate and exception expiry are retained. No compatibility adapter or
+exception extension is included. A reviewed build-tool dependency migration
+remains required before merge.
 
 Seven additional HTTP scenarios passed against the actual production build on
 temporary loopback servers: pending initial setup; denied correct-email public
@@ -120,14 +134,17 @@ still be assessed on the exact published commit before any promotion.
 
 ## Remaining release dependencies
 
-1. Verify the original hosted exception from the function log if an exact root
+1. Resolve the affected development dependency chains through a supported,
+   reviewed build-tool migration and pass the dependency audit. The expired
+   exception remains a visible failing gate.
+2. Verify the original hosted exception from the function log if an exact root
    cause is required.
-2. Implement and verify shared durable storage on the intended host, with
+3. Implement and verify shared durable storage on the intended host, with
    isolated preview credentials and reviewed migrations. No service is
    provisioned or connected by this patch.
-3. Verify authenticated multi-user behavior, persistence across instances and
+4. Verify authenticated multi-user behavior, persistence across instances and
    deployed edge protections on the exact preview commit before promotion.
-4. Resolve a reachable authorized model endpoint for hosted model-written
+5. Resolve a reachable authorized model endpoint for hosted model-written
    drafting. This patch does not activate a paid provider.
 
 Rollback reference is the source SHA above. Prefer a targeted correction:

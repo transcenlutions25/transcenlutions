@@ -4,8 +4,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -52,12 +51,9 @@ public final class MainActivity extends Activity {
 
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private final Handler main = new Handler(Looper.getMainLooper());
-    private SharedPreferences settings;
     private SecureSessionStore sessions;
     private TayApiClient api;
-    private String baseUrl = "";
     private String currentProjectId;
-    private String currentConversationId;
     private Object predictiveBackCallback;
 
     @Override
@@ -66,14 +62,10 @@ public final class MainActivity extends Activity {
         getWindow().setStatusBarColor(BG);
         getWindow().setNavigationBarColor(BG);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) registerPredictiveBack();
-        settings = getSharedPreferences("tay_settings", Context.MODE_PRIVATE);
         sessions = new SecureSessionStore(this);
-        baseUrl = settings.getString("base_url", BuildConfig.DEFAULT_BASE_URL).trim();
-        if (baseUrl.isEmpty()) showServerSetup(null);
-        else {
-            api = new TayApiClient(baseUrl, sessions);
-            checkSession();
-        }
+        api = new TayApiClient(sessions);
+        if (sessions.load() == null) showSignIn(null);
+        else checkSession();
     }
 
     @Override
@@ -87,16 +79,13 @@ public final class MainActivity extends Activity {
     private void registerPredictiveBack() {
         OnBackInvokedCallback callback = this::handleBack;
         predictiveBackCallback = callback;
-        getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
-                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
-                callback);
+        getOnBackInvokedDispatcher().registerOnBackInvokedCallback(OnBackInvokedDispatcher.PRIORITY_DEFAULT, callback);
     }
 
     @TargetApi(33)
     private void unregisterPredictiveBack() {
         if (predictiveBackCallback instanceof OnBackInvokedCallback) {
-            getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(
-                    (OnBackInvokedCallback) predictiveBackCallback);
+            getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback((OnBackInvokedCallback) predictiveBackCallback);
         }
         predictiveBackCallback = null;
     }
@@ -110,7 +99,6 @@ public final class MainActivity extends Activity {
     private void handleBack() {
         if (currentProjectId != null) {
             currentProjectId = null;
-            currentConversationId = null;
             loadProjects();
         } else {
             finish();
@@ -118,63 +106,30 @@ public final class MainActivity extends Activity {
     }
 
     private void checkSession() {
-        showLoading("Connecting to Tay…");
+        showLoading("Connecting to Tay Cloud…");
         runApi(api::session, response -> {
             if (response.status == 200 && response.body.optJSONObject("session") != null) loadProjects();
-            else if (response.status == 503) showUnavailable(response.errorMessage("Tay storage is unavailable on this server."));
-            else showSignIn(response.status == 200 ? null : response.errorMessage("Sign in to continue."));
-        });
-    }
-
-    private void showServerSetup(String error) {
-        currentProjectId = null;
-        currentConversationId = null;
-        LinearLayout content = page();
-        content.addView(brand());
-        content.addView(title("Connect Tay"));
-        content.addView(body("Enter the HTTPS address of the Transcenlutions Tay server. The app uses the same account and project APIs as the web workspace."));
-        if (error != null) content.addView(errorText(error));
-
-        EditText server = input("https://tay.example.com");
-        server.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-        server.setSingleLine(true);
-        server.setText(baseUrl);
-        content.addView(label("Server URL"));
-        content.addView(server);
-        content.addView(space(14));
-        Button connect = primaryButton("Continue");
-        connect.setOnClickListener(view -> {
-            String normalized = normalizeServer(server.getText().toString());
-            if (normalized == null) {
-                toast(BuildConfig.DEBUG
-                        ? "Enter an HTTPS URL, or HTTP for local debug use."
-                        : "Enter an HTTPS server URL.");
-                return;
+            else {
+                sessions.clear();
+                showSignIn(response.errorMessage("Sign in to continue."));
             }
-            if (!normalized.equals(baseUrl)) sessions.clear();
-            baseUrl = normalized;
-            settings.edit().putString("base_url", baseUrl).apply();
-            api = new TayApiClient(baseUrl, sessions);
-            checkSession();
         });
-        content.addView(connect);
-        setContentView(scroll(content));
     }
 
     private void showSignIn(String error) {
         currentProjectId = null;
-        currentConversationId = null;
         LinearLayout content = page();
         content.addView(brand());
         content.addView(title("Sign in to Tay"));
-        content.addView(body("Use the same Transcenlutions account as the web workspace."));
-        content.addView(small("Server: " + baseUrl));
-        if (error != null) content.addView(errorText(error));
+        content.addView(body("Tay Cloud works anywhere over HTTPS. Your Mac does not need to be running."));
+        content.addView(goldText("Shared Transcenlutions cloud account"));
+        if (error != null && !error.isEmpty()) content.addView(errorText(error));
 
         EditText email = input("you@example.com");
         email.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         email.setSingleLine(true);
         email.setAutofillHints(View.AUTOFILL_HINT_EMAIL_ADDRESS);
+        email.setText("transcenlutions@gmail.com");
         content.addView(label("Email"));
         content.addView(email);
         content.addView(space(12));
@@ -205,13 +160,8 @@ public final class MainActivity extends Activity {
         });
 
         FrameLayout passwordFrame = new FrameLayout(this);
-        passwordFrame.addView(password, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                dp(56)));
-        passwordFrame.addView(eye, new FrameLayout.LayoutParams(
-                dp(54),
-                dp(54),
-                Gravity.END | Gravity.CENTER_VERTICAL));
+        passwordFrame.addView(password, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
+        passwordFrame.addView(eye, new FrameLayout.LayoutParams(dp(54), dp(54), Gravity.END | Gravity.CENTER_VERTICAL));
         content.addView(label("Password"));
         content.addView(passwordFrame);
         content.addView(space(16));
@@ -220,16 +170,15 @@ public final class MainActivity extends Activity {
         View.OnClickListener submit = view -> {
             String emailValue = email.getText().toString().trim();
             String passwordValue = password.getText().toString();
-            if (emailValue.isEmpty() || passwordValue.length() < 12) {
-                toast("Enter a valid email and a password of at least 12 characters.");
+            if (emailValue.isEmpty() || passwordValue.length() < 6) {
+                toast("Enter your email and password.");
                 return;
             }
             signIn.setEnabled(false);
             signIn.setText(R.string.signing_in);
             runApi(() -> api.signIn(emailValue, passwordValue), response -> {
                 password.setText("");
-                if (response.status == 200 && response.body.optBoolean("ok")) loadProjects();
-                else if (response.status == 503) showUnavailable(response.errorMessage("Tay storage is unavailable on this server."));
+                if (response.status == 200 && !response.body.optString("access_token", "").isEmpty()) checkSession();
                 else showSignIn(response.errorMessage("Sign-in failed."));
             });
         };
@@ -242,23 +191,28 @@ public final class MainActivity extends Activity {
             return false;
         });
         content.addView(signIn);
-        content.addView(space(8));
-        Button change = secondaryButton("Change server");
-        change.setOnClickListener(view -> showServerSetup(null));
-        content.addView(change);
+        content.addView(space(10));
+        Button web = secondaryButton("Open Tay on the web");
+        web.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(BuildConfig.TAY_WEB_URL))));
+        content.addView(web);
+        content.addView(space(12));
+        content.addView(small("Session tokens are encrypted by Android Keystore. Your password is never saved by this app."));
         setContentView(scroll(content));
-        email.requestFocus();
+        password.requestFocus();
     }
 
     private void loadProjects() {
         currentProjectId = null;
-        currentConversationId = null;
-        showLoading("Loading projects…");
+        showLoading("Loading cloud projects…");
         runApi(api::projects, response -> {
-            if (response.status == 401) showSignIn("Your session expired. Sign in again.");
-            else if (response.status == 503) showUnavailable(response.errorMessage("Tay storage is unavailable on this server."));
-            else if (response.status == 200 && response.body.optBoolean("ok")) renderProjects(response.body.optJSONArray("projects"));
-            else showUnavailable(response.errorMessage("Projects could not be loaded."));
+            if (response.status == 401) {
+                sessions.clear();
+                showSignIn("Your session expired. Sign in again.");
+            } else if (response.status == 200 && response.body.optBoolean("ok")) {
+                renderProjects(response.body.optJSONArray("projects"));
+            } else {
+                showUnavailable(response.errorMessage("Projects could not be loaded."), this::loadProjects);
+            }
         });
     }
 
@@ -270,13 +224,10 @@ public final class MainActivity extends Activity {
         TextView heading = title("Projects");
         header.addView(heading, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         Button logout = compactButton("Sign out");
-        logout.setOnClickListener(view -> runApi(api::signOut, response -> {
-            sessions.clear();
-            showSignIn(null);
-        }));
+        logout.setOnClickListener(view -> confirmSignOut());
         header.addView(logout);
         content.addView(header);
-        content.addView(small("Native Tay · " + baseUrl));
+        content.addView(goldText("Tay Cloud · Connected"));
         content.addView(space(12));
 
         Button create = primaryButton("New project");
@@ -285,13 +236,12 @@ public final class MainActivity extends Activity {
         content.addView(space(14));
 
         if (projects == null || projects.length() == 0) {
-            content.addView(body("No projects yet. Create one to begin a Tay conversation."));
+            content.addView(body("No projects yet. Create one to begin a cloud-synchronized Tay conversation."));
         } else {
             for (int index = 0; index < projects.length(); index++) {
                 JSONObject project = projects.optJSONObject(index);
                 if (project == null) continue;
                 String id = project.optString("id");
-                String conversationId = project.optString("conversationId", "");
                 String name = project.optString("name", "Untitled project");
                 String summary = project.optString("summary", "");
                 int approvals = project.optInt("pendingApprovals", 0);
@@ -302,16 +252,34 @@ public final class MainActivity extends Activity {
                 card.addView(cardTitle(name));
                 if (!summary.isEmpty()) card.addView(small(summary));
                 if (approvals > 0) card.addView(goldText(approvals + " approval" + (approvals == 1 ? "" : "s") + " pending"));
-                card.setOnClickListener(view -> openProject(id, conversationId));
+                card.setOnClickListener(view -> openProject(id));
                 content.addView(card);
                 content.addView(space(10));
             }
         }
-        Button change = secondaryButton("Server settings");
-        change.setOnClickListener(view -> showServerSetup(null));
+        Button web = secondaryButton("Open shared web workspace");
+        web.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(BuildConfig.TAY_WEB_URL))));
         content.addView(space(10));
-        content.addView(change);
+        content.addView(web);
         setContentView(scroll(content));
+    }
+
+    private void confirmSignOut() {
+        new AlertDialog.Builder(this)
+                .setTitle("Sign out everywhere?")
+                .setMessage("This revokes the current cloud session before removing it from this phone.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Sign out", (dialog, which) -> {
+                    showLoading("Revoking session…");
+                    runApi(api::signOut, response -> {
+                        if (response.status == 200 && response.body.optBoolean("revoked")) {
+                            sessions.clear();
+                            showSignIn(null);
+                        } else {
+                            showUnavailable(response.errorMessage("Session revocation could not be confirmed. Your local session was kept."), this::loadProjects);
+                        }
+                    });
+                }).show();
     }
 
     private void showCreateProjectDialog() {
@@ -322,6 +290,7 @@ public final class MainActivity extends Activity {
         name.setSingleLine(true);
         EditText summary = input("What are you building?");
         summary.setSingleLine(false);
+        summary.setMinLines(2);
         form.addView(name);
         form.addView(space(10));
         form.addView(summary);
@@ -338,41 +307,43 @@ public final class MainActivity extends Activity {
                 return;
             }
             dialog.dismiss();
-            showLoading("Creating project…");
+            showLoading("Creating cloud project…");
             runApi(() -> api.createProject(projectName, summary.getText().toString().trim()), response -> {
                 if (response.status == 200 && response.body.optBoolean("ok")) {
-                    JSONObject project = response.body.optJSONObject("project");
-                    openProject(project == null ? "" : project.optString("id"), response.body.optString("conversationId", ""));
-                } else if (response.status == 401) showSignIn("Your session expired. Sign in again.");
-                else showUnavailable(response.errorMessage("The project could not be created."));
+                    openProject(response.body.optString("projectId", ""));
+                } else if (response.status == 401) {
+                    sessions.clear();
+                    showSignIn("Your session expired. Sign in again.");
+                } else {
+                    showUnavailable(response.errorMessage("The project could not be created."), this::loadProjects);
+                }
             });
         }));
         dialog.show();
     }
 
-    private void openProject(String projectId, String conversationId) {
+    private void openProject(String projectId) {
         if (projectId == null || projectId.isEmpty()) {
             toast("This project is missing an identifier.");
             loadProjects();
             return;
         }
         showLoading("Opening project…");
-        runApi(() -> api.project(projectId, conversationId), response -> {
-            if (response.status == 401) showSignIn("Your session expired. Sign in again.");
-            else if (response.status == 503) showUnavailable(response.errorMessage("Tay storage is unavailable on this server."));
-            else if (response.status == 200 && response.body.optBoolean("ok")) renderProject(response.body);
-            else {
-                toast(response.errorMessage("The project could not be opened."));
-                loadProjects();
+        runApi(() -> api.project(projectId), response -> {
+            if (response.status == 401) {
+                sessions.clear();
+                showSignIn("Your session expired. Sign in again.");
+            } else if (response.status == 200 && response.body.optBoolean("ok")) {
+                renderProject(response.body);
+            } else {
+                showUnavailable(response.errorMessage("The project could not be opened."), this::loadProjects);
             }
         });
     }
 
     private void renderProject(JSONObject state) {
         JSONObject project = state.optJSONObject("project");
-        JSONObject conversation = state.optJSONObject("conversation");
         currentProjectId = project == null ? null : project.optString("id", null);
-        currentConversationId = conversation == null ? null : conversation.optString("id", null);
         String projectName = project == null ? "Project" : project.optString("name", "Project");
 
         LinearLayout root = new LinearLayout(this);
@@ -389,7 +360,7 @@ public final class MainActivity extends Activity {
         heading.setGravity(Gravity.CENTER);
         header.addView(heading, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         Button refresh = compactButton("Refresh");
-        refresh.setOnClickListener(view -> openProject(currentProjectId, currentConversationId));
+        refresh.setOnClickListener(view -> openProject(currentProjectId));
         header.addView(refresh);
         root.addView(header);
 
@@ -402,8 +373,9 @@ public final class MainActivity extends Activity {
             }
         }
         if (pending > 0) {
-            TextView notice = goldText(pending + " approval" + (pending == 1 ? "" : "s") + " pending. Decisions remain in the web workspace during this alpha.");
+            TextView notice = goldText(pending + " approval" + (pending == 1 ? "" : "s") + " pending. Open the shared web workspace to review full previews.");
             notice.setPadding(dp(10), dp(10), dp(10), dp(10));
+            notice.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(BuildConfig.TAY_WEB_URL))));
             root.addView(notice);
         }
 
@@ -441,16 +413,18 @@ public final class MainActivity extends Activity {
         composer.addView(send, sendParams);
         send.setOnClickListener(view -> {
             String text = message.getText().toString().trim();
-            if (text.isEmpty() || currentProjectId == null || currentConversationId == null) return;
+            if (text.isEmpty() || currentProjectId == null) return;
             message.setEnabled(false);
             send.setEnabled(false);
             send.setText("…");
-            runApi(() -> api.sendMessage(currentProjectId, currentConversationId, text), response -> {
-                if (response.status == 200 && response.body.optBoolean("ok")) openProject(currentProjectId, currentConversationId);
-                else if (response.status == 401) showSignIn("Your session expired. Sign in again.");
-                else {
-                    toast(response.errorMessage("Tay could not send that message."));
-                    openProject(currentProjectId, currentConversationId);
+            runApi(() -> api.sendMessage(currentProjectId, text), response -> {
+                if (response.status == 200 && response.body.optBoolean("ok")) {
+                    openProject(currentProjectId);
+                } else if (response.status == 401) {
+                    sessions.clear();
+                    showSignIn("Your session expired. Sign in again.");
+                } else {
+                    showUnavailable(response.errorMessage("Tay could not send that message."), () -> openProject(currentProjectId));
                 }
             });
         });
@@ -459,21 +433,19 @@ public final class MainActivity extends Activity {
         message.requestFocus();
     }
 
-    private void showUnavailable(String detail) {
-        currentProjectId = null;
-        currentConversationId = null;
+    private void showUnavailable(String detail, Runnable retryAction) {
         LinearLayout content = page();
         content.addView(brand());
-        content.addView(title("Tay is temporarily unavailable"));
+        content.addView(title("Tay Cloud is unavailable"));
         content.addView(body(detail));
-        content.addView(body("The Android client will use the same account and project data as web and desktop once this server has durable workspace storage. It will not create a separate unsynchronized account."));
+        content.addView(body("Your Mac is not required. This message means the cloud request could not be completed."));
         Button retry = primaryButton("Try again");
-        retry.setOnClickListener(view -> checkSession());
+        retry.setOnClickListener(view -> retryAction.run());
         content.addView(retry);
         content.addView(space(8));
-        Button change = secondaryButton("Change server");
-        change.setOnClickListener(view -> showServerSetup(null));
-        content.addView(change);
+        Button web = secondaryButton("Open web workspace");
+        web.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(BuildConfig.TAY_WEB_URL))));
+        content.addView(web);
         setContentView(scroll(content));
     }
 
@@ -492,25 +464,9 @@ public final class MainActivity extends Activity {
                 TayApiClient.ApiResponse response = operation.call();
                 main.post(() -> result.accept(response));
             } catch (Exception error) {
-                main.post(() -> showUnavailable("Could not reach the configured Tay server. Check the address and your connection."));
+                main.post(() -> showUnavailable("Could not reach Tay Cloud. Check your internet connection and try again.", this::checkSession));
             }
         });
-    }
-
-    private String normalizeServer(String value) {
-        String candidate = value == null ? "" : value.trim();
-        while (candidate.endsWith("/")) candidate = candidate.substring(0, candidate.length() - 1);
-        try {
-            Uri uri = Uri.parse(candidate);
-            String scheme = uri.getScheme();
-            String host = uri.getHost();
-            if (host == null || host.trim().isEmpty() || uri.getUserInfo() != null || uri.getQuery() != null || uri.getFragment() != null) return null;
-            if ("https".equalsIgnoreCase(scheme)) return uri.buildUpon().path("").build().toString().replaceAll("/$", "");
-            if (BuildConfig.DEBUG && "http".equalsIgnoreCase(scheme)) return uri.buildUpon().path("").build().toString().replaceAll("/$", "");
-            return null;
-        } catch (Exception error) {
-            return null;
-        }
     }
 
     private ScrollView scroll(LinearLayout content) {
@@ -626,9 +582,7 @@ public final class MainActivity extends Activity {
 
     private Button primaryButton(String value) {
         Button button = button(value);
-        GradientDrawable background = new GradientDrawable(
-                GradientDrawable.Orientation.LEFT_RIGHT,
-                new int[]{BLUE, PURPLE});
+        GradientDrawable background = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{BLUE, PURPLE});
         background.setCornerRadius(dp(14));
         button.setBackground(background);
         return button;
@@ -675,9 +629,7 @@ public final class MainActivity extends Activity {
         background.setCornerRadius(dp(16));
         background.setStroke(dp(1), user ? Color.rgb(86, 112, 245) : Color.rgb(72, 61, 92));
         bubble.setBackground(background);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(user ? dp(38) : 0, 0, user ? 0 : dp(38), 0);
         bubble.setLayoutParams(params);
         return bubble;

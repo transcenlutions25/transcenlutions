@@ -8,7 +8,8 @@ import shutil
 import zipfile
 
 ROOT = Path(__file__).resolve().parent
-APK = ROOT / "app/build/outputs/apk/debug/app-debug.apk"
+DEBUG_APK = ROOT / "app/build/outputs/apk/debug/app-debug.apk"
+RELEASE_APK = ROOT / "app/build/outputs/apk/release/app-release-unsigned.apk"
 AAB = ROOT / "app/build/outputs/bundle/release/app-release.aab"
 OUTPUT = ROOT / "build/release-artifacts"
 
@@ -34,9 +35,10 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-require_file(APK)
-require_file(AAB)
-require_zip_entries(APK, ("AndroidManifest.xml", "classes.dex", "resources.arsc"))
+for path in (DEBUG_APK, RELEASE_APK, AAB):
+    require_file(path)
+require_zip_entries(DEBUG_APK, ("AndroidManifest.xml", "classes.dex", "resources.arsc"))
+require_zip_entries(RELEASE_APK, ("AndroidManifest.xml", "classes.dex", "resources.arsc"))
 require_zip_entries(AAB, ("base/manifest/AndroidManifest.xml", "base/dex/classes.dex"))
 
 OUTPUT.mkdir(parents=True, exist_ok=True)
@@ -44,14 +46,16 @@ for child in OUTPUT.iterdir():
     if child.is_file():
         child.unlink()
 
-apk_out = OUTPUT / "Tay-Android-debug.apk"
-aab_out = OUTPUT / "Tay-Android-unsigned.aab"
-shutil.copy2(APK, apk_out)
+debug_out = OUTPUT / "Tay-Cloud-Android-debug.apk"
+release_out = OUTPUT / "Tay-Cloud-Android-unsigned.apk"
+aab_out = OUTPUT / "Tay-Cloud-Android-unsigned.aab"
+shutil.copy2(DEBUG_APK, debug_out)
+shutil.copy2(RELEASE_APK, release_out)
 shutil.copy2(AAB, aab_out)
 
 checksums = OUTPUT / "SHA256SUMS"
 checksums.write_text(
-    f"{sha256(apk_out)}  {apk_out.name}\n{sha256(aab_out)}  {aab_out.name}\n",
+    "".join(f"{sha256(path)}  {path.name}\n" for path in (debug_out, release_out, aab_out)),
     encoding="utf-8",
 )
 metadata = OUTPUT / "BUILD-METADATA.txt"
@@ -61,12 +65,15 @@ metadata.write_text(
             f"commit={os.environ.get('GITHUB_SHA', 'local')}",
             "applicationId=com.transcenlutions.tay",
             "debugApplicationId=com.transcenlutions.tay.debug",
-            "versionName=0.1.0-alpha",
-            "versionCode=1",
-            "releaseSigning=unsigned",
+            "versionName=0.3.0-alpha",
+            "versionCode=3",
+            "backend=https://efmbtmlfqeiaczcqovkb.supabase.co/functions/v1/tay-api",
+            "web=https://efmbtmlfqeiaczcqovkb.supabase.co/functions/v1/tay-web",
+            "cleartextTraffic=false",
+            "releaseSigning=unsigned-owner-handoff",
             "",
         ]
     ),
     encoding="utf-8",
 )
-print(f"Verified {apk_out} and {aab_out}")
+print(f"Verified {debug_out}, {release_out}, and {aab_out}")

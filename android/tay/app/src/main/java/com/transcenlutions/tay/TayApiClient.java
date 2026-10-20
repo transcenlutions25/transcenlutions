@@ -1,7 +1,5 @@
 package com.transcenlutions.tay;
 
-import android.net.Uri;
-
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -9,8 +7,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 
 final class TayApiClient {
     static final class ApiResponse {
@@ -24,75 +20,110 @@ final class TayApiClient {
 
         String errorMessage(String fallback) {
             String value = body.optString("error", "").trim();
+            if (value.isEmpty()) value = body.optString("message", "").trim();
             return value.isEmpty() ? fallback : value;
         }
     }
 
-    private final String baseUrl;
     private final SecureSessionStore sessions;
 
-    TayApiClient(String baseUrl, SecureSessionStore sessions) {
-        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+    TayApiClient(SecureSessionStore sessions) {
         this.sessions = sessions;
-    }
-
-    ApiResponse session() throws Exception {
-        return request("GET", "/api/tay/session", null, 30_000);
     }
 
     ApiResponse signIn(String email, String password) throws Exception {
         JSONObject body = new JSONObject();
         body.put("email", email);
         body.put("password", password);
-        return request("POST", "/api/tay/session", body, 30_000);
+        ApiResponse response = authRequest("/auth/v1/token?grant_type=password", body);
+        if (response.status == 200) saveTokens(response.body);
+        return response;
+    }
+
+    ApiResponse session() throws Exception {
+        return apiRequest("GET", "/session", null, true);
     }
 
     ApiResponse signOut() throws Exception {
-        return request("DELETE", "/api/tay/session", null, 30_000);
+        return apiRequest("DELETE", "/session", null, true);
     }
 
     ApiResponse projects() throws Exception {
-        return request("GET", "/api/tay/projects", null, 30_000);
+        return apiRequest("GET", "/projects", null, true);
     }
 
     ApiResponse createProject(String name, String summary) throws Exception {
         JSONObject body = new JSONObject();
         body.put("name", name);
         body.put("summary", summary);
-        return request("POST", "/api/tay/projects", body, 30_000);
+        return apiRequest("POST", "/projects", body, true);
     }
 
-    ApiResponse project(String projectId, String conversationId) throws Exception {
-        String path = "/api/tay/projects/" + Uri.encode(projectId);
-        if (conversationId != null && !conversationId.isEmpty()) {
-            path += "?conversationId=" + Uri.encode(conversationId);
-        }
-        return request("GET", path, null, 30_000);
+    ApiResponse project(String projectId) throws Exception {
+        return apiRequest("GET", "/projects/" + projectId, null, true);
     }
 
-    ApiResponse sendMessage(String projectId, String conversationId, String text) throws Exception {
+    ApiResponse sendMessage(String projectId, String text) throws Exception {
         JSONObject body = new JSONObject();
-        body.put("conversationId", conversationId);
         body.put("text", text);
-        body.put("agentId", "tay");
-        return request("POST", "/api/tay/projects/" + Uri.encode(projectId) + "/messages", body, 210_000);
+        return apiRequest("POST", "/projects/" + projectId + "/messages", body, true);
     }
 
-    private ApiResponse request(String method, String path, JSONObject payload, int readTimeout) throws Exception {
-        HttpURLConnection connection = (HttpURLConnection) new URL(baseUrl + path).openConnection();
+    private ApiResponse apiRequest(String method, String path, JSONObject body, boolean allowRefresh) throws Exception {
+        SecureSessionStore.Tokens tokens = sessions.load();
+        if (tokens == null) return error(401, "Sign in to continue.");
+        if (allowRefresh && tokens.expiresAt > 0 && tokens.expiresAt <= (System.currentTimeMillis() / 1000L) + 45L) {
+            ApiResponse refreshed = refresh(tokens.refreshToken);
+            if (refreshed.status != 200) return refreshed;
+            tokens = sessions.load();
+            if (tokens == null) return error(401, "Your session expired. Sign in again.");
+        }
+        ApiResponse response = request(method, BuildConfig.TAY_API_BASE + path, body, tokens.accessToken);
+        if (response.status == 401 && allowRefresh) {
+            ApiResponse refreshed = refresh(tokens.refreshToken);
+            if (refreshed.status == 200) return apiRequest(method, path, body, false);
+        }
+        return response;
+    }
+
+    private ApiResponse refresh(String refreshToken) throws Exception {
+        JSONObject body = new JSONObject();
+        body.put("refresh_token", refreshToken);
+        ApiResponse response = authRequest("/auth/v1/token?grant_type=refresh_token", body);
+        if (response.status == 200) saveTokens(response.body);
+        else sessions.clear();
+        return response;
+    }
+
+    private ApiResponse authRequest(String path, JSONObject body) throws Exception {
+        return request("POST", BuildConfig.SUPABASE_URL + path, body, null);
+    }
+
+    private void saveTokens(JSONObject body) {
+        String access = body.optString("access_token", "");
+        String refresh = body.optString("refresh_token", "");
+        long expiresAt = body.optLong("expires_at", 0L);
+        if (expiresAt <= 0L) expiresAt = (System.currentTimeMillis() / 1000L) + body.optLong("expires_in", 3600L);
+        if (!access.isEmpty() && !refresh.isEmpty()) {
+            sessions.save(new SecureSessionStore.Tokens(access, refresh, expiresAt));
+        }
+    }
+
+    private ApiResponse request(String method, String url, JSONObject payload, String accessToken) throws Exception {
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setRequestMethod(method);
-        connection.setConnectTimeout(15_000);
-        connection.setReadTimeout(readTimeout);
+        connection.setConnectTimeout(20_000);
+        connection.setReadTimeout(210_000);
         connection.setInstanceFollowRedirects(false);
         connection.setUseCaches(false);
         connection.setRequestProperty("Accept", "application/json");
         connection.setRequestProperty("Cache-Control", "no-store");
-        connection.setRequestProperty("User-Agent", "Transcenlutions-Tay-Android/0.1");
-        String cookie = sessions.loadCookie();
-        if (cookie != null) connection.setRequestProperty("Cookie", cookie);
+        connection.setRequestProperty("User-Agent", "Transcenlutions-Tay-Android/0.3");
+        connection.setRequestProperty("apikey", BuildConfig.SUPABASE_PUBLISHABLE_KEY);
+        if (accessToken != null) connection.setRequestProperty("Authorization", "Bearer " + accessToken);
 
-        if (payload != null) {
-            byte[] bytes = payload.toString().getBytes(StandardCharsets.UTF_8);
+        if (payload != null || "POST".equals(method)) {
+            byte[] bytes = (payload == null ? "{}" : payload.toString()).getBytes(StandardCharsets.UTF_8);
             connection.setDoOutput(true);
             connection.setFixedLengthStreamingMode(bytes.length);
             connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
@@ -100,7 +131,6 @@ final class TayApiClient {
         }
 
         int status = connection.getResponseCode();
-        captureSessionCookie(connection.getHeaderFields());
         InputStream stream = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
         String text = stream == null ? "" : readBounded(stream, 2_000_000);
         connection.disconnect();
@@ -111,29 +141,20 @@ final class TayApiClient {
         } catch (Exception invalidJson) {
             body = new JSONObject();
             body.put("ok", false);
-            body.put("error", "The Tay server returned an invalid response.");
+            body.put("error", "Tay Cloud returned an invalid response.");
         }
-        if (status == 401) sessions.clear();
         if (status >= 300 && status < 400) {
             body.put("ok", false);
-            body.put("error", "The Tay server redirected unexpectedly. Check the configured server URL.");
+            body.put("error", "Tay Cloud redirected unexpectedly.");
         }
         return new ApiResponse(status, body);
     }
 
-    private void captureSessionCookie(Map<String, List<String>> headers) {
-        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-            if (entry.getKey() == null || !"set-cookie".equalsIgnoreCase(entry.getKey())) continue;
-            for (String header : entry.getValue()) {
-                if (header == null) continue;
-                int start = header.indexOf("tay_session=");
-                if (start < 0) continue;
-                int end = header.indexOf(';', start);
-                String pair = (end < 0 ? header.substring(start) : header.substring(start, end)).trim();
-                if ("tay_session=".equals(pair)) sessions.clear();
-                else sessions.saveCookie(pair);
-            }
-        }
+    private static ApiResponse error(int status, String message) throws Exception {
+        JSONObject body = new JSONObject();
+        body.put("ok", false);
+        body.put("error", message);
+        return new ApiResponse(status, body);
     }
 
     private static String readBounded(InputStream stream, int maxBytes) throws Exception {
@@ -142,7 +163,7 @@ final class TayApiClient {
             int total = 0;
             for (int read; (read = input.read(buffer)) != -1; ) {
                 total += read;
-                if (total > maxBytes) throw new IllegalStateException("The Tay server response is too large.");
+                if (total > maxBytes) throw new IllegalStateException("The Tay Cloud response is too large.");
                 output.write(buffer, 0, read);
             }
             return output.toString(StandardCharsets.UTF_8.name());

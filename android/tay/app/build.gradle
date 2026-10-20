@@ -11,10 +11,12 @@ android {
         applicationId 'com.transcenlutions.tay'
         minSdk 26
         targetSdk 36
-        versionCode 1
-        versionName '0.1.0-alpha'
-        buildConfigField 'String', 'DEFAULT_BASE_URL', '""'
-        manifestPlaceholders = [usesCleartextTraffic: 'false']
+        versionCode 3
+        versionName '0.3.0-alpha'
+        buildConfigField 'String', 'SUPABASE_URL', '"https://efmbtmlfqeiaczcqovkb.supabase.co"'
+        buildConfigField 'String', 'SUPABASE_PUBLISHABLE_KEY', '"sb_publishable_A13pR37f9Rg_I2xb-S4LDw_ncmiXqci"'
+        buildConfigField 'String', 'TAY_API_BASE', '"https://efmbtmlfqeiaczcqovkb.supabase.co/functions/v1/tay-api"'
+        buildConfigField 'String', 'TAY_WEB_URL', '"https://efmbtmlfqeiaczcqovkb.supabase.co/functions/v1/tay-web"'
     }
 
     buildFeatures {
@@ -25,12 +27,11 @@ android {
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix '-debug'
-            manifestPlaceholders = [usesCleartextTraffic: 'true']
         }
         release {
             debuggable false
             minifyEnabled false
-            manifestPlaceholders = [usesCleartextTraffic: 'false']
+            // Deliberately unsigned in CI. The owner signs the verified output.
         }
     }
 

@@ -1,18 +1,16 @@
-name: Tay Android build
+name: Tay Android cloud build
 
 on:
   push:
     branches: [main]
     paths:
       - 'android/tay/**'
-      - 'app/api/tay/**'
-      - 'lib/tay/**'
+      - 'supabase/**'
       - '.github/workflows/tay-android.yml'
   pull_request:
     paths:
       - 'android/tay/**'
-      - 'app/api/tay/**'
-      - 'lib/tay/**'
+      - 'supabase/**'
       - '.github/workflows/tay-android.yml'
   workflow_dispatch:
 
@@ -20,12 +18,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: tay-android-${{ github.ref }}
+  group: tay-android-cloud-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
-    name: Build native Tay Android alpha
+    name: Build native cloud-connected Tay Android
     if: github.event.repository.private == false
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -48,14 +46,16 @@ jobs:
           cache-disabled: true
           dependency-graph: disabled
           build-scan-publish: false
-      - name: Lint and build debug APK and unsigned release bundle
-        run: gradle -p android/tay --no-daemon --no-build-cache --console=plain :app:lint :app:assembleDebug :app:bundleRelease
+      - name: Lint and build debug APK, unsigned release APK and AAB
+        run: gradle -p android/tay --no-daemon --no-build-cache --console=plain :app:lint :app:assembleDebug :app:assembleRelease :app:bundleRelease
       - name: Verify Android outputs and calculate checksums
+        env:
+          GITHUB_SHA: ${{ github.sha }}
         run: python3 android/tay/verify-artifacts.py
-      - name: Upload Tay Android builds
+      - name: Upload Tay cloud Android builds
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: tay-android-${{ github.sha }}
+          name: tay-cloud-android-${{ github.sha }}
           path: |
             android/tay/build/release-artifacts/
             android/tay/app/build/reports/lint-results-*.html

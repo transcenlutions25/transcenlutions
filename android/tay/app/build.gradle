@@ -1,0 +1,47 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.transcenlutions.tay'
+    compileSdk 36
+    buildToolsVersion '35.0.0'
+
+    defaultConfig {
+        applicationId 'com.transcenlutions.tay'
+        minSdk 26
+        targetSdk 36
+        versionCode 1
+        versionName '0.1.0-alpha'
+        buildConfigField 'String', 'DEFAULT_BASE_URL', '""'
+        manifestPlaceholders = [usesCleartextTraffic: 'false']
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-debug'
+            manifestPlaceholders = [usesCleartextTraffic: 'true']
+        }
+        release {
+            debuggable false
+            minifyEnabled false
+            manifestPlaceholders = [usesCleartextTraffic: 'false']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        abortOnError true
+        checkReleaseBuilds true
+        textReport true
+    }
+}

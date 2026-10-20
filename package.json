@@ -14,6 +14,7 @@
     "test:identity": "tsc lib/platform-identity.ts scripts/check-platform-identity.ts --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .identity-test && node .identity-test/scripts/check-platform-identity.js && node -e \"require('fs').rmSync('.identity-test',{recursive:true,force:true})\"",
     "test:social": "tsc lib/request-security.ts lib/social-publisher/types.ts lib/social-publisher/config.ts lib/social-publisher/validate.ts scripts/check-social-publisher.ts --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .social-test && node .social-test/scripts/check-social-publisher.js && node -e \"require('fs').rmSync('.social-test',{recursive:true,force:true})\"",
     "test:workspace": "node scripts/check-workspace.mjs && node scripts/check-writing-blocks.mjs && node scripts/check-desktop-bridge.mjs && npm run test:social",
+    "test:platform-sync": "node scripts/check-platform-sync.mjs",
     "test:tay": "node scripts/test-tay-workspace.mjs && npm run test:tay-owner && npm run test:tay-storage && npm run test:tay-password",
     "test:tay-owner": "node --test scripts/test-tay-owner-provisioning.mjs",
     "test:tay-storage": "node scripts/test-tay-storage.mjs",

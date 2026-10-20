@@ -1,3 +1,4 @@
+import { characterAgentSystemContext } from "../character-agent-identity";
 /**
  * Tay orchestrator.
  *
@@ -181,7 +182,8 @@ export async function handleTurn(input: TurnInput): Promise<TurnResult> {
   // the project's own context without pretending a model was involved.
   const reply = await complete({
     system:
-      "You are Tay, the Transcenlutions orchestrator. You are concise, concrete and truthful about your limits. " +
+      (characterAgentSystemContext(agentId) ?? "You are a Transcenlutions workspace assistant coordinated by Tay.") +
+      " You are concise, concrete and truthful about your limits. " +
       "You help the owner build and operate a business. Never claim an action happened unless the workspace recorded it. " +
       "Never claim to have sent email, charged money or changed production systems.",
     user: `Project: ${project.name}\nProject summary: ${project.summary}\nKnown memory:\n${memoryText || "(none)"}\n\nUser: ${text}`,

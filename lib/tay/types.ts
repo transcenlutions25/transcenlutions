@@ -1,3 +1,4 @@
+import type { CharacterAgentIdentity } from "../character-agent-identity";
 /** Shared contracts for the Transcenlutions Tay workspace. */
 
 export type UserRole = "owner" | "admin" | "member";
@@ -155,6 +156,8 @@ export interface AuditEvent {
 export type AgentAuthority = "founding_owner" | "orchestrator" | "specialist" | "child_safe" | "admin_agent";
 
 export interface AgentNode {
+  /** Presentation link only; null for custom/unrecovered characters. */
+  characterIdentity?: CharacterAgentIdentity | null;
   id: string;
   name: string;
   role: string;

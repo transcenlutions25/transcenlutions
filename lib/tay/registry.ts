@@ -1,3 +1,4 @@
+import { getCharacterAgentIdentity } from "../character-agent-identity";
 /**
  * Server-authoritative agent roster, skill tree and authority tree.
  *
@@ -173,7 +174,10 @@ export function listAgents(): AgentNode[] {
     picture: row.picture,
     voice: row.voice,
   }));
-  return [...canonicalAgents, ...custom];
+  return [...canonicalAgents, ...custom].map((agent) => ({
+    ...agent,
+    characterIdentity: agent.source === "canon" ? getCharacterAgentIdentity(agent.id) : null,
+  }));
 }
 
 export function findAgent(agentId: string): AgentNode | null {

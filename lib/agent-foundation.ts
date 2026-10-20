@@ -1,3 +1,4 @@
+import { getCharacterAgentIdentity, type CharacterAgentIdentity } from "./character-agent-identity";
 /** Agent Foundation v1: shared runtime for chat and voice channels. */
 export type AgentId = "tay" | "dawn" | "kj" | "rory";
 export type Channel = "chat" | "voice";
@@ -31,6 +32,8 @@ export interface AgentDefinition {
   role: string;
   authority: Authority;
   constitution: AgentConstitution;
+  /** Stable presentation identity; does not grant authority. */
+  characterIdentity?: CharacterAgentIdentity | null;
   allowedDelegates: readonly AgentId[];
   allowedActions: readonly AgentAction[];
 }
@@ -62,7 +65,7 @@ const approvalActions = new Set<AgentAction>([
 export const agentRegistry: Record<AgentId, AgentDefinition> = {
   tay: {
     id: "tay",
-    name: "Tay",
+    name: "Tay", characterIdentity: getCharacterAgentIdentity("tay"),
     role: "Executive orchestrator and primary relationship agent",
     authority: "orchestrator",
     constitution,
@@ -87,7 +90,7 @@ export const agentRegistry: Record<AgentId, AgentDefinition> = {
   },
   dawn: {
     id: "dawn",
-    name: "Dawn",
+    name: "Dawn", characterIdentity: getCharacterAgentIdentity("dawn"),
     role: "Creator, marketing, and audience growth specialist",
     authority: "specialist",
     constitution,
@@ -95,12 +98,12 @@ export const agentRegistry: Record<AgentId, AgentDefinition> = {
     allowedActions: ["read_context", "plan", "draft_content", "prepare_offer", "recommend_follow_up"],
   },
   kj: {
-    id: "kj", name: "KJ", role: "Forge Master · Head of Ascended Forge", authority: "specialist",
+    id: "kj", name: "KJ", characterIdentity: getCharacterAgentIdentity("kj"), role: "Forge Master · Head of Ascended Forge", authority: "specialist",
     constitution, allowedDelegates: [], allowedActions: ["read_context", "plan", "draft_content"],
   },
   rory: {
     id: "rory",
-    name: "Rory",
+    name: "Rory", characterIdentity: getCharacterAgentIdentity("rory"),
     role: "Child-safe learning and family-side guide",
     authority: "child_safe",
     constitution,

@@ -19,8 +19,22 @@ final class TayApiClient {
         }
 
         String errorMessage(String fallback) {
+            String code = body.optString("code", "").trim();
             String value = body.optString("error", "").trim();
             if (value.isEmpty()) value = body.optString("message", "").trim();
+            if (value.isEmpty()) value = body.optString("msg", "").trim();
+            if (value.isEmpty()) value = body.optString("error_description", "").trim();
+
+            String normalized = (code + " " + value).toLowerCase();
+            if (normalized.contains("invalid_credentials") || normalized.contains("invalid login credentials")) {
+                return "Incorrect email or password.";
+            }
+            if (normalized.contains("email_not_confirmed") || normalized.contains("email not confirmed")) {
+                return "Confirm your email before signing in.";
+            }
+            if (normalized.contains("rate") && normalized.contains("limit")) {
+                return "Too many sign-in attempts. Try again shortly.";
+            }
             return value.isEmpty() ? fallback : value;
         }
     }

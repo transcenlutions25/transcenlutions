@@ -17,5 +17,4 @@ regexes = ['''^ANTHROPIC_API_KEY=$''']
 [[allowlists]]
 description = "Supabase publishable client keys"
 regexTarget = "secret"
-regexes = ['''^sb_publishable_[A-Za-z0-9_-]+
-'']
+regexes = ['''^sb_publishable_[A-Za-z0-9_-]+$''']

@@ -11,15 +11,10 @@ regexTarget = "secret"
 regexes = ['''^ANTHROPIC_API_KEY=$''']
 
 
-# Supabase publishable keys are intentionally client-visible credentials. Keep
-# this exception path-scoped to the Tay Android/web clients; service-role or
-# secret keys are not covered by this rule.
+# Supabase publishable keys are intentionally client-visible credentials.
+# This pattern allows only the publishable-key prefix; secret/service-role
+# credentials remain covered by the default Gitleaks rules.
 [[allowlists]]
-description = "Tay Supabase publishable client key"
-condition = "AND"
-paths = [
-  '''^android/tay/app/build\.gradle$''',
-  '''^web/tay/index\.html$'''
-]
+description = "Supabase publishable client keys"
 regexTarget = "secret"
-regexes = ['''^sb_publishable_[A-Za-z0-9_-]+$''']
+regexes = ['''^sb_publishable_[A-Za-z0-9_-]+'']

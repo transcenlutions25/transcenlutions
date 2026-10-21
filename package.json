@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit",
     "test:identity": "tsc lib/platform-identity.ts scripts/check-platform-identity.ts --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .identity-test && node .identity-test/scripts/check-platform-identity.js && node -e \"require('fs').rmSync('.identity-test',{recursive:true,force:true})\"",
     "test:social": "tsc lib/request-security.ts lib/social-publisher/types.ts lib/social-publisher/config.ts lib/social-publisher/validate.ts scripts/check-social-publisher.ts --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .social-test && node .social-test/scripts/check-social-publisher.js && node -e \"require('fs').rmSync('.social-test',{recursive:true,force:true})\"",
-    "test:workspace": "node scripts/check-workspace.mjs && node scripts/check-writing-blocks.mjs && node scripts/check-desktop-bridge.mjs && npm run test:social",
+    "test:workspace": "node scripts/check-workspace.mjs && node scripts/check-writing-blocks.mjs && node scripts/check-desktop-bridge.mjs && npm run test:social && npm run test:browser",
     "test:apex": "node --test scripts/test-apex-provider-probe.cjs products/funnel-checklist/test.cjs lib/test-apex-payments.cjs lib/test-apex-public-checkout.cjs lib/test-apex-workflows.cjs lib/test-apex-browser.cjs products/funnel-checklist/test-ui.cjs",
     "test:workflows": "npm run test:apex && python3 -m unittest discover -s tools/apex-flow -p \"test_*.py\" && python3 -m unittest discover -s integrations/tay-desktop/tests -v && npm run smoke",
     "probe:apex-providers": "node scripts/apex-provider-probe.cjs",
@@ -22,7 +22,8 @@
     "build:arcade": "node products/arcade/build-offline.mjs",
     "security:dependencies": "node scripts/security-dependencies.mjs",
     "security:secrets": "bash scripts/security-secrets.sh",
-    "security": "npm run test:security && npm run security:dependencies && npm run security:secrets"
+    "security": "npm run test:security && npm run security:dependencies && npm run security:secrets",
+    "test:browser": "tsc lib/browser-operator.ts scripts/check-browser-operator.ts --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .browser-test && node .browser-test/scripts/check-browser-operator.js && node -e \"require('fs').rmSync('.browser-test',{recursive:true,force:true})\""
   },
   "dependencies": {
     "clsx": "^2.1.1",

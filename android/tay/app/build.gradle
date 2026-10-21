@@ -11,12 +11,12 @@ android {
         applicationId 'com.transcenlutions.tay'
         minSdk 26
         targetSdk 36
-        versionCode 3
-        versionName '0.3.0-alpha'
+        versionCode 4
+        versionName '0.3.1-alpha'
         buildConfigField 'String', 'SUPABASE_URL', '"https://efmbtmlfqeiaczcqovkb.supabase.co"'
         buildConfigField 'String', 'SUPABASE_PUBLISHABLE_KEY', '"sb_publishable_A13pR37f9Rg_I2xb-S4LDw_ncmiXqci"'
         buildConfigField 'String', 'TAY_API_BASE', '"https://efmbtmlfqeiaczcqovkb.supabase.co/functions/v1/tay-api"'
-        buildConfigField 'String', 'TAY_WEB_URL', '"https://efmbtmlfqeiaczcqovkb.supabase.co/functions/v1/tay-web"'
+        buildConfigField 'String', 'TAY_WEB_URL', '"https://transcenlutions25.github.io/transcenlutions/"'
     }
 
     buildFeatures {

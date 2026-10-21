@@ -18,6 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Tay source commit: d9085f84788177e63582becf31b9f505f9959eb6
   deploy:
     runs-on: ubuntu-24.04
     environment:

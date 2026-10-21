@@ -9,3 +9,17 @@ condition = "AND"
 paths = ['''(^|/)\.env\.example$''']
 regexTarget = "secret"
 regexes = ['''^ANTHROPIC_API_KEY=$''']
+
+
+# Supabase publishable keys are intentionally client-visible credentials. Keep
+# this exception path-scoped to the Tay Android/web clients; service-role or
+# secret keys are not covered by this rule.
+[[allowlists]]
+description = "Tay Supabase publishable client key"
+condition = "AND"
+paths = [
+  '''^android/tay/app/build\.gradle$''',
+  '''^web/tay/index\.html$'''
+]
+regexTarget = "secret"
+regexes = ['''^sb_publishable_[A-Za-z0-9_-]+$''']

@@ -1,0 +1,39 @@
+name: Tay web on GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/tay-web-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: tay-web-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out approved Tay web source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: feat/tay-android-native
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
+      - name: Upload Tay web
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          path: web/tay
+      - name: Deploy Tay web
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346

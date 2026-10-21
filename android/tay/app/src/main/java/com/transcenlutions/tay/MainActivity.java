@@ -129,7 +129,6 @@ public final class MainActivity extends Activity {
         email.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         email.setSingleLine(true);
         email.setAutofillHints(View.AUTOFILL_HINT_EMAIL_ADDRESS);
-        email.setText("transcenlutions@gmail.com");
         content.addView(label("Email"));
         content.addView(email);
         content.addView(space(12));
@@ -191,6 +190,13 @@ public final class MainActivity extends Activity {
             return false;
         });
         content.addView(signIn);
+        content.addView(space(10));
+        Button setup = secondaryButton("New here? Set up Tay");
+        setup.setOnClickListener(view -> startActivity(new Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(BuildConfig.TAY_WEB_URL + "?signup=1")
+        )));
+        content.addView(setup);
         content.addView(space(10));
         Button web = secondaryButton("Open Tay on the web");
         web.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(BuildConfig.TAY_WEB_URL))));

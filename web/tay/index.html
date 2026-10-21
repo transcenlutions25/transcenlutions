@@ -114,7 +114,7 @@ function renderIntake(){
    saveDraft();
    if(signup.step<spokenPrompts.length-1){signup.step++;saveDraft();renderIntake();return}
    await createAccount();
- }catch(x){notice.textContent=x.message}}}
+ }catch(x){notice.textContent=x.message}};
 }
 async function createAccount(){
  const notice=document.getElementById('notice');notice.className='muted';notice.textContent='Creating your Tay account…';

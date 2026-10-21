@@ -17,9 +17,9 @@ concurrency:
   group: tay-web-pages
   cancel-in-progress: true
 
+# Tay source commit: 76cddf5a743981d30a013c1762c153e7ae2accc6
 jobs:
-  # Tay source commit: 76cddf5a743981d30a013c1762c153e7ae2accc6
-    deploy:
+  deploy:
     runs-on: ubuntu-24.04
     environment:
       name: github-pages

@@ -18,7 +18,7 @@
     "test:tay": "node scripts/test-tay-workspace.mjs && npm run test:tay-owner && npm run test:tay-storage && npm run test:tay-password && npm run test:tay-setup",
     "test:tay-owner": "node --test scripts/test-tay-owner-provisioning.mjs",
     "test:tay-storage": "node scripts/test-tay-storage.mjs",
-    "test:tay-setup": "node --test scripts/test-tay-setup-navigation.mjs",
+    "test:tay-setup": "node --test scripts/test-tay-setup-navigation.mjs scripts/test-tay-recovery.mjs scripts/test-tay-cost-wording.mjs",
     "test:tay-password": "node scripts/test-tay-password.mjs",
     "provision:tay-owner": "node scripts/provision-tay-owner.mjs",
     "test:apex": "node --test scripts/test-apex-provider-probe.cjs products/funnel-checklist/test.cjs lib/test-apex-payments.cjs lib/test-apex-public-checkout.cjs lib/test-apex-workflows.cjs lib/test-apex-browser.cjs products/funnel-checklist/test-ui.cjs",

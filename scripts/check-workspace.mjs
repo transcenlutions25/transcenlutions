@@ -65,3 +65,5 @@ assert.deepEqual(
 );
 
 console.log("Workspace checks passed: queue capacity, idempotency, immutable reorder, earned progress, storage schema.");
+
+assert.deepEqual(appendRecentCompletions([], [{ id: "zero", title: "Done", summary: "Recorded" }], 0), []);

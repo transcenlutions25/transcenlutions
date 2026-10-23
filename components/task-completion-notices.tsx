@@ -11,6 +11,7 @@ import {
 interface TaskCompletionNoticesProps {
   /** Change the component key when switching conversations or desktop sessions. */
   completed: readonly CompletedWorkNotice[];
+  ready?: boolean;
   onOpenHistory?: () => void;
 }
 
@@ -70,12 +71,13 @@ function CompletionCard({
  * completed work is seeded into the seen set, so reloads and conversation
  * switching do not replay old notifications. Completion history is untouched.
  */
-export function TaskCompletionNotices({ completed, onOpenHistory }: TaskCompletionNoticesProps) {
+export function TaskCompletionNotices({ completed, ready = true, onOpenHistory }: TaskCompletionNoticesProps) {
   const [visible, setVisible] = useState<CompletedWorkNotice[]>([]);
   const seenIds = useRef<Set<string>>(new Set());
   const seeded = useRef(false);
 
   useEffect(() => {
+    if (!ready) return;
     if (!seeded.current) {
       seenIds.current = new Set(completed.map((item) => item.id));
       seeded.current = true;
@@ -85,7 +87,7 @@ export function TaskCompletionNotices({ completed, onOpenHistory }: TaskCompleti
     if (incoming.length === 0) return;
     for (const item of incoming) seenIds.current.add(item.id);
     setVisible((current) => appendRecentCompletions(current, incoming));
-  }, [completed]);
+  }, [completed, ready]);
 
   if (visible.length === 0) return null;
 

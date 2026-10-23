@@ -28,6 +28,7 @@ export function appendRecentCompletions(
   incoming: readonly CompletedWorkNotice[],
   limit = 3,
 ): CompletedWorkNotice[] {
+  if (!Number.isFinite(limit) || limit <= 0) return [];
   return [...current, ...unseenCompletedWork(incoming, new Set(current.map((item) => item.id)))]
-    .slice(-Math.max(0, limit));
+    .slice(-Math.floor(limit));
 }

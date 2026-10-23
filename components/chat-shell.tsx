@@ -873,7 +873,7 @@ export function ChatShell({
   </>;
 
   return <WorkspaceFrame conversationTitle={title} sidecarTitle={sidecarLabels[sidecarKey] || "Workspace"}
-    completionNotices={hydrated ? <TaskCompletionNotices key={completionScope} completed={completedWork} onOpenHistory={() => openPanel(desktopEnabled ? "queue" : "agent")} /> : null}
+    completionNotices={hydrated ? <TaskCompletionNotices key={completionScope} ready={!desktopEnabled || Boolean(desktop.state)} completed={completedWork} onOpenHistory={() => openPanel(desktopEnabled ? "queue" : "agent")} /> : null}
     sidecarOpen={sidecarOpen} onSidecarOpenChange={setSidecarOpen} sidecar={sidecar}
     navigation={<>
       <div className="tay-privacy-controls"><button aria-pressed={desktopEnabled} type="button" onClick={() => openPanel("plugins")}>{desktopEnabled ? "● Offline" : "Private alpha"}</button><button type="button" onClick={() => openPanel("plugins")}>Connections</button></div>

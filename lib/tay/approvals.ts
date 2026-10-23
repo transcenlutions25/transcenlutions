@@ -273,6 +273,41 @@ function applyProposal(db: Database, approval: ApprovalRecord, user: UserRecord)
     return { ok: false, error: "That business action is not recognized." };
   }
 
+  if (approval.kind === "checkpoint_restore") {
+    const files = approval.payload.files;
+    if (!Array.isArray(files) || files.length === 0) {
+      return { ok: false, error: "The stored checkpoint has no files." };
+    }
+    if (files.length > 60) return { ok: false, error: "That checkpoint holds more files than a restore accepts." };
+    let restored = 0;
+    for (const entry of files) {
+      const record = entry as { path?: unknown; content?: unknown };
+      const path = safeProjectPath(record.path);
+      if (!path || typeof record.content !== "string") {
+        return { ok: false, error: "The stored checkpoint contains an invalid file entry." };
+      }
+      const { file } = writeProjectFile(db, approval.projectId, path, record.content);
+      recordArtifact(db, {
+        projectId: approval.projectId,
+        conversationId: approval.conversationId,
+        taskId: approval.taskId,
+        path,
+        title: `Rewind restore · ${approval.title}`,
+        kind: "restored_file",
+        version: file.version,
+      });
+      restored++;
+    }
+    audit(db, {
+      projectId: approval.projectId,
+      actorId: user.id,
+      actorLabel: user.email,
+      kind: "checkpoint_restored",
+      detail: { approvalId: approval.id, files: restored },
+    });
+    return { ok: true };
+  }
+
   if (approval.kind === "memory_write") {
     const key = typeof approval.payload.key === "string" ? approval.payload.key : null;
     const value = typeof approval.payload.value === "string" ? approval.payload.value : null;

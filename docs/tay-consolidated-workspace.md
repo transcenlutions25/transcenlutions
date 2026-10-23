@@ -140,12 +140,32 @@ No value is exposed to the browser. `.env.example` contains empty templates.
   step change before the confirmed project reload finishes. A failed reload is
   reported without hiding the recorded decision.
 
+## Engineering sessions
+
+The workspace now includes a Devin-style engineering surface on the
+**Engineering** panel: scoped sessions with a phased plan, a worklog, read-only
+repository tools, allowlisted checks, approval-gated sandbox patches,
+checkpoints with a rewind approval, per-project playbooks, and a handoff pack
+written as an artifact. Nothing in a session pushes, deploys, charges or
+messages anyone.
+
+Sessions are server-authoritative: the API resolves the project and identity
+before any tool runs, the `kj` engineering agent's actions come from
+`lib/tay/registry.ts`, and every write lands through `lib/tay/approvals.ts`.
+The capability map, API and remaining limits are in
+[docs/tay-devin-style-engineering.md](tay-devin-style-engineering.md).
+
+The workspace schema is now versioned (`lib/tay/migrations.ts`), and agent work
+that outlives a request runs through a durable leased queue with retries and an
+audit trail (`lib/tay/queue.ts`, `scripts/tay-queue-worker.mjs`). See
+[docs/tay-agent-runtime-queue.md](tay-agent-runtime-queue.md).
+
 ## Verification
 
 ```bash
 npm run typecheck
 npm run lint
-npm run test:tay       # 23 checks: identity, isolation, authority, approvals, flow, business
+npm run test:tay       # 36 checks: identity, isolation, authority, approvals, flow, business, engineering, migrations, queue
 npm run smoke
 npm run test:workspace
 npm run build
@@ -179,3 +199,11 @@ for that host), and a second bootstrap 409.
    a mounted volume. Vercel/Netlify serverless functions will not persist it.
 8. **Rate limiting** for the new routes is not configured. The existing Netlify
    edge rules cover the hosted site but were not extended or verified here.
+9. **Engineering sessions run in-process.** There is no container or VM runner,
+   no fresh clone and no git push. A session reads this checkout read-only and
+   writes only into the project sandbox after an approval.
+
+
+## Recovery review limits — October 23, 2026
+
+See `docs/handoffs/tay-desktop-recovery-review-2026-10-23.md`. Repository verification is local-only; production owner bootstrap is disabled. SQLite is a single-server adapter, not a verified serverless or cross-device cloud store. No account migration, hosted authentication or production deployment is established by these local checks.

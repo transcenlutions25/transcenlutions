@@ -180,7 +180,7 @@ class DesktopRuntime:
         # can select a tool or expand this action's text-only capability.
         self.store.validate(d)
         session = self.store.verify_session(item['session_id'])
-        project = self.env['hub'].validate_project(session['project'])
+        project = self.env['hub'].validate_project(session['project']).resolve()
         mode, key, model = d['mode'], provider_key(d['mode']), d['model'].strip()
         if mode != 'local' and not key:
             raise ValueError('Configure this provider’s server environment variable, then Retry. API keys never belong in chat or browser storage.')

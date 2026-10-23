@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WorkspaceFrame } from "../workspace-frame";
 import { ApprovalCard, ProgressChecklist } from "./tay-approval";
+import { EngineeringPanel } from "./tay-engineering";
 import {
   AdminPanel,
   AgentsPanel,
@@ -25,11 +26,21 @@ import {
 } from "./tay-types";
 import type { ApprovalRecord, MessageRecord, TaskStep } from "../../lib/tay/types";
 
-type PanelId = "preview" | "files" | "approvals" | "memory" | "business" | "hierarchy" | "history" | "admin";
+type PanelId =
+  | "preview"
+  | "files"
+  | "engineering"
+  | "approvals"
+  | "memory"
+  | "business"
+  | "hierarchy"
+  | "history"
+  | "admin";
 
 const PANELS: { id: PanelId; label: string; ownerOnly?: boolean }[] = [
   { id: "preview", label: "Preview" },
   { id: "files", label: "Files" },
+  { id: "engineering", label: "Engineering" },
   { id: "approvals", label: "Approvals" },
   { id: "memory", label: "Memory" },
   { id: "business", label: "Business" },
@@ -119,6 +130,15 @@ export function TayWorkspace({ user, initialProjects }: { user: SessionUser; ini
     },
     [loadProject, refreshProjects],
   );
+
+  // Stable callbacks so the engineering panel does not reload on every render.
+  const notifyEngineering = useCallback(
+    (tone: "ok" | "error" | "info", text: string) => setNotice({ tone, text }),
+    [],
+  );
+  const refreshEngineering = useCallback(async () => {
+    if (bundle?.project.id) await refreshAfterChange(bundle.project.id);
+  }, [bundle?.project.id, refreshAfterChange]);
 
   async function send(text: string) {
     if (!bundle || busy) return;
@@ -527,6 +547,16 @@ export function TayWorkspace({ user, initialProjects }: { user: SessionUser; ini
                   if (bundle) void loadProject(bundle.project.id, { file: path });
                 }}
                 onSave={(path, content) => void saveFile(path, content)}
+              />
+            ) : null}
+
+            {activePanel === "engineering" && bundle ? (
+              <EngineeringPanel
+                key={bundle.project.id}
+                projectId={bundle.project.id}
+                canEdit={bundle.project.access.canEdit}
+                onNotice={notifyEngineering}
+                onChanged={refreshEngineering}
               />
             ) : null}
 

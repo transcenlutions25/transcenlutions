@@ -36,7 +36,14 @@ class HTTPBoundaryTests(unittest.TestCase):
         conn = http.client.HTTPConnection('127.0.0.1', self.port, timeout=2)
         try:
             conn.request(method, path, body=body, headers={'Content-Type': 'application/json', 'X-Tay-Token': 'fixture-only', **(headers or {})})
-            response = conn.getresponse(); response.read(); return response.status
+            response = conn.getresponse()
+            try:
+                response.read()
+            except ConnectionResetError:
+                # macOS may reset a refusal with unread request bytes; assert its parsed status.
+                if response.status < 400:
+                    raise
+            return response.status
         finally: conn.close()
 
     def test_legacy_boundary_and_environment_credentials(self):

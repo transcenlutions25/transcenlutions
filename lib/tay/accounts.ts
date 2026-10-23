@@ -31,7 +31,11 @@ interface UserRow {
 }
 
 function sessionSecret(): string {
-  return process.env.TAY_SESSION_SECRET || "transcenlutions-local-development-secret";
+  const secret = process.env.TAY_SESSION_SECRET;
+  if (process.env.NODE_ENV === "production" && (!secret || secret.length < 32)) {
+    throw new Error("A server-managed session secret of at least 32 characters is required.");
+  }
+  return secret || "transcenlutions-local-development-secret";
 }
 
 export function newId(prefix: string): string {
@@ -113,13 +117,13 @@ export function ownerExists(db: Database): boolean {
  * one verified address instead of "whoever signed up first" on a live host.
  */
 export function bootstrapOwner(db: Database, email: string, password: string, displayName: string): UserRecord {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Public owner setup is disabled on hosted deployments. Provision a verified immutable owner offline before release.");
+  }
   if (ownerExists(db)) throw new Error("A founding owner already exists.");
   const configured = process.env.TAY_OWNER_EMAIL?.trim().toLowerCase();
   if (configured && configured !== email) {
     throw new Error("The founding owner email does not match the configured owner identity.");
-  }
-  if (!configured && process.env.NODE_ENV === "production") {
-    throw new Error("Set TAY_OWNER_EMAIL before creating the founding owner on a hosted deployment.");
   }
   const { salt, hash } = hashPassword(password);
   const user: UserRecord = {

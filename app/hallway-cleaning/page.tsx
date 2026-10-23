@@ -46,7 +46,7 @@ export default function HallwayWorkspace() {
         <Link href="/" style={{color:"#f0d575"}}>← Back to Tay Command</Link>
         <p style={{marginTop:32,color:"#f0d575",fontWeight:700,letterSpacing:2,textTransform:"uppercase",fontSize:12}}>Transcenlutions · Business division</p>
         <h1 style={{fontSize:"clamp(30px,5vw,48px)",lineHeight:1.1,margin:"10px 0 14px"}}>Hallway Cleaning</h1>
-        <p style={{maxWidth:800,lineHeight:1.7,color:"#ddd7ef"}}>One command surface for the existing cleaning business. The customer intake and vendor application live in the separate Hallway Cleaning service; Tay does not silently copy or expose private customer data.</p>
+        <p style={{maxWidth:800,lineHeight:1.7,color:"#ddd7ef"}}>One command surface for professional vacation rental and apartment turnovers, offices, warehouses, estates, hotels, timeshares, pressure washing and larger projects. The customer intake and vendor application live in the separate Hallway Cleaning service; Tay does not silently copy or expose private customer data.</p>
         <section aria-label="Business tools" style={{display:"flex",flexWrap:"wrap",gap:12,margin:"26px 0"}}>
           {[
             ["Public site","https://hallwaycleaning.com"],
@@ -57,6 +57,20 @@ export default function HallwayWorkspace() {
           ].map(([label,url])=><a key={label} href={url} target="_blank" rel="noopener noreferrer" style={{border:"1px solid #9c81d0",borderRadius:8,padding:"12px 16px",color:"#fff",textDecoration:"none"}}>{label} ↗</a>)}
         </section>
         <p style={{borderLeft:"3px solid #e0be67",paddingLeft:15,color:"#e8dba6"}}>Connection status: routes are references to the existing Hallway Cleaning app. Live deployment, database, email delivery, payments and cross-application identity sharing must be validated separately. Do not send customer records into Tay chat.</p>
+        <h2 style={{marginTop:42,fontSize:25}}>Client acquisition · sales pipeline</h2>
+        <p style={{lineHeight:1.6,color:"#ddd7ef"}}>Focus on Airbnb and vacation rental operators, apartment leasing teams, office and warehouse facility managers, estate managers, hotels, timeshares and pressure-washing customers. Each prospective buyer follows the existing Hallway Cleaning quoting process without copying private contact data to Tay.</p>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:12}}>
+        {[
+          ["1. Target", "Identify legitimate decision-makers by property type, service area and likely cleaning need."],
+          ["2. Qualify", "Verify location, property size, vendor eligibility and appropriate contact channels."],
+          ["3. Connect", "Send a relevant one-to-one introduction with a custom quote invitation, not bulk spam."],
+          ["4. Capture", "Direct website, referral, email and call leads to Hallway Cleaning's existing /start intake."],
+          ["5. Propose", "Collect photos or walkthrough details, review staffing and price, and issue an approved quote."],
+          ["6. Close & grow", "Confirm payment and service readiness, complete work, request permission-based reviews and follow-up for recurring contracts."]
+        ].map(([title,copy])=><article key={title} style={{background:"#17152d",border:"1px solid #524783",borderRadius:10,padding:17}}><h3 style={{color:"#e4c675"}}>{title}</h3><p style={{color:"#ddd7ef",lineHeight:1.55}}>{copy}</p></article>)}
+        </div>
+        <p style={{marginTop:18,color:"#e8dba6"}}>Acquisition status: structured workflow and quote-link routing ready for review. Prospect research, outreach delivery, CRM synchronization, automated follow-up and collected payments are not verified live. No customer or contractor is promised until capacity is confirmed.</p>
+        <a href="https://hallwaycleaning.com/commercial-clients" target="_blank" rel="noopener noreferrer" style={{display:"inline-block",margin:"12px 0 28px",color:"#f0d575"}}>Commercial client acquisition landing page ↗</a>
         <h2 style={{marginTop:42,fontSize:25}}>Vendor recruitment workflow</h2>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:14}}>
           {stages.map(s=><article key={s.title} style={{background:"#17152d",border:"1px solid #524783",borderRadius:12,padding:18}}><h3 style={{color:"#e4c675",fontSize:17}}>{s.title}</h3><p style={{lineHeight:1.55,color:"#ddd7ef"}}>{s.copy}</p></article>)}

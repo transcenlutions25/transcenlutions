@@ -40,4 +40,30 @@ const { getAgentActionPolicy } = require("../lib/agent-foundation.ts");
 assert.equal(getAgentActionPolicy("kj", "plan").allowed, true);
 assert.equal(getAgentActionPolicy("kj", "payment", true).allowed, false, "KJ selection cannot grant payment authority");
 assert.equal(getAgentActionPolicy("kj", "execute_local_task", true).allowed, false);
+const { unseenCompletedWork, appendRecentCompletions } = require("../lib/task-completion-notices.ts");
+const completed = ["existing", "new-one", "new-one", "new-two"].map(id => ({
+  id, title: id, summary: `Verified result for ${id}`,
+}));
+assert.deepEqual(
+  unseenCompletedWork(completed, new Set(["existing"])).map(item => item.id),
+  ["new-one", "new-two"],
+  "completion notifications never replay already observed tasks or duplicate polling responses",
+);
+assert.deepEqual(
+  appendRecentCompletions(
+    [{ id: "older", title: "Older", summary: "Already announced" }],
+    completed,
+    3,
+  ).map(item => item.id),
+  ["existing", "new-one", "new-two"],
+  "only the latest three unique completions remain visible",
+);
+assert.deepEqual(
+  appendRecentCompletions(completed.slice(0, 2), [], 3).map(item => item.id),
+  ["existing", "new-one"],
+  "no new completions means no new announcements",
+);
+
 console.log("Workspace checks passed: queue capacity, idempotency, immutable reorder, earned progress, storage schema.");
+
+assert.deepEqual(appendRecentCompletions([], [{ id: "zero", title: "Done", summary: "Recorded" }], 0), []);

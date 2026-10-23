@@ -23,7 +23,8 @@
     "build:arcade": "node products/arcade/build-offline.mjs",
     "security:dependencies": "node scripts/security-dependencies.mjs",
     "security:secrets": "bash scripts/security-secrets.sh",
-    "security": "npm run test:security && npm run security:dependencies && npm run security:secrets"
+    "security": "npm run test:security && npm run security:dependencies && npm run security:secrets",
+    "test:quiet": "node scripts/test-quiet-completion.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

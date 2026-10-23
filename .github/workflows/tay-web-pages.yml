@@ -17,7 +17,7 @@ concurrency:
   group: tay-web-pages
   cancel-in-progress: true
 
-# Tay source commit: b6b0fb8e0f7bababa4f893617b2d7d3141bcdc48
+# Tay source commit: edf5011aab81f68d92e2ba23ea13b0a4fb46164e
 jobs:
   deploy:
     runs-on: ubuntu-24.04

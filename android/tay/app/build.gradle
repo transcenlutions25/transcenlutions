@@ -11,8 +11,8 @@ android {
         applicationId 'com.transcenlutions.tay'
         minSdk 26
         targetSdk 36
-        versionCode 5
-        versionName '0.3.2-alpha'
+        versionCode 6
+        versionName '0.4.0-alpha'
         buildConfigField 'String', 'SUPABASE_URL', '"https://efmbtmlfqeiaczcqovkb.supabase.co"'
         buildConfigField 'String', 'SUPABASE_PUBLISHABLE_KEY', '"sb_publishable_A13pR37f9Rg_I2xb-S4LDw_ncmiXqci"'
         buildConfigField 'String', 'TAY_API_BASE', '"https://efmbtmlfqeiaczcqovkb.supabase.co/functions/v1/tay-api"'

@@ -34,6 +34,7 @@ export default function Page() {
         <Link href="/acquisition" style={intelligenceLinkStyle}>Acquisition & Funding</Link>
         <Link href="/creative-intelligence" style={intelligenceLinkStyle}>Creative Intelligence 2026</Link>
         <Link href="/arcade" style={intelligenceLinkStyle}>Arcade</Link>
+        <Link href="/hallway-cleaning" style={intelligenceLinkStyle}>Hallway Cleaning</Link>
       </nav>
       <ChatShell
         desktopEnabled={Boolean(desktopBridgeUrl())}

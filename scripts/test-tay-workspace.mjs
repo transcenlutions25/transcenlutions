@@ -6,7 +6,7 @@
  * conversation → approval → apply → artifact flow, project memory, authorized
  * task runs, business records, and the vendored file-edit matcher.
  */
-import { execFileSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
 import { readFileSync, rmSync, mkdtempSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -427,7 +427,8 @@ await checkAsync("an agent session persists a plan and a worklog", async () => {
   assert.equal(created.session.mode, "agent");
   assert.equal(created.session.status, "running");
   assert.ok(created.session.steps.length >= 6);
-  assert.equal(created.session.baseBranch, execFileSync("git", ["symbolic-ref", "--short", "HEAD"], { encoding: "utf8" }).trim());
+  const head = spawnSync("git", ["symbolic-ref", "--quiet", "--short", "HEAD"], { encoding: "utf8" });
+  assert.equal(created.session.baseBranch, head.status === 0 ? head.stdout.trim() : "detached-or-unavailable");
   const events = engineering.listEngineeringEvents(db, created.session.id, project.id);
   assert.ok(events.some((event) => event.kind === "plan"));
   assert.ok(events.some((event) => event.tool === "repository_facts"));

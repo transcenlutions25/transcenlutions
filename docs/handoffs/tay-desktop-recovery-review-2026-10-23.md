@@ -84,3 +84,10 @@ HTTP/browser tests and GitHub metadata.
 
 Rollback: discard the new draft branch or revert its commits. Do not reset the
 original worktree or delete its uncommitted work. No real data migration ran.
+
+## CI follow-up
+
+The first Launch gate run exposed a test expectation that assumed a symbolic
+branch name; GitHub checks out the PR merge commit detached. The assertion now
+checks the actual checkout form, including the explicit detached/unavailable
+label. The desktop-runtime CI job passed in that initial run.

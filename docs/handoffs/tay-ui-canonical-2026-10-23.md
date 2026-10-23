@@ -65,6 +65,8 @@ its APIs, or production.
 | `npm run build` | pass on Next 15.5.28 |
 | `next start` route probes | `/` 200, `/tay` 200 HTML, `/tay/index.html` 200, CSS/PNG/manifest 200 |
 | Visual | desktop 1280×900, phone 390×844, context panel open; unauthorized sign-in and password-recovery routes |
+| Launch gate on `6fe9740` | `verify`, `desktop-runtime`, both dependency audits, both security regressions and secret scan succeeded; Netlify header/redirect checks succeeded |
+| Netlify deploy preview (PR #90) | `https://6adbe73d142a052bbb3859c9--tay-command.netlify.app/tay/` — 200 after `/tay` → `/tay/`, title `Tay · Transcenlutions`, 36,864 bytes, approved asset 200, no console errors, sign-in screen rendered |
 
 The workspace screenshots use a temporary local mock of the existing API
 response shape because no owner credentials were used. They are layout
@@ -75,8 +77,9 @@ evidence, not account or cloud verification. The mock is not committed.
 - Authenticated Supabase sign-in, recovery callback completion, saved
   conversations, projects, memory and cross-account isolation. The function is
   reachable and returns 401 without an auth header, but no account was used.
-- Netlify preview/deployment and any production connection. Production remains
-  locked; nothing was deployed.
+- Any production deployment. Netlify built an automatic **deploy preview**
+  from PR #90 (linked above); production remains locked and `main` is
+  untouched. The preview's authenticated journeys were not tested.
 - Android/cloud release. The existing Android branch and its uncommitted
   release configuration were not touched.
 - Admin invitations, admin AI agents, durable approvals, notifications and

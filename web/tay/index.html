@@ -20,8 +20,25 @@ input:focus,textarea:focus,select:focus,button:focus-visible{border-color:var(--
 .choice-grid{display:grid;gap:10px;margin-top:14px}.choice{display:flex;align-items:flex-start;gap:11px;padding:13px;border:1px solid #4d4262;background:#100c1c;border-radius:14px}.choice:hover{border-color:#8167a0}.choice input{width:auto;margin-top:3px}.choice span{line-height:1.35}.choice small{display:block;color:var(--muted);margin-top:3px}
 .nav{display:flex;gap:10px;margin-top:20px}.nav button{flex:1}.nav .primary{margin:0}.voice-note{margin-top:16px;padding:12px 14px;border:1px solid rgba(238,197,91,.28);border-radius:14px;background:#100c1c;color:var(--muted)}
 .shell{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 40px);overflow:hidden}.sidebar{padding:18px;border-right:1px solid rgba(238,197,91,.2)}.sidebar-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:14px 0}.projects{display:grid;gap:9px}.project{border:1px solid #4a3b62;background:#100c1c;color:var(--text);border-radius:14px;padding:12px;text-align:left}.project.active{border-color:var(--gold);background:#211634}.project strong{display:block}.project small{color:var(--muted)}.main{display:flex;flex-direction:column;min-width:0}.topbar{padding:16px 20px;border-bottom:1px solid rgba(238,197,91,.2);display:flex;justify-content:space-between;gap:12px;align-items:center}.messages{padding:20px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:12px}.bubble{max-width:82%;padding:14px 16px;border-radius:18px;line-height:1.55;white-space:pre-wrap}.bubble.user{align-self:flex-end;background:#313b8e;border:1px solid #5b72f4}.bubble.tay,.bubble.system{align-self:flex-start;background:#171126;border:1px solid #4c3c62}.composer{padding:16px;border-top:1px solid rgba(238,197,91,.2);display:flex;gap:10px}.composer textarea{resize:none;min-height:54px;max-height:180px}.composer button{width:auto;margin:0;min-width:90px}.empty{padding:30px;color:var(--muted)}.badge{color:var(--gold);font-size:.82rem}
+
+.workspace-nav{display:grid;gap:7px;margin:18px 0}.workspace-nav button{border:1px solid transparent;background:transparent;color:var(--muted);padding:10px 12px;border-radius:12px;text-align:left;font-weight:750}.workspace-nav button:hover{background:#130e20;color:var(--text)}.workspace-nav button.active{background:#211634;border-color:rgba(238,197,91,.5);color:var(--gold)}
+.project-switch{margin-top:18px;padding-top:14px;border-top:1px solid rgba(238,197,91,.18)}.project-switch .projects{max-height:220px;overflow:auto}.sidebar-actions{display:grid;gap:9px;margin-top:14px}
+.workspace{padding:20px;overflow:auto;flex:1}.view-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:18px}.view-head h2{margin:0 0 5px;font-size:1.55rem}.view-head p{margin:0;color:var(--muted)}
+.hq-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.metric,.panel,.agent-card,.task-card,.approval-card,.integration-card,.template-card{background:#100c1c;border:1px solid #443653;border-radius:16px}.metric{padding:15px}.metric strong{display:block;font-size:1.8rem;color:var(--gold)}.metric span{color:var(--muted);font-size:.86rem}
+.panel{padding:18px;margin-bottom:14px}.panel h3{margin:0 0 8px}.panel p{color:var(--muted);line-height:1.5}.panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}
+.lead-card{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}.avatar{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,var(--purple),#2f1f54);display:grid;place-items:center;color:var(--gold);font-weight:900;border:1px solid rgba(238,197,91,.4)}.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px}
+.quick-actions{display:flex;flex-wrap:wrap;gap:8px}.quick-actions .secondary{padding:10px 12px}.pill{display:inline-block;border:1px solid #4d4262;background:#181022;border-radius:999px;padding:5px 9px;color:var(--muted);font-size:.78rem}.pill.gold{border-color:rgba(238,197,91,.5);color:var(--gold)}.pill.ok{border-color:rgba(169,240,191,.45);color:var(--ok)}.pill.warn{border-color:rgba(255,159,159,.4);color:var(--danger)}
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(210px,1fr));gap:12px;overflow-x:auto;padding-bottom:8px}.kanban-col{min-width:210px}.kanban-col h4{margin:0 0 9px;color:var(--muted);font-size:.85rem;text-transform:uppercase;letter-spacing:.06em}.task-card{padding:12px;margin-bottom:9px}.task-card strong{display:block;margin-bottom:6px}.task-card p{margin:5px 0 10px;color:var(--muted);font-size:.88rem}.task-meta{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.task-card select{padding:8px;border-radius:10px;font-size:.82rem}
+.team-grid,.integration-grid,.template-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.agent-card,.integration-card,.template-card{padding:15px}.agent-card h3,.integration-card h3,.template-card h3{margin:0 0 6px}.agent-card p,.integration-card p,.template-card p{color:var(--muted);font-size:.9rem;line-height:1.45}.agent-actions{display:flex;gap:8px;margin-top:12px}
+.approval-list{display:grid;gap:10px}.approval-card{padding:15px}.approval-card h3{margin:0 0 6px}.approval-card p{color:var(--muted);line-height:1.45}.approval-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.inline-form{display:grid;gap:10px}.inline-form .row{align-items:end}.inline-form textarea{min-height:92px}.compact{padding:9px 11px!important;margin:0!important;width:auto!important}.danger-btn{border:1px solid rgba(255,159,159,.45);background:#2b111a;color:#ffd5d5;border-radius:12px;padding:9px 11px;font-weight:800}
+.empty-state{padding:24px;border:1px dashed #4d4262;border-radius:16px;color:var(--muted);text-align:center}.workspace-chat{display:flex;flex-direction:column;min-height:calc(100vh - 155px)}.workspace-chat .messages{padding:0 0 16px}.workspace-chat .composer{padding:12px 0 0;border-top:1px solid rgba(238,197,91,.18)}
+.integration-catalog{margin-top:18px}.integration-note{font-size:.86rem;color:var(--muted);margin-top:10px}.top-actions{display:flex;gap:8px;align-items:center}.top-actions button{white-space:nowrap}
+
 @media(max-width:760px){.app{padding:0}.auth,.auth.wide{margin:0;min-height:100vh;border-radius:0;padding:24px}.row{display:block}.shell{grid-template-columns:1fr;min-height:100vh;border-radius:0}.sidebar{border-right:0;border-bottom:1px solid rgba(238,197,91,.2);max-height:40vh;overflow:auto}.bubble{max-width:94%}.topbar{padding:12px}.messages{padding:12px}.composer{padding:10px}}
 .password-rules{margin:12px 0;color:var(--muted);font-size:.9rem}.password-rules ul{list-style:none;padding:0;margin:8px 0;display:grid;gap:5px}.password-rules [data-met="true"]{color:var(--ok)}.password-match{font-size:.9rem;color:var(--muted);margin:8px 0}
+@media(max-width:920px){.hq-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.team-grid,.integration-grid,.template-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.sidebar{max-height:none}.workspace-nav{grid-template-columns:repeat(4,minmax(0,1fr));overflow:auto}.workspace-nav button{text-align:center;font-size:.78rem;padding:9px 7px}.project-switch{display:none}.hq-grid,.team-grid,.integration-grid,.template-grid{grid-template-columns:1fr}.workspace{padding:14px}.view-head{display:block}.top-actions{margin-top:10px}.lead-card{grid-template-columns:auto 1fr}.lead-card>.pill{grid-column:1/-1}.kanban{grid-template-columns:repeat(5,230px)}}
 </style>
 </head>
 <body><div id="root" class="app"></div>
@@ -31,7 +48,7 @@ const KEY='sb_publishable_A13pR37f9Rg_I2xb-S4LDw_ncmiXqci';
 const API=SUPABASE_URL+'/functions/v1/tay-api';
 const STORE='transcenlutions_tay_cloud_session_v4';
 const DRAFT='transcenlutions_tay_signup_draft_v1';
-let session=null,projects=[],activeProject=null;
+let session=null,projects=[],activeProject=null,currentView='headquarters',headquarters=null,sessionProfile=null;
 let signup={account:{preferred_name:'',email:'',password:''},step:0,answers:null};
 const root=document.getElementById('root');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -172,9 +189,126 @@ async function boot(){
    await renderShell();
  }catch(e){if(/sign in|session|jwt|token|invalid/i.test(e.message))saveSession(null);signInView(e.message)}
 }
-async function renderShell(){root.innerHTML='<div class="shell glass"><aside class="sidebar"><div class="brand">TRANSCENLUTIONS</div><div class="sidebar-head"><strong>Projects</strong><button id="newProject" class="secondary">New</button></div><div id="projects" class="projects"></div><button id="logout" class="secondary" style="margin-top:16px;width:100%">Sign out</button></aside><main class="main"><header class="topbar"><div><strong id="projectTitle">Tay Cloud</strong><div class="badge">Cloud connected</div></div><button id="refresh" class="secondary">Refresh</button></header><section id="messages" class="messages"><div class="empty">Choose or create a project.</div></section><form id="composer" class="composer"><textarea id="message" placeholder="Message Tay" required></textarea><button class="primary" type="submit">Send</button></form></main></div>';
- const list=document.getElementById('projects');list.innerHTML=projects.length?projects.map(p=>'<button class="project '+(p.id===activeProject?'active':'')+'" data-id="'+esc(p.id)+'"><strong>'+esc(p.name)+'</strong><small>'+esc(p.summary||'')+'</small></button>').join(''):'<div class="muted">No projects yet.</div>';list.querySelectorAll('.project').forEach(b=>b.onclick=async()=>{activeProject=b.dataset.id;await renderShell()});document.getElementById('newProject').onclick=async()=>{const name=prompt('Project name');if(!name)return;const summary=prompt('What are you building?')||'';try{const d=await api('/projects',{method:'POST',body:{name,summary}});activeProject=d.projectId;projects=(await api('/projects')).projects||[];await renderShell()}catch(e){alert(e.message)}};document.getElementById('logout').onclick=async()=>{try{await api('/session',{method:'DELETE'})}catch{}saveSession(null);signInView()};document.getElementById('refresh').onclick=async()=>{projects=(await api('/projects')).projects||[];await renderShell()};document.getElementById('composer').onsubmit=async e=>{e.preventDefault();if(!activeProject)return;const box=document.getElementById('message');const t=box.value.trim();if(!t)return;box.disabled=true;try{await api('/projects/'+activeProject+'/messages',{method:'POST',body:{text:t}});box.value='';await loadProject()}catch(x){alert(x.message)}finally{box.disabled=false;box.focus()}};if(activeProject)await loadProject()}
-async function loadProject(){try{const d=await api('/projects/'+activeProject);const p=d.project||{};document.getElementById('projectTitle').textContent=p.name||'Tay project';const messages=Array.isArray(d.messages)?d.messages:[];const area=document.getElementById('messages');area.innerHTML=messages.length?messages.map(m=>'<div class="bubble '+esc(m.role)+'">'+esc(m.text)+'</div>').join(''):'<div class="empty">Start the conversation with Tay.</div>';area.scrollTop=area.scrollHeight}catch(e){document.getElementById('messages').innerHTML='<div class="error">'+esc(e.message)+'</div>'}}
+
+async function loadHeadquarters(){
+ if(!activeProject){headquarters=null;return null}
+ const d=await api('/projects/'+activeProject+'/headquarters');
+ headquarters=d;
+ return d;
+}
+function viewLabel(view){return ({headquarters:'Headquarters',chat:'Chat with Tay',tasks:'Tasks',team:'Team',approvals:'Approvals',integrations:'Integrations',plan:'Plan'})[view]||'Headquarters'}
+function activeProjectRecord(){return projects.find(p=>p.id===activeProject)||headquarters?.project||null}
+function renderProjectButtons(){
+ const list=document.getElementById('projects');
+ if(!list)return;
+ list.innerHTML=projects.length?projects.map(p=>'<button class="project '+(p.id===activeProject?'active':'')+'" data-id="'+esc(p.id)+'"><strong>'+esc(p.name)+'</strong><small>'+esc(p.summary||'')+'</small></button>').join(''):'<div class="muted">No projects yet.</div>';
+ list.querySelectorAll('.project').forEach(b=>b.onclick=async()=>{activeProject=b.dataset.id;currentView='headquarters';await renderShell()});
+}
+function renderWorkspaceNav(){
+ document.querySelectorAll('.workspace-nav button').forEach(b=>{b.classList.toggle('active',b.dataset.view===currentView);b.onclick=async()=>{currentView=b.dataset.view;renderWorkspaceNav();await renderCurrentView()}});
+}
+async function renderShell(){
+ if(activeProject)await loadHeadquarters();
+ const project=activeProjectRecord();
+ root.innerHTML='<div class="shell glass"><aside class="sidebar"><div class="brand">TRANSCENLUTIONS</div><div style="margin-top:10px"><strong>Tay Command</strong><div class="badge">Owner-directed AI team</div></div><nav class="workspace-nav" aria-label="Tay workspace"><button data-view="headquarters">Headquarters</button><button data-view="chat">Tay</button><button data-view="tasks">Tasks</button><button data-view="team">Team</button><button data-view="approvals">Approvals</button><button data-view="integrations">Integrations</button><button data-view="plan">Plan</button></nav><div class="project-switch"><div class="sidebar-head"><strong>Projects</strong><button id="newProject" class="secondary compact">New</button></div><div id="projects" class="projects"></div></div><div class="sidebar-actions"><button id="logout" class="secondary">Sign out</button></div></aside><main class="main"><header class="topbar"><div><strong id="projectTitle">'+esc(project?.name||'Tay Cloud')+'</strong><div class="badge">Tay · '+esc(viewLabel(currentView))+'</div></div><div class="top-actions"><button id="refresh" class="secondary compact">Refresh</button></div></header><section id="workspace" class="workspace"></section></main></div>';
+ renderProjectButtons();renderWorkspaceNav();
+ const newProject=document.getElementById('newProject');
+ if(newProject)newProject.onclick=async()=>{const name=prompt('Project name');if(!name)return;const summary=prompt('What should Tay help this project accomplish?')||'';try{const d=await api('/projects',{method:'POST',body:{name,summary}});activeProject=d.projectId;projects=(await api('/projects')).projects||[];currentView='headquarters';await renderShell()}catch(e){alert(e.message)}};
+ document.getElementById('logout').onclick=async()=>{try{await api('/session',{method:'DELETE'})}catch{}saveSession(null);signInView()};
+ document.getElementById('refresh').onclick=async()=>{projects=(await api('/projects')).projects||[];if(activeProject)await loadHeadquarters();renderProjectButtons();await renderCurrentView()};
+ await renderCurrentView();
+}
+async function renderCurrentView(){
+ const area=document.getElementById('workspace');if(!area)return;
+ if(!activeProject){area.innerHTML='<div class="empty-state">Create a project to open Tay Headquarters.</div>';return}
+ if(!headquarters)await loadHeadquarters();
+ const title=document.getElementById('projectTitle');if(title)title.textContent=headquarters?.project?.name||'Tay project';
+ if(currentView==='chat')return renderChatView();
+ if(currentView==='tasks')return renderTasksView();
+ if(currentView==='team')return renderTeamView();
+ if(currentView==='approvals')return renderApprovalsView();
+ if(currentView==='integrations')return renderIntegrationsView();
+ if(currentView==='plan')return renderPlanView();
+ return renderHeadquartersView();
+}
+function renderHeadquartersView(){
+ const area=document.getElementById('workspace'),h=headquarters||{},tasks=h.tasks||[],approvals=h.approvals||[],agents=h.agents||[],project=h.project||{};
+ const pending=approvals.filter(a=>a.status==='pending').length;
+ const activeTasks=tasks.filter(t=>['pending','in_progress','blocked','review'].includes(t.status)).length;
+ const done=tasks.filter(t=>t.status==='done').length;
+ const activeAgents=agents.filter(a=>a.status==='active').length;
+ const recent=tasks.slice(0,4);
+ area.innerHTML='<div class="view-head"><div><h2>Headquarters</h2><p>One command center for Tay, the team, work, and approvals.</p></div><div class="quick-actions"><button class="secondary compact" data-go="chat">Ask Tay</button><button class="secondary compact" data-go="tasks">New task</button><button class="secondary compact" data-go="team">Add specialist</button></div></div>'+
+ '<div class="hq-grid"><div class="metric"><strong>'+activeTasks+'</strong><span>active tasks</span></div><div class="metric"><strong>'+pending+'</strong><span>awaiting approval</span></div><div class="metric"><strong>'+activeAgents+'</strong><span>active specialists</span></div><div class="metric"><strong>'+done+'</strong><span>completed tasks</span></div></div>'+
+ '<div class="panel lead-card"><div class="avatar">T</div><div><h3 style="margin:0">Tay · Team Lead</h3><p style="margin:5px 0">Primary interface, planner, delegator, reviewer, and owner-policy enforcer.</p><span class="small"><span class="status-dot"></span>Cloud connected</span></div><span class="pill gold">Lead</span></div>'+
+ '<div class="panel"><div class="panel-head"><h3>Plan</h3><button class="secondary compact" data-go="plan">Edit</button></div><p>'+esc(project.plan||project.summary||'Define what this project is trying to accomplish and Tay will use it as the operating objective.')+'</p></div>'+
+ '<div class="panel"><div class="panel-head"><h3>Work in motion</h3><button class="secondary compact" data-go="tasks">Open board</button></div>'+(recent.length?recent.map(t=>'<div class="task-card"><strong>'+esc(t.title)+'</strong><div class="task-meta"><span class="pill">'+esc(t.status.replaceAll('_',' '))+'</span><span class="pill">'+esc(t.priority||'normal')+'</span></div></div>').join(''):'<div class="empty-state">No team tasks yet. Give Tay a task or create one from the board.</div>')+'</div>';
+ area.querySelectorAll('[data-go]').forEach(b=>b.onclick=async()=>{currentView=b.dataset.go;renderWorkspaceNav();await renderCurrentView()});
+}
+async function renderChatView(){
+ const area=document.getElementById('workspace');
+ area.innerHTML='<div class="view-head"><div><h2>Chat with Tay</h2><p>Tay is the team lead. Specialists stay subordinate to your rules and approval boundaries.</p></div></div><div class="workspace-chat"><section id="messages" class="messages"><div class="empty">Loading conversation…</div></section><form id="composer" class="composer"><textarea id="message" placeholder="Tell Tay what outcome you want" required></textarea><button class="primary compact" type="submit">Send</button></form></div>';
+ const form=document.getElementById('composer'),box=document.getElementById('message');
+ form.onsubmit=async e=>{e.preventDefault();const t=box.value.trim();if(!t)return;box.disabled=true;try{await api('/projects/'+activeProject+'/messages',{method:'POST',body:{text:t}});box.value='';await loadProjectIntoChat()}catch(x){alert(x.message)}finally{box.disabled=false;box.focus()}};
+ await loadProjectIntoChat();
+}
+async function loadProjectIntoChat(){
+ try{const d=await api('/projects/'+activeProject);const messages=Array.isArray(d.messages)?d.messages:[];const area=document.getElementById('messages');if(!area)return;area.innerHTML=messages.length?messages.map(m=>'<div class="bubble '+esc(m.role)+'">'+esc(m.text)+'</div>').join(''):'<div class="empty-state">Start with an outcome. Tay will keep the conversation attached to this project.</div>';area.scrollTop=area.scrollHeight}catch(e){const area=document.getElementById('messages');if(area)area.innerHTML='<div class="error">'+esc(e.message)+'</div>'}
+}
+function taskAgentName(id){const a=(headquarters?.agents||[]).find(x=>x.id===id);return a?.name||'Unassigned'}
+function taskColumn(status,label,tasks){
+ return '<div class="kanban-col"><h4>'+label+' · '+tasks.length+'</h4>'+ (tasks.length?tasks.map(t=>'<div class="task-card"><strong>'+esc(t.title)+'</strong><p>'+esc(t.description||'')+'</p><div class="task-meta"><span class="pill">'+esc(t.priority||'normal')+'</span><span class="pill">'+esc(taskAgentName(t.assigned_agent_id))+'</span></div><select data-task-status="'+esc(t.id)+'"><option value="pending" '+(t.status==='pending'?'selected':'')+'>Queued</option><option value="in_progress" '+(t.status==='in_progress'?'selected':'')+'>In progress</option><option value="blocked" '+(t.status==='blocked'?'selected':'')+'>Blocked</option><option value="review" '+(t.status==='review'?'selected':'')+'>Review</option><option value="done" '+(t.status==='done'?'selected':'')+'>Done</option></select></div>').join(''):'<div class="empty-state">Empty</div>')+'</div>'
+}
+function renderTasksView(){
+ const area=document.getElementById('workspace'),tasks=headquarters?.tasks||[],agents=headquarters?.agents||[];
+ area.innerHTML='<div class="view-head"><div><h2>Tasks</h2><p>Tay can organize and delegate work here. A task is not treated as executed until the runtime actually produces a result.</p></div></div>'+
+ '<div class="panel"><div class="panel-head"><h3>Create task</h3><span class="pill gold">Team board</span></div><form id="taskForm" class="inline-form"><div class="row"><div><label>Task</label><input id="taskTitle" maxlength="240" required placeholder="What needs to get done?"></div><div><label>Priority</label><select id="taskPriority"><option>normal</option><option>high</option><option>urgent</option><option>low</option></select></div></div><div><label>Context</label><textarea id="taskDescription" maxlength="4000" placeholder="What should Tay or the specialist know?"></textarea></div><div class="row"><div><label>Assign</label><select id="taskAgent"><option value="">Tay / unassigned</option>'+agents.filter(a=>a.status!=='retired').map(a=>'<option value="'+esc(a.id)+'">'+esc(a.name)+'</option>').join('')+'</select></div><label class="choice" style="margin-top:0"><input id="taskApproval" type="checkbox"><span><strong>Approval before execution</strong><small>Create a human gate before this task can proceed.</small></span></label></div><button class="primary compact" type="submit">Create task</button></form></div>'+
+ '<div class="kanban">'+taskColumn('pending','Queued',tasks.filter(t=>t.status==='pending'))+taskColumn('in_progress','In progress',tasks.filter(t=>t.status==='in_progress'))+taskColumn('blocked','Blocked',tasks.filter(t=>t.status==='blocked'))+taskColumn('review','Review',tasks.filter(t=>t.status==='review'))+taskColumn('done','Done',tasks.filter(t=>t.status==='done'))+'</div>';
+ document.getElementById('taskForm').onsubmit=async e=>{e.preventDefault();const title=document.getElementById('taskTitle').value.trim();if(!title)return;const payload={title,description:document.getElementById('taskDescription').value.trim(),priority:document.getElementById('taskPriority').value,assignedAgentId:document.getElementById('taskAgent').value||null,requiresApproval:document.getElementById('taskApproval').checked};try{await api('/projects/'+activeProject+'/tasks',{method:'POST',body:payload});await loadHeadquarters();renderTasksView()}catch(x){alert(x.message)}};
+ area.querySelectorAll('[data-task-status]').forEach(s=>s.onchange=async()=>{try{await api('/tasks/'+s.dataset.taskStatus,{method:'POST',body:{status:s.value}});await loadHeadquarters();renderTasksView()}catch(x){alert(x.message)}});
+}
+const teamTemplates=[
+ {name:'Research',purpose:'Investigate markets, competitors, evidence, and source-backed questions.',instructions:'Research first. Separate verified facts from assumptions. Return sources and decision-relevant findings.'},
+ {name:'Builder',purpose:'Turn approved plans into implementation-ready product and technical work.',instructions:'Build in small verifiable increments. Preserve owner controls, existing architecture, and rollback paths.'},
+ {name:'Operations',purpose:'Track commitments, blockers, follow-ups, and recurring operating work.',instructions:'Keep work moving. Surface blockers early. Never mark work done without verification.'},
+ {name:'Growth',purpose:'Prepare positioning, outreach, content, offers, and customer-development work.',instructions:'Use the project voice. Keep external sending and spending behind owner approval.'}
+];
+function renderTeamView(){
+ const area=document.getElementById('workspace'),agents=headquarters?.agents||[],approvalRules=headquarters?.onboarding?.approval_boundaries?.alwaysRequire||[];
+ area.innerHTML='<div class="view-head"><div><h2>Team</h2><p>Tay stays the lead. Specialists are scoped roles, not independent owners.</p></div></div>'+
+ '<div class="team-grid"><div class="agent-card"><div class="avatar">T</div><h3 style="margin-top:10px">Tay</h3><span class="pill gold">Team Lead</span><p>Plans, delegates, reviews, communicates with you, and enforces your intake rules.</p></div>'+agents.map(a=>'<div class="agent-card"><div class="avatar">'+esc((a.name||'A').slice(0,1).toUpperCase())+'</div><h3 style="margin-top:10px">'+esc(a.name)+'</h3><div><span class="pill">'+esc(a.status)+'</span> <span class="pill">'+esc(a.model||'auto')+'</span></div><p>'+esc(a.purpose||'Specialist')+'</p><div class="agent-actions">'+(a.status==='active'?'<button class="secondary compact" data-agent="'+esc(a.id)+'" data-status="paused">Pause</button>':'<button class="secondary compact" data-agent="'+esc(a.id)+'" data-status="active">Activate</button>')+'</div></div>').join('')+'</div>'+
+ '<div class="panel" style="margin-top:16px"><div class="panel-head"><h3>Ready-made specialists</h3><span class="pill gold">Tay templates</span></div><div class="template-grid">'+teamTemplates.map((t,i)=>'<div class="template-card"><h3>'+esc(t.name)+'</h3><p>'+esc(t.purpose)+'</p><button class="secondary compact" data-template="'+i+'">Add to team</button></div>').join('')+'</div><p class="integration-note">These profiles organize delegation and policy. They do not claim autonomous background execution unless Tay has a verified runtime/tool path for the work.</p></div>'+
+ '<div class="panel"><div class="panel-head"><h3>Custom specialist</h3></div><form id="agentForm" class="inline-form"><div class="row"><div><label>Name</label><input id="agentName" maxlength="120" required placeholder="e.g. Finance reviewer"></div><div><label>Routing</label><select id="agentModel"><option value="auto">Auto · Tay runtime</option></select></div></div><div><label>Purpose</label><textarea id="agentPurpose" maxlength="1000" required placeholder="What should this specialist own?"></textarea></div><div><label>Instructions</label><textarea id="agentInstructions" maxlength="6000" placeholder="Rules, quality bar, or boundaries"></textarea></div><button class="primary compact" type="submit">Add specialist</button></form></div>';
+ area.querySelectorAll('[data-agent]').forEach(b=>b.onclick=async()=>{try{await api('/agents/'+b.dataset.agent,{method:'POST',body:{status:b.dataset.status}});await loadHeadquarters();renderTeamView()}catch(x){alert(x.message)}});
+ area.querySelectorAll('[data-template]').forEach(b=>b.onclick=async()=>{const t=teamTemplates[Number(b.dataset.template)];try{await api('/projects/'+activeProject+'/agents',{method:'POST',body:{name:t.name,purpose:t.purpose,instructions:t.instructions,model:'auto',approvalRequiredFor:approvalRules}});await loadHeadquarters();renderTeamView()}catch(x){alert(x.message)}});
+ document.getElementById('agentForm').onsubmit=async e=>{e.preventDefault();try{await api('/projects/'+activeProject+'/agents',{method:'POST',body:{name:document.getElementById('agentName').value.trim(),purpose:document.getElementById('agentPurpose').value.trim(),instructions:document.getElementById('agentInstructions').value.trim(),model:'auto',approvalRequiredFor:approvalRules}});await loadHeadquarters();renderTeamView()}catch(x){alert(x.message)}};
+}
+function renderApprovalsView(){
+ const area=document.getElementById('workspace'),items=headquarters?.approvals||[];
+ area.innerHTML='<div class="view-head"><div><h2>Approvals</h2><p>Consequential actions stay visible and owner-controlled.</p></div></div><div class="approval-list">'+(items.length?items.map(a=>'<div class="approval-card"><div class="panel-head"><div><h3>'+esc(a.title)+'</h3><span class="pill '+(a.status==='pending'?'gold':'')+'">'+esc(a.status)+'</span> <span class="pill">'+esc(a.risk||'low')+' risk</span></div></div><p>'+esc(a.summary||a.explanation||'')+'</p>'+(a.status==='pending'?'<div class="approval-actions"><button class="secondary compact" data-approval="'+esc(a.id)+'" data-decision="approved">Approve</button><button class="danger-btn" data-approval="'+esc(a.id)+'" data-decision="rejected">Reject</button><button class="secondary compact" data-approval="'+esc(a.id)+'" data-decision="review_later">Review later</button></div>':'')+'</div>').join(''):'<div class="empty-state">Nothing is waiting for your approval.</div>')+'</div>';
+ area.querySelectorAll('[data-approval]').forEach(b=>b.onclick=async()=>{try{await api('/approvals/'+b.dataset.approval,{method:'POST',body:{decision:b.dataset.decision}});await loadHeadquarters();renderApprovalsView()}catch(x){alert(x.message)}});
+}
+const connectorCatalog=[
+ ['GitHub','Repositories, pull requests, Actions, and code workflows'],
+ ['Gmail','Email search, drafting, replies, and owner-approved sending'],
+ ['Google Calendar','Schedule context, availability, and owner-approved events'],
+ ['Google Drive','Docs, Sheets, Slides, and project files'],
+ ['Slack','Team context, updates, and scoped collaboration'],
+ ['Notion','Specs, research, documentation, and implementation plans'],
+ ['Stripe','Products, payments, subscriptions, and payment links']
+];
+function renderIntegrationsView(){
+ const area=document.getElementById('workspace'),connected=headquarters?.integrations||[];
+ area.innerHTML='<div class="view-head"><div><h2>Integrations</h2><p>Connected infrastructure is separated from app connectors so Tay never implies access it does not have.</p></div></div>'+
+ '<div class="panel"><div class="panel-head"><h3>Verified platform connections</h3><span class="pill ok">Live</span></div><div class="integration-grid">'+connected.map(i=>'<div class="integration-card"><h3>'+esc(i.label)+'</h3><span class="pill ok">'+esc(i.status)+'</span><p>'+esc((i.capabilities||[]).join(' · '))+'</p></div>').join('')+'</div></div>'+
+ '<div class="panel integration-catalog"><div class="panel-head"><h3>Tay connector catalog</h3><span class="pill">Setup through Tay runtime</span></div><div class="integration-grid">'+connectorCatalog.map(i=>'<div class="integration-card"><h3>'+esc(i[0])+'</h3><span class="pill">Not claimed connected</span><p>'+esc(i[1])+'</p></div>').join('')+'</div><p class="integration-note">This web client does not store third-party passwords or OAuth secrets. A connector only becomes “connected” after Tay verifies the actual account/tool connection.</p></div>';
+}
+function renderPlanView(){
+ const area=document.getElementById('workspace'),project=headquarters?.project||{},onboarding=headquarters?.onboarding||{};
+ area.innerHTML='<div class="view-head"><div><h2>Plan</h2><p>The operating objective Tay uses to prioritize and delegate work.</p></div></div><div class="panel"><form id="planForm" class="inline-form"><div><label>Project objective</label><textarea id="planEditor" maxlength="6000" placeholder="What are we building, for whom, and what result matters?">'+esc(project.plan||project.summary||onboarding.primary_goal||'')+'</textarea></div><div class="row"><div><span class="small muted">Definition of done</span><p>'+esc(onboarding.success_definition||'Use your onboarding definition of done and project-specific instructions.')+'</p></div><div><span class="small muted">Default autonomy</span><p>'+esc(onboarding.autonomy_level||'prepare')+'</p></div></div><button class="primary compact" type="submit">Save plan</button><div id="planNotice" class="success"></div></form></div>';
+ document.getElementById('planForm').onsubmit=async e=>{e.preventDefault();const notice=document.getElementById('planNotice');notice.textContent='Saving…';try{await api('/projects/'+activeProject+'/plan',{method:'POST',body:{plan:document.getElementById('planEditor').value}});await loadHeadquarters();notice.textContent='Plan saved.'}catch(x){notice.className='error';notice.textContent=x.message}};
+}
+
 function openInitialView(){
  const hash=new URLSearchParams(location.hash.replace(/^#/,'')),query=new URLSearchParams(location.search);
  const authError=hash.has('error')||hash.has('error_code')||query.has('error')||query.has('error_code');

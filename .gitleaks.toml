@@ -9,3 +9,14 @@ condition = "AND"
 paths = ['''(^|/)\.env\.example$''']
 regexTarget = "secret"
 regexes = ['''^ANTHROPIC_API_KEY=$''']
+
+# Supabase's publishable/anon client key is designed to ship to browsers and
+# Android; it is not a server secret. Data access still depends on the signed-in
+# user and row-level security. Allow only this exact value in the three known
+# client files so a different key or a real secret is still reported.
+[[allowlists]]
+description = "Known public Supabase publishable client key in reviewed client files"
+condition = "AND"
+paths = ['''android/tay/app/build\.gradle$''', '''(^|/)web/tay/index\.html$''', '''(^|/)public/tay/index\.html$''']
+regexTarget = "secret"
+regexes = ['''^"?sb_publishable_A13pR37f9Rg_I2xb-S4LDw_ncmiXqci"?$''']

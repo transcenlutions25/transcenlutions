@@ -6,8 +6,9 @@
  * conversation → approval → apply → artifact flow, project memory, authorized
  * task runs, business records, and the vendored file-edit matcher.
  */
+import { execFileSync } from "node:child_process";
 import assert from "node:assert/strict";
-import { readFileSync, rmSync, mkdtempSync } from "node:fs";
+import { readFileSync, rmSync, mkdtempSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createRequire } from "node:module";
@@ -36,7 +37,7 @@ delete process.env.TAY_MODEL_BASE_URL;
 delete process.env.STRIPE_SECRET_KEY;
 delete process.env.TAY_STRIPE_PAYMENT_LINK;
 
-const { getDatabase } = require("../lib/tay/db.ts");
+const { getDatabase, openDatabase, validateStorageEnvironment } = require("../lib/tay/db.ts");
 const accounts = require("../lib/tay/accounts.ts");
 const projects = require("../lib/tay/projects.ts");
 const approvals = require("../lib/tay/approvals.ts");
@@ -44,6 +45,9 @@ const registry = require("../lib/tay/registry.ts");
 const orchestrator = require("../lib/tay/orchestrator.ts");
 const business = require("../lib/tay/business.ts");
 const diff = require("../lib/tay/diff.ts");
+const engineering = require("../lib/tay/engineering.ts");
+const migrations = require("../lib/tay/migrations.ts");
+const queue = require("../lib/tay/queue.ts");
 const model = require("../lib/tay/model.ts");
 const patch = require("../third_party/freebuff/str-replace.ts");
 
@@ -376,9 +380,309 @@ check("a payment handoff only records a configured link", () => {
   delete process.env.TAY_STRIPE_PAYMENT_LINK;
 });
 
+/* -------------------------- engineering sessions ------------------------ */
+
+check("repository inspection is read-only and refuses secret paths", () => {
+  const facts = engineering.repositoryFacts();
+  assert.ok(facts.fileCount > 50, `expected a populated repository, saw ${facts.fileCount} files`);
+  assert.equal(facts.packageManager, "npm");
+  assert.ok(facts.verificationCommands.some((command) => command.id === "typecheck"));
+  assert.ok(facts.scripts.some((script) => script.name === "test:tay"));
+  assert.match(engineering.readRepoFile("lib/tay/approvals.ts").content, /decideApproval/);
+  assert.throws(() => engineering.readRepoFile(".env"), /outside the readable repository|secret/);
+  assert.throws(() => engineering.readRepoFile("../package.json"), /outside the readable repository|secret/);
+  assert.throws(() => engineering.readRepoFile("node_modules/typescript/package.json"), /outside the readable repository|secret/);
+  const found = engineering.searchRepository("decideAuthority");
+  assert.ok(found.matches.some((match) => match.path === "lib/tay/registry.ts"));
+});
+
+check("the plan is phased and names the real checks", () => {
+  const facts = engineering.repositoryFacts();
+  const plan = engineering.buildEngineeringPlan("Fix the approval checklist so it updates after a decision", facts, "agent");
+  assert.equal(plan.kind, "bugfix");
+  assert.equal(plan.title, "Fix the approval checklist so it updates after a decision");
+  assert.deepEqual(
+    plan.steps.map((step) => step.id),
+    ["scope", "map", "approach", "implement", "verify", "checkpoint", "handoff"],
+  );
+  assert.ok(plan.acceptance.length >= 3);
+  const ask = engineering.buildEngineeringPlan("Where is the approval status rendered?", facts, "ask");
+  assert.match(ask.steps.find((step) => step.id === "implement").detail, /No writes/);
+});
+
+check("verification refuses anything outside the allowlist", () => {
+  assert.throws(() => engineering.runVerification("rm -rf /"), /Only these checks/);
+  assert.throws(() => engineering.runVerification("npm install"), /Only these checks/);
+  assert.ok(engineering.verificationCommandIds().includes("typecheck"));
+});
+
+let engineeringSessionId = null;
+await checkAsync("an agent session persists a plan and a worklog", async () => {
+  const created = await engineering.createEngineeringSession(db, projectRow, owner, {
+    request: "Fix the approval checklist so it updates after a decision",
+    mode: "agent",
+    conversationId: conversation.id,
+  });
+  engineeringSessionId = created.session.id;
+  assert.equal(created.session.mode, "agent");
+  assert.equal(created.session.status, "running");
+  assert.ok(created.session.steps.length >= 6);
+  assert.equal(created.session.baseBranch, execFileSync("git", ["symbolic-ref", "--short", "HEAD"], { encoding: "utf8" }).trim());
+  const events = engineering.listEngineeringEvents(db, created.session.id, project.id);
+  assert.ok(events.some((event) => event.kind === "plan"));
+  assert.ok(events.some((event) => event.tool === "repository_facts"));
+  assert.ok(engineering.listEngineeringSessions(db, project.id).some((entry) => entry.id === created.session.id));
+});
+
+await checkAsync("a patch is proposed and only applied after approval", async () => {
+  const path = "engineering/notes.md";
+  const outcome = await engineering.runEngineeringTool(db, projectRow, owner, {
+    sessionId: engineeringSessionId,
+    tool: "propose_patch",
+    args: { path, content: "# Engineering note\n\nProposed by the session.\n" },
+  });
+  assert.ok(outcome.approvalId);
+  assert.equal(projects.readProjectFile(db, project.id, path), null, "no file may exist before approval");
+  const applied = approvals.decideApproval(db, outcome.approvalId, project.id, "approve", owner);
+  assert.equal(applied.applied, true, applied.error);
+  assert.match(projects.readProjectFile(db, project.id, path).content, /Engineering note/);
+});
+
+await checkAsync("ask sessions never write", async () => {
+  const created = await engineering.createEngineeringSession(db, projectRow, owner, {
+    request: "Explain how approvals are applied in this repository",
+    mode: "ask",
+  });
+  assert.equal(created.session.mode, "ask");
+  await assert.rejects(
+    engineering.runEngineeringTool(db, projectRow, owner, {
+      sessionId: created.session.id,
+      tool: "propose_patch",
+      args: { path: "engineering/ask.md", content: "should never be written" },
+    }),
+    /read-only/,
+  );
+  assert.equal(projects.readProjectFile(db, project.id, "engineering/ask.md"), null);
+});
+
+await checkAsync("a checkpoint can be rewound through an approval", async () => {
+  const path = "engineering/notes.md";
+  const session = engineering.getEngineeringSession(db, engineeringSessionId, project.id);
+  const checkpoint = engineering.captureCheckpoint(db, projectRow, owner, session, "Before the rewrite");
+  assert.ok(checkpoint.files.some((file) => file.path === path));
+  // A tool run must not clear the pending decision it is running alongside.
+  const toolRun = await engineering.runEngineeringTool(db, projectRow, owner, {
+    sessionId: engineeringSessionId,
+    tool: "checkpoint",
+    args: { label: "Second checkpoint" },
+  });
+  assert.equal(toolRun.session.status, session.status);
+  projects.writeProjectFile(db, project.id, path, "# Rewritten\n");
+  const restore = await engineering.runEngineeringTool(db, projectRow, owner, {
+    sessionId: engineeringSessionId,
+    tool: "rewind",
+    args: { checkpointId: checkpoint.id },
+  });
+  assert.ok(restore.approvalId);
+  const approval = approvals.getApproval(db, restore.approvalId, project.id);
+  assert.equal(approval.kind, "checkpoint_restore");
+  const applied = approvals.decideApproval(db, restore.approvalId, project.id, "approve", owner);
+  assert.equal(applied.applied, true, applied.error);
+  assert.match(projects.readProjectFile(db, project.id, path).content, /Engineering note/);
+});
+
+await checkAsync("the handoff pack is an artifact, not a push", async () => {
+  const outcome = await engineering.runEngineeringTool(db, projectRow, owner, {
+    sessionId: engineeringSessionId,
+    tool: "handoff",
+    args: {},
+  });
+  assert.ok(outcome.approvalId);
+  const approval = approvals.getApproval(db, outcome.approvalId, project.id);
+  assert.equal(approval.kind, "file_write");
+  assert.match(approval.payload.path, /^handoffs\//);
+  const applied = approvals.decideApproval(db, outcome.approvalId, project.id, "approve", owner);
+  assert.equal(applied.applied, true, applied.error);
+  const file = projects.readProjectFile(db, project.id, approval.payload.path);
+  assert.match(file.content, /Engineering handoff/);
+  assert.match(file.content, /Next commands for a human/);
+  assert.match(file.content, /Nothing in this session pushed/);
+});
+
+/* --------------------------- migrations and queue ----------------------- */
+
+check("migrations are recorded and safe to re-run", () => {
+  const status = migrations.migrationStatus(db);
+  assert.deepEqual(status.pending, []);
+  assert.ok(status.applied.includes("001_workspace_core"));
+  assert.ok(status.applied.includes("003_agent_jobs"));
+  assert.deepEqual(migrations.applyMigrations(db).applied, []);
+});
+
+check("the queue refuses an agent without run_task authority", () => {
+  assert.throws(
+    () =>
+      queue.enqueueJob(db, {
+        projectId: project.id,
+        agentId: "dawn",
+        kind: "engineering_checkpoint",
+        payload: { sessionId: engineeringSessionId },
+        createdBy: owner.id,
+      }),
+    /cannot queue work/,
+  );
+});
+
+await checkAsync("a queued job is leased once, completed once, and audited", async () => {
+  const job = queue.enqueueJob(db, {
+    projectId: project.id,
+    agentId: "kj",
+    kind: "engineering_checkpoint",
+    payload: { sessionId: engineeringSessionId, label: "Lease check" },
+    createdBy: owner.id,
+  });
+  assert.equal(job.status, "queued");
+  const claimed = queue.claimNextJob(db, "worker-a");
+  assert.equal(claimed.id, job.id);
+  assert.equal(claimed.attempts, 1);
+  assert.equal(queue.claimNextJob(db, "worker-b"), null, "a leased job cannot be claimed twice");
+  assert.throws(() => queue.completeJob(db, job.id, "worker-b"), /Only the lease holder/);
+  const done = queue.completeJob(db, job.id, "worker-a", { ok: true });
+  assert.equal(done.status, "completed");
+  assert.equal(done.finishedAt !== null, true);
+  const auditKinds = db
+    .all("SELECT kind FROM audit_events WHERE detail LIKE ?", [`%${job.id}%`])
+    .map((row) => row.kind);
+  assert.ok(auditKinds.includes("agent_job_enqueued"));
+  assert.ok(auditKinds.includes("agent_job_claimed"));
+  assert.ok(auditKinds.includes("agent_job_completed"));
+});
+
+await checkAsync("a failing job backs off, retries, then fails permanently", async () => {
+  const job = queue.enqueueJob(db, {
+    projectId: project.id,
+    agentId: "kj",
+    kind: "engineering_checkpoint",
+    payload: { sessionId: engineeringSessionId, label: "Retry check" },
+    createdBy: owner.id,
+    maxAttempts: 2,
+  });
+  const first = queue.claimNextJob(db, "worker-a");
+  assert.equal(first.id, job.id);
+  queue.failJob(db, job.id, "worker-a", "first failure");
+  const retried = queue.getJob(db, job.id, project.id);
+  assert.equal(retried.status, "queued");
+  assert.equal(retried.attempts, 1);
+  assert.equal(retried.lastError, "first failure");
+  assert.equal(queue.claimNextJob(db, "worker-a"), null, "backoff must delay the retry");
+  db.run("UPDATE agent_jobs SET available_at = ? WHERE id = ?", [new Date(0).toISOString(), job.id]);
+  const second = queue.claimNextJob(db, "worker-a");
+  assert.equal(second.attempts, 2);
+  queue.failJob(db, job.id, "worker-a", "second failure");
+  assert.equal(queue.getJob(db, job.id, project.id).status, "failed");
+});
+
+await checkAsync("a worker tick runs a real checkpoint job", async () => {
+  const before = engineering.listCheckpoints(db, engineeringSessionId, project.id).length;
+  const job = queue.enqueueJob(db, {
+    projectId: project.id,
+    agentId: "kj",
+    kind: "engineering_checkpoint",
+    payload: { sessionId: engineeringSessionId, label: "From the queue" },
+    createdBy: owner.id,
+  });
+  const tick = await queue.runQueueTick(db, { owner: "worker-a", limit: 1, projectId: project.id });
+  assert.equal(tick.processed, 1);
+  assert.equal(tick.jobs[0].id, job.id);
+  assert.equal(tick.jobs[0].status, "completed", tick.jobs[0].error);
+  assert.equal(engineering.listCheckpoints(db, engineeringSessionId, project.id).length, before + 1);
+  assert.equal(queue.getJob(db, job.id, project.id).status, "completed");
+});
+
+/* ----------------------- recovery security regressions ---------------- */
+
+check("accounts and artifacts persist across independent server connections", () => {
+  const token = accounts.createSession(db, owner.id).token;
+  const other = openDatabase(join(dataDir, "tay.sqlite"));
+  try {
+    assert.equal(accounts.authenticate(other, owner.email, "correct horse battery").id, owner.id);
+    assert.equal(accounts.sessionIdentityFromToken(other, token).user.id, owner.id);
+    assert.match(projects.readProjectFile(other, project.id, "engineering/notes.md").content, /Engineering note/);
+    assert.equal(accounts.loadProjectForUser(other, project.id, stranger), null);
+    accounts.revokeSession(other, token);
+    assert.equal(accounts.sessionIdentityFromToken(db, token), null);
+  } finally { other.close(); }
+});
+
+check("hosted defaults fail closed for storage, session signing and owner signup", () => {
+  const prior = process.env.NODE_ENV;
+  const secret = process.env.TAY_SESSION_SECRET;
+  const dir = process.env.TAY_DATA_DIR;
+  try {
+    process.env.NODE_ENV = "production";
+    delete process.env.TAY_SESSION_SECRET;
+    delete process.env.TAY_DATA_DIR;
+    assert.throws(() => validateStorageEnvironment(), /persistent|absolute TAY_DATA_DIR/);
+    assert.throws(() => accounts.signPayload("untrusted"), /session secret/);
+    assert.throws(() => accounts.bootstrapOwner(db, "intruder@example.test", "long password here", "Intruder"), /Public owner setup is disabled/);
+    assert.throws(() => engineering.runVerification("git_status"), /local-only/);
+  } finally {
+    for (const [key, value] of Object.entries({ NODE_ENV: prior, TAY_SESSION_SECRET: secret, TAY_DATA_DIR: dir })) {
+      if (value === undefined) delete process.env[key]; else process.env[key] = value;
+    }
+  }
+});
+
+check("repository reads and search reject symlink aliases to private files", () => {
+  const alias = "tay-security-alias.txt";
+  const folder = "tay-security-alias-dir";
+  try {
+    symlinkSync(join(dataDir, "tay.sqlite"), alias);
+    symlinkSync(dataDir, folder);
+    assert.throws(() => engineering.readRepoFile(alias), /outside the readable repository|secret/);
+    assert.throws(() => engineering.readRepoFile(`${folder}/tay.sqlite`), /outside the readable repository|secret/);
+    assert.ok(!engineering.repositoryMap().entries.some((entry) => entry.path.startsWith("tay-security-alias")));
+  } finally { rmSync(alias, { force: true }); rmSync(folder, { force: true }); }
+});
+
+check("completed jobs cannot be completed again or audited by a different worker", () => {
+  const job = queue.enqueueJob(db, { projectId: project.id, agentId: "kj", kind: "engineering_checkpoint",
+    payload: { sessionId: engineeringSessionId }, createdBy: owner.id });
+  queue.claimNextJob(db, "one");
+  queue.completeJob(db, job.id, "one");
+  assert.throws(() => queue.completeJob(db, job.id, "two"), /Only the lease holder/);
+  assert.equal(db.get("SELECT COUNT(*) AS n FROM audit_events WHERE kind = 'agent_job_completed' AND detail LIKE ?", [`%${job.id}%`]).n, 1);
+});
+
+check("an expired final lease is terminal and cannot be completed", () => {
+  const job = queue.enqueueJob(db, { projectId: project.id, agentId: "kj", kind: "engineering_checkpoint",
+    payload: { sessionId: engineeringSessionId }, createdBy: owner.id, maxAttempts: 1 });
+  queue.claimNextJob(db, "crashed");
+  db.run("UPDATE agent_jobs SET lease_expires_at = ? WHERE id = ?", [new Date(0).toISOString(), job.id]);
+  assert.throws(() => queue.completeJob(db, job.id, "crashed"), /unexpired/);
+  assert.equal(queue.claimNextJob(db, "replacement"), null);
+  assert.equal(queue.getJob(db, job.id, project.id).status, "failed");
+});
+
+await checkAsync("queue rechecks disabled identities before checkpoint side effects", async () => {
+  const before = engineering.listCheckpoints(db, engineeringSessionId, project.id).length;
+  const job = queue.enqueueJob(db, { projectId: project.id, agentId: "kj", kind: "engineering_checkpoint",
+    payload: { sessionId: engineeringSessionId }, createdBy: owner.id, maxAttempts: 1 });
+  db.run("UPDATE users SET disabled = 1 WHERE id = ?", [owner.id]);
+  try {
+    const tick = await queue.runQueueTick(db, { owner: "revocation-test", projectId: project.id });
+    assert.equal(tick.jobs[0].status, "failed");
+    assert.match(tick.jobs[0].error, /authority is no longer valid/);
+    assert.equal(engineering.listCheckpoints(db, engineeringSessionId, project.id).length, before);
+    assert.throws(() => queue.enqueueJob(db, { projectId: project.id, agentId: "kj", kind: "engineering_checkpoint",
+      payload: { sessionId: engineeringSessionId }, createdBy: owner.id }), /cannot queue/);
+    assert.equal(queue.getJob(db, job.id, project.id).status, "failed");
+  } finally { db.run("UPDATE users SET disabled = 0 WHERE id = ?", [owner.id]); }
+});
+
 /* ------------------------------- model -------------------------------- */
 
-check("no provider is reported as connected by default", async () => {
+await checkAsync("no provider is reported as connected by default", async () => {
   const status = await model.modelStatus(200);
   assert.equal(status.connected, false);
   assert.equal(status.provider, "none");
@@ -394,4 +698,4 @@ if (failures.length > 0) {
   for (const failure of failures) console.error(` - ${failure}`);
   process.exit(1);
 }
-console.log(`Tay workspace tests passed: ${passed} checks across identity, isolation, authority, approvals, task runs, and business records.`);
+console.log(`Tay workspace tests passed: ${passed} checks across identity, isolation, authority, approvals, task runs, business records, engineering sessions, migrations, and the agent queue.`);

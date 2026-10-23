@@ -89,7 +89,13 @@ export interface TaskRecord {
   updatedAt: string;
 }
 
-export type ApprovalKind = "file_write" | "file_edit" | "business_action" | "external_action" | "memory_write";
+export type ApprovalKind =
+  | "file_write"
+  | "file_edit"
+  | "business_action"
+  | "external_action"
+  | "memory_write"
+  | "checkpoint_restore";
 
 export interface ApprovalSlide {
   title: string;
@@ -247,6 +253,101 @@ export interface BusinessInvoice {
   providerRef: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+/* ------------------- engineering sessions (Devin-style) ------------------ */
+
+export type EngineeringMode = "ask" | "agent";
+
+export type EngineeringStatus =
+  | "planning"
+  | "awaiting_approval"
+  | "running"
+  | "paused"
+  | "blocked"
+  | "completed"
+  | "failed";
+
+export type EngineeringEventKind =
+  | "plan"
+  | "tool"
+  | "observation"
+  | "proposal"
+  | "verification"
+  | "checkpoint"
+  | "handoff"
+  | "message"
+  | "error";
+
+export interface EngineeringSessionRecord {
+  id: string;
+  projectId: string;
+  conversationId: string | null;
+  title: string;
+  request: string;
+  mode: EngineeringMode;
+  status: EngineeringStatus;
+  /** Repository the session inspects. Read-only in this deployment. */
+  repository: string;
+  baseBranch: string;
+  steps: TaskStep[];
+  taskId: string | null;
+  playbookId: string | null;
+  modelLabel: string | null;
+  summary: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EngineeringEventRecord {
+  id: string;
+  sessionId: string;
+  projectId: string;
+  kind: EngineeringEventKind;
+  tool: string | null;
+  summary: string;
+  detail: Record<string, unknown> | null;
+  at: string;
+}
+
+export interface EngineeringCheckpointFile {
+  path: string;
+  version: number;
+  sha256: string;
+  bytes: number;
+}
+
+export interface EngineeringCheckpointRecord {
+  id: string;
+  sessionId: string;
+  projectId: string;
+  label: string;
+  files: EngineeringCheckpointFile[];
+  createdAt: string;
+}
+
+export interface EngineeringPlaybookRecord {
+  id: string;
+  projectId: string;
+  name: string;
+  /** Short invocation token, e.g. `!migrate`. */
+  macro: string;
+  instructions: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RepositoryFacts {
+  root: string;
+  name: string | null;
+  framework: string | null;
+  packageManager: string | null;
+  nodeVersion: string | null;
+  scripts: { name: string; command: string }[];
+  verificationCommands: { id: string; label: string }[];
+  topLevel: string[];
+  fileCount: number;
+  truncated: boolean;
 }
 
 export interface BusinessState {

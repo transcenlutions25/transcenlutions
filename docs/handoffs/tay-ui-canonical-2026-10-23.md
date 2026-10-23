@@ -10,7 +10,9 @@
 | Branch | `feat/tay-ui-canonical-20261023` |
 | Base | `main` at `e094f43` |
 | Code commit | `e6571893a38c57eb2fa67355b606ef34768a2bb0` |
-| GitHub PR | opened as a **draft**; see the branch's PR link after push |
+| Handoff commit | `b9c5ce730c2fa5323138d1e18ab4a2ccf863d689` |
+| GitHub PR | [#90](https://github.com/transcenlutions25/transcenlutions/pull/90) — **draft**, base `main` |
+| Push | `origin` fetches over HTTPS and pushes over SSH (key `~/.ssh/id_ed25519`); no force-push |
 
 The branch is a dedicated worktree. It does not replace `main`, the root app,
 its APIs, or production.

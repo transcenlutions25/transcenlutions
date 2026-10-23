@@ -76,7 +76,7 @@ export default function HallwayWorkspace() {
           {stages.map(s=><article key={s.title} style={{background:"#17152d",border:"1px solid #524783",borderRadius:12,padding:18}}><h3 style={{color:"#e4c675",fontSize:17}}>{s.title}</h3><p style={{lineHeight:1.55,color:"#ddd7ef"}}>{s.copy}</p></article>)}
         </div>
         <h2 style={{marginTop:42,fontSize:25}}>Reusable email campaign</h2>
-        <p style={{lineHeight:1.6,color:"#ddd7ef"}}>Personalize for a verified recipient. Draft and review the offer before sending; no automated outreach is activated. Campaign copy is original and does not reproduce another company's proprietary content.</p>
+        <p style={{lineHeight:1.6,color:"#ddd7ef"}}>Personalize for a verified recipient. Draft and review the offer before sending; no automated outreach is activated. Campaign copy is original and does not reproduce another company&apos;s proprietary content.</p>
         {campaign.map((item)=><section key={item.label} style={{marginTop:18,padding:20,background:"#131226",border:"1px solid #504470",borderRadius:12}}>
           <h3 style={{fontSize:19,color:"#e4c675"}}>{item.label}</h3>
           <p><strong>Subject:</strong> {item.subject}</p>

@@ -21,6 +21,27 @@ User request
 → next step is suggested
 ```
 
+## Consolidated Tay workspace
+
+The shared application now includes `/workspace`: the consolidated Tay Command
+surface, with Tay as the central orchestrator, a conversation-first layout,
+collapsible navigation, a resizable preview panel, saved projects and history,
+project memory, file editing, approval-gated changes with a short visual
+preview, authorized task runs, live progress, and the Agent/Skill/Authority
+trees. Business records (customers, deliveries, invoices) live in the same
+workspace with honest configuration states.
+
+Server-side identity, approvals, project scoping and agent authority are
+enforced in `lib/tay/`. The implementation status, Freebuff provenance, run
+instructions and remaining blockers are recorded in
+[docs/tay-consolidated-workspace.md](docs/tay-consolidated-workspace.md).
+
+```bash
+npm run dev
+# then open http://localhost:3000/workspace
+npm run test:tay
+```
+
 ## Active App Structure
 
 The active Next.js app lives at the repository root:

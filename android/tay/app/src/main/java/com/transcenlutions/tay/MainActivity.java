@@ -263,7 +263,7 @@ public final class MainActivity extends Activity {
                 content.addView(space(10));
             }
         }
-        Button web = secondaryButton("Open shared web workspace");
+        Button web = secondaryButton("Open Tay Headquarters");
         web.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(BuildConfig.TAY_WEB_URL))));
         content.addView(space(10));
         content.addView(web);

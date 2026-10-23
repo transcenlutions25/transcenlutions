@@ -93,6 +93,8 @@ import { SalesPanel } from "./sales-panel";
 import { SessionLog } from "./session-log";
 import { SystemStack } from "./system-stack";
 import { WorkspaceFrame } from "./workspace-frame";
+import { TaskCompletionNotices } from "./task-completion-notices";
+import type { CompletedWorkNotice } from "../lib/task-completion-notices";
 import { AssetsPanel, DesktopQueuePanel, MomentumPanel, ProjectsPanel, ReusableReply, WebQueuePanel } from "./workspace-tools";
 import { useDesktopRuntime, callDesktop, type DesktopState, type DesktopItem } from "../lib/use-desktop-runtime";
 import { addQueuedRequest, newWorkspaceId, readWorkspaceState, recordMomentum, workspaceStorageKey,
@@ -773,6 +775,23 @@ export function ChatShell({
   const canSteer = desktopEnabled ? Boolean(activeDesktop) : Boolean(activeResponse && !result && executionStatus !== "running");
   const sidecarLabels: Record<string, string> = { agent: "Agent & activity", queue: "Command queue", projects: "Projects", assets: "Workspace Library", explore: "Explore", launch: "Launch & deployment", revenue: "Revenue", sales: "Sales", fulfillment: "Fulfillment", founder: "Founder operations", governance: "Governance", memory: "Memory", feedback: "Feedback", settings: "Settings", browser: "Browser", preview: "Preview", tools: "Mac tools", momentum: "Crowne Momentum", result: "Queue result", scheduled: "Scheduled", plugins: "Plugins" };
   const existingBusy = executionStatus === "running" || desktop.busy;
+  const completionScope = desktopEnabled
+    ? `desktop:${desktop.project}:${desktop.state?.session_id || ""}`
+    : `hosted:${threadId}`;
+  const completedWork: CompletedWorkNotice[] = desktopEnabled
+    ? (desktop.state?.items ?? []).filter((item) => item.status === "completed").map((item) => ({
+        id: item.id,
+        title: item.payload.message || "Mac objective",
+        summary: item.result?.answer || "The connected Mac runtime marked this objective completed. Review its queue record for details.",
+      }))
+    : activeResponse && result?.status === "completed" && executionStatus === "completed"
+      ? [{
+          id: activeResponse.id,
+          title: activeResponse.action.title || "Tay task",
+          summary: result.result,
+          nextStep: result.nextStep,
+        }]
+      : [];
 
   async function reviseWriting(request: WritingRevisionRequest) {
     if (!desktopEnabled || !desktop.project) throw new Error("Connect the Mac runtime to request a Tay revision. Direct editing is available.");
@@ -854,6 +873,7 @@ export function ChatShell({
   </>;
 
   return <WorkspaceFrame conversationTitle={title} sidecarTitle={sidecarLabels[sidecarKey] || "Workspace"}
+    completionNotices={hydrated ? <TaskCompletionNotices key={completionScope} completed={completedWork} onOpenHistory={() => openPanel(desktopEnabled ? "queue" : "agent")} /> : null}
     sidecarOpen={sidecarOpen} onSidecarOpenChange={setSidecarOpen} sidecar={sidecar}
     navigation={<>
       <div className="tay-privacy-controls"><button aria-pressed={desktopEnabled} type="button" onClick={() => openPanel("plugins")}>{desktopEnabled ? "● Offline" : "Private alpha"}</button><button type="button" onClick={() => openPanel("plugins")}>Connections</button></div>

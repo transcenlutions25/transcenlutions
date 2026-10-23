@@ -11,6 +11,11 @@ const nextConfig = {
   outputFileTracingIncludes: {
     "/api/apex/checklist": ["./products/funnel-checklist/funnel-leak-emergency-checklist.html"],
   },
+  // The reviewed static Tay client lives in public/tay. Serve the clean /tay
+  // entry point without creating a second app or touching the root route.
+  async rewrites() {
+    return [{ source: "/tay", destination: "/tay/index.html" }];
+  },
   ...(process.env.NEXT_OUTPUT === "export"
     ? {
         output: "export",

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "agentId": "tay",
+  "asset": {
+    "filename": "Tay-approved-suit-fullbody-transparent-2026-10-17.png",
+    "width": 1024,
+    "height": 1536,
+    "mimeType": "image/png",
+    "bytes": 1743984,
+    "sha256": "4258118a1bf5272efcb048e749845a699ccf5e7834078071f4df70a0f8e5c16e",
+    "provenance": "Owner-approved canonical human Tay standing-pose artwork: ornate black-and-gold suit, jewels and black cap, transparent background. Original bytes retained; no substitution and no synthetic pose."
+  },
+  "motion": {
+    "id": "standing-sway-v1",
+    "kind": "whole-cutout-transform",
+    "cycleMilliseconds": 50000,
+    "motionMilliseconds": 3000,
+    "maxRotationDegrees": 0.6,
+    "origin": [0.5, 0.98],
+    "keyframes": [
+      { "offset": 0, "rotationDegrees": 0 },
+      { "offset": 0.94, "rotationDegrees": 0 },
+      { "offset": 0.96, "rotationDegrees": -0.6 },
+      { "offset": 0.98, "rotationDegrees": 0.6 },
+      { "offset": 1, "rotationDegrees": 0 }
+    ],
+    "reducedMotion": "static",
+    "requiresVisibleDocumentAndElement": true,
+    "pauseSupported": true,
+    "pausePersistence": "local-only: tay.header.motion.v1",
+    "notImplemented": [
+      "blinking",
+      "walking",
+      "limb motion",
+      "hat tipping",
+      "gestures",
+      "facial animation",
+      "speech sync",
+      "speaking state",
+      "listening state"
+    ]
+  },
+  "cover": {
+    "caption": "Transcenlutions",
+    "framing": "centered portrait crop in the left panel; complete full body everywhere else",
+    "asset": "Tay-approved-suit-fullbody-transparent-2026-10-17.png"
+  }
+}

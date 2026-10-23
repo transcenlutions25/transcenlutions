@@ -190,11 +190,15 @@ async function boot(){
  }catch(e){if(/sign in|session|jwt|token|invalid/i.test(e.message))saveSession(null);signInView(e.message)}
 }
 
+let headquartersRevision=0,headquartersError='';
 async function loadHeadquarters(){
- if(!activeProject){headquarters=null;return null}
- const d=await api('/projects/'+activeProject+'/headquarters');
- headquarters=d;
- return d;
+ const projectId=activeProject,revision=++headquartersRevision;headquarters=null;headquartersError='';
+ if(!projectId)return null;
+ try{const d=await api('/projects/'+projectId+'/headquarters',{retry:false});
+  if(revision!==headquartersRevision||activeProject!==projectId)return null;
+  if(!d?.ok||d.project?.id!==projectId||!Array.isArray(d.tasks)||d.tasks.some(t=>t.project_id!==projectId))throw Error('Unexpected project response.');
+  headquarters=d;return d;
+ }catch(e){if(revision===headquartersRevision&&activeProject===projectId){headquarters=null;headquartersError=e.message||'Cloud unavailable';}return null;}
 }
 function viewLabel(view){return ({headquarters:'Headquarters',chat:'Chat with Tay',tasks:'Tasks',team:'Team',approvals:'Approvals',integrations:'Integrations',plan:'Plan'})[view]||'Headquarters'}
 function activeProjectRecord(){return projects.find(p=>p.id===activeProject)||headquarters?.project||null}
@@ -208,7 +212,7 @@ function renderWorkspaceNav(){
  document.querySelectorAll('.workspace-nav button').forEach(b=>{b.classList.toggle('active',b.dataset.view===currentView);b.onclick=async()=>{currentView=b.dataset.view;renderWorkspaceNav();await renderCurrentView()}});
 }
 async function renderShell(){
- if(activeProject)await loadHeadquarters();
+ const requestedProject=activeProject;if(activeProject)await loadHeadquarters();if(activeProject!==requestedProject)return;
  const project=activeProjectRecord();
  root.innerHTML='<div class="shell glass"><aside class="sidebar"><div class="brand">TRANSCENLUTIONS</div><div style="margin-top:10px"><strong>Tay Command</strong><div class="badge">Owner-directed AI team</div></div><nav class="workspace-nav" aria-label="Tay workspace"><button data-view="headquarters">Headquarters</button><button data-view="chat">Tay</button><button data-view="tasks">Tasks</button><button data-view="team">Team</button><button data-view="approvals">Approvals</button><button data-view="integrations">Integrations</button><button data-view="plan">Plan</button></nav><div class="project-switch"><div class="sidebar-head"><strong>Projects</strong><button id="newProject" class="secondary compact">New</button></div><div id="projects" class="projects"></div></div><div class="sidebar-actions"><button id="logout" class="secondary">Sign out</button></div></aside><main class="main"><header class="topbar"><div><strong id="projectTitle">'+esc(project?.name||'Tay Cloud')+'</strong><div class="badge">Tay · '+esc(viewLabel(currentView))+'</div></div><div class="top-actions"><button id="refresh" class="secondary compact">Refresh</button></div></header><section id="workspace" class="workspace"></section></main></div>';
  renderProjectButtons();renderWorkspaceNav();
@@ -221,7 +225,8 @@ async function renderShell(){
 async function renderCurrentView(){
  const area=document.getElementById('workspace');if(!area)return;
  if(!activeProject){area.innerHTML='<div class="empty-state">Create a project to open Tay Headquarters.</div>';return}
- if(!headquarters)await loadHeadquarters();
+ if(!headquarters&&!headquartersError)await loadHeadquarters();
+ if(!headquarters){area.innerHTML='<div class="error" role="alert">Saved workspace unavailable. '+esc(headquartersError||'Loading interrupted.')+'</div><button id="retryWorkspace" class="secondary">Reload saved workspace</button>';document.getElementById('retryWorkspace').onclick=async()=>{await loadHeadquarters();await renderCurrentView()};return;}
  const title=document.getElementById('projectTitle');if(title)title.textContent=headquarters?.project?.name||'Tay project';
  if(currentView==='chat')return renderChatView();
  if(currentView==='tasks')return renderTasksView();
@@ -234,8 +239,8 @@ async function renderCurrentView(){
 function renderHeadquartersView(){
  const area=document.getElementById('workspace'),h=headquarters||{},tasks=h.tasks||[],approvals=h.approvals||[],agents=h.agents||[],project=h.project||{};
  const pending=approvals.filter(a=>a.status==='pending').length;
- const activeTasks=tasks.filter(t=>['pending','in_progress','blocked','review'].includes(t.status)).length;
- const done=tasks.filter(t=>t.status==='done').length;
+ const activeTasks=tasks.filter(t=>['pending','active','blocked','awaiting_approval'].includes(t.status)).length;
+ const done=tasks.filter(t=>t.status==='completed').length;
  const activeAgents=agents.filter(a=>a.status==='active').length;
  const recent=tasks.slice(0,4);
  area.innerHTML='<div class="view-head"><div><h2>Headquarters</h2><p>One command center for Tay, the team, work, and approvals.</p></div><div class="quick-actions"><button class="secondary compact" data-go="chat">Ask Tay</button><button class="secondary compact" data-go="tasks">New task</button><button class="secondary compact" data-go="team">Add specialist</button></div></div>'+
@@ -257,15 +262,25 @@ async function loadProjectIntoChat(){
 }
 function taskAgentName(id){const a=(headquarters?.agents||[]).find(x=>x.id===id);return a?.name||'Unassigned'}
 function taskColumn(status,label,tasks){
- return '<div class="kanban-col"><h4>'+label+' · '+tasks.length+'</h4>'+ (tasks.length?tasks.map(t=>'<div class="task-card"><strong>'+esc(t.title)+'</strong><p>'+esc(t.description||'')+'</p><div class="task-meta"><span class="pill">'+esc(t.priority||'normal')+'</span><span class="pill">'+esc(taskAgentName(t.assigned_agent_id))+'</span></div><select data-task-status="'+esc(t.id)+'"><option value="pending" '+(t.status==='pending'?'selected':'')+'>Queued</option><option value="in_progress" '+(t.status==='in_progress'?'selected':'')+'>In progress</option><option value="blocked" '+(t.status==='blocked'?'selected':'')+'>Blocked</option><option value="review" '+(t.status==='review'?'selected':'')+'>Review</option><option value="done" '+(t.status==='done'?'selected':'')+'>Done</option></select></div>').join(''):'<div class="empty-state">Empty</div>')+'</div>'
+ return '<div class="kanban-col"><h4>'+label+' · '+tasks.length+'</h4>'+ (tasks.length?tasks.map(t=>'<div class="task-card"><strong>'+esc(t.title)+'</strong><p>'+esc(t.description||'')+'</p><div class="task-meta"><span class="pill">'+esc(t.priority||'normal')+'</span><span class="pill">'+esc(taskAgentName(t.assigned_agent_id))+'</span></div><select data-task-status="'+esc(t.id)+'"><option value="pending" '+(t.status==='pending'?'selected':'')+'>Queued</option><option value="active" '+(t.status==='active'?'selected':'')+'>In progress</option><option value="blocked" '+(t.status==='blocked'?'selected':'')+'>Blocked</option><option value="awaiting_approval" '+(t.status==='awaiting_approval'?'selected':'')+'>Review</option><option value="completed" '+(t.status==='completed'?'selected':'')+'>Done</option><option value="failed" '+(t.status==='failed'?'selected':'')+'>Failed</option><option value="cancelled" '+(t.status==='cancelled'?'selected':'')+'>Cancelled</option></select></div>').join(''):'<div class="empty-state">Empty</div>')+'</div>'
+}
+let taskSavePending=false;
+async function saveTaskChange(path,body){
+ if(taskSavePending)return;taskSavePending=true;const projectId=activeProject;
+ const area=document.getElementById('workspace');area.querySelectorAll('button,input,select,textarea').forEach(e=>e.disabled=true);
+ const notice=document.createElement('p');notice.setAttribute('role','status');notice.textContent='Saving task…';area.prepend(notice);
+ try{const result=await api(path,{method:'POST',body,retry:false});if(!result?.ok||result.task?.project_id!==projectId)throw Error('Save response not confirmed.');
+  if(activeProject===projectId){await loadHeadquarters();if(activeProject===projectId)await renderCurrentView();}
+ }catch(e){if(activeProject===projectId){notice.textContent='Save not confirmed. Reload before trying again. '+e.message;const button=document.createElement('button');button.textContent='Reload saved workspace';button.onclick=async()=>{await loadHeadquarters();await renderCurrentView()};notice.append(button);}}
+ finally{taskSavePending=false;}
 }
 function renderTasksView(){
  const area=document.getElementById('workspace'),tasks=headquarters?.tasks||[],agents=headquarters?.agents||[];
  area.innerHTML='<div class="view-head"><div><h2>Tasks</h2><p>Tay can organize and delegate work here. A task is not treated as executed until the runtime actually produces a result.</p></div></div>'+
  '<div class="panel"><div class="panel-head"><h3>Create task</h3><span class="pill gold">Team board</span></div><form id="taskForm" class="inline-form"><div class="row"><div><label>Task</label><input id="taskTitle" maxlength="240" required placeholder="What needs to get done?"></div><div><label>Priority</label><select id="taskPriority"><option>normal</option><option>high</option><option>urgent</option><option>low</option></select></div></div><div><label>Context</label><textarea id="taskDescription" maxlength="4000" placeholder="What should Tay or the specialist know?"></textarea></div><div class="row"><div><label>Assign</label><select id="taskAgent"><option value="">Tay / unassigned</option>'+agents.filter(a=>a.status!=='retired').map(a=>'<option value="'+esc(a.id)+'">'+esc(a.name)+'</option>').join('')+'</select></div><label class="choice" style="margin-top:0"><input id="taskApproval" type="checkbox"><span><strong>Approval before execution</strong><small>Create a human gate before this task can proceed.</small></span></label></div><button class="primary compact" type="submit">Create task</button></form></div>'+
- '<div class="kanban">'+taskColumn('pending','Queued',tasks.filter(t=>t.status==='pending'))+taskColumn('in_progress','In progress',tasks.filter(t=>t.status==='in_progress'))+taskColumn('blocked','Blocked',tasks.filter(t=>t.status==='blocked'))+taskColumn('review','Review',tasks.filter(t=>t.status==='review'))+taskColumn('done','Done',tasks.filter(t=>t.status==='done'))+'</div>';
- document.getElementById('taskForm').onsubmit=async e=>{e.preventDefault();const title=document.getElementById('taskTitle').value.trim();if(!title)return;const payload={title,description:document.getElementById('taskDescription').value.trim(),priority:document.getElementById('taskPriority').value,assignedAgentId:document.getElementById('taskAgent').value||null,requiresApproval:document.getElementById('taskApproval').checked};try{await api('/projects/'+activeProject+'/tasks',{method:'POST',body:payload});await loadHeadquarters();renderTasksView()}catch(x){alert(x.message)}};
- area.querySelectorAll('[data-task-status]').forEach(s=>s.onchange=async()=>{try{await api('/tasks/'+s.dataset.taskStatus,{method:'POST',body:{status:s.value}});await loadHeadquarters();renderTasksView()}catch(x){alert(x.message)}});
+ '<div class="kanban">'+taskColumn('pending','Queued',tasks.filter(t=>t.status==='pending'))+taskColumn('active','In progress',tasks.filter(t=>t.status==='active'))+taskColumn('blocked','Blocked',tasks.filter(t=>t.status==='blocked'))+taskColumn('awaiting_approval','Review',tasks.filter(t=>t.status==='awaiting_approval'))+taskColumn('completed','Done',tasks.filter(t=>t.status==='completed'))+taskColumn('failed','Failed',tasks.filter(t=>t.status==='failed'))+taskColumn('cancelled','Cancelled',tasks.filter(t=>t.status==='cancelled'))+'</div>';
+ document.getElementById('taskForm').onsubmit=async e=>{e.preventDefault();const title=document.getElementById('taskTitle').value.trim();if(!title)return;const payload={title,description:document.getElementById('taskDescription').value.trim(),priority:document.getElementById('taskPriority').value,assignedAgentId:document.getElementById('taskAgent').value||null,requiresApproval:document.getElementById('taskApproval').checked};await saveTaskChange('/projects/'+activeProject+'/tasks',payload)};
+ area.querySelectorAll('[data-task-status]').forEach(s=>s.onchange=async()=>{await saveTaskChange('/tasks/'+s.dataset.taskStatus,{status:s.value})});
 }
 const teamTemplates=[
  {name:'Research',purpose:'Investigate markets, competitors, evidence, and source-backed questions.',instructions:'Research first. Separate verified facts from assumptions. Return sources and decision-relevant findings.'},
@@ -326,3 +341,4 @@ function openInitialView(){
 }
 openInitialView();
 </script></body></html>
+

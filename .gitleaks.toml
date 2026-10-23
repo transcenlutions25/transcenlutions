@@ -9,3 +9,11 @@ condition = "AND"
 paths = ['''(^|/)\.env\.example$''']
 regexTarget = "secret"
 regexes = ['''^ANTHROPIC_API_KEY=$''']
+
+# Reviewed public Supabase client key only; not a secret or authorization grant.
+[[allowlists]]
+description = "Exact reviewed Supabase publishable key at three client integration paths"
+condition = "AND"
+paths = ['''^android/tay/app/build\.gradle$''', '''^web/tay/index\.html$''', '''^public/tay/index\.html$''']
+regexTarget = "secret"
+regexes = ['''^sb_publishable_A13pR37f9Rg_I2xb-S4LDw_ncmiXqci$''']

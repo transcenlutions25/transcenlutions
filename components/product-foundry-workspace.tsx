@@ -9,8 +9,8 @@ import {
   calculateFoundryEconomics, createFoundryPrompt, foundryLines,
   foundryProviders, productRequirements, type FoundryEconomicsInput,
   type FoundryLineId,
-} from "../../lib/product-foundry";
-import { foundryWorkflow } from "../../lib/product-foundry-adapters";
+} from "../lib/product-foundry";
+import { foundryWorkflow } from "../lib/product-foundry-adapters";
 
 const emptyEconomics: FoundryEconomicsInput = {
   retail: null, manufacturing: null, shipping: null, packaging: null,

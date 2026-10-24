@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080611">
+<title>Tay · Transcenlutions</title>
+<style>
+:root{color-scheme:dark;--bg:#080611;--panel:#171126;--text:#f7f2ff;--muted:#bfb4d2;--gold:#eec55b;--blue:#3657dd;--purple:#7043c2;--danger:#ff9f9f;--ok:#a9f0bf}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#25134b 0,transparent 35%),linear-gradient(145deg,#07050d,#0c1128);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+button,input,textarea,select{font:inherit}button{cursor:pointer}.app{max-width:1080px;margin:0 auto;min-height:100vh;padding:20px}.brand{letter-spacing:.18em;color:var(--gold);font-weight:800;font-size:.93rem}
+.glass{background:rgba(23,17,38,.92);border:1px solid rgba(238,197,91,.35);box-shadow:0 18px 60px rgba(0,0,0,.35);border-radius:22px}.auth{max-width:580px;margin:6vh auto;padding:28px}.auth.wide{max-width:720px}
+.muted{color:var(--muted);line-height:1.55}.small{font-size:.88rem}.field{margin-top:16px}.field label{display:block;margin-bottom:7px;font-size:.9rem;font-weight:700}.input-wrap{position:relative}
+input,textarea,select{width:100%;border:1px solid #4d4262;background:#0d0a16;color:var(--text);border-radius:14px;padding:14px;outline:none}textarea{min-height:120px;resize:vertical}
+input:focus,textarea:focus,select:focus,button:focus-visible{border-color:var(--gold);box-shadow:0 0 0 3px rgba(238,197,91,.2)}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--gold);min-width:52px;min-height:46px;border-radius:12px}
+.primary,.secondary,.linkbtn{border:0;border-radius:14px;padding:13px 16px;color:#fff;font-weight:800}.primary{background:linear-gradient(100deg,var(--blue),var(--purple));width:100%;margin-top:18px}.secondary{background:#21172f;border:1px solid rgba(238,197,91,.5)}.linkbtn{background:transparent;color:var(--gold);padding:12px 0;width:100%}
+.error{color:var(--danger);margin-top:12px;white-space:pre-wrap}.success{color:var(--ok);margin-top:12px;white-space:pre-wrap}.row{display:flex;gap:10px}.row>*{flex:1}.progress{height:7px;background:#0d0a16;border-radius:999px;overflow:hidden;margin:18px 0}.progress>div{height:100%;background:linear-gradient(90deg,var(--gold),var(--purple));transition:width .2s ease}
+.step-kicker{color:var(--gold);font-size:.84rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.question{font-size:1.55rem;line-height:1.2;margin:.5rem 0}.help{color:var(--muted);line-height:1.5;margin:0 0 14px}
+.choice-grid{display:grid;gap:10px;margin-top:14px}.choice{display:flex;align-items:flex-start;gap:11px;padding:13px;border:1px solid #4d4262;background:#100c1c;border-radius:14px}.choice:hover{border-color:#8167a0}.choice input{width:auto;margin-top:3px}.choice span{line-height:1.35}.choice small{display:block;color:var(--muted);margin-top:3px}
+.nav{display:flex;gap:10px;margin-top:20px}.nav button{flex:1}.nav .primary{margin:0}.voice-note{margin-top:16px;padding:12px 14px;border:1px solid rgba(238,197,91,.28);border-radius:14px;background:#100c1c;color:var(--muted)}
+.shell{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 40px);overflow:hidden}.sidebar{padding:18px;border-right:1px solid rgba(238,197,91,.2)}.sidebar-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:14px 0}.projects{display:grid;gap:9px}.project{border:1px solid #4a3b62;background:#100c1c;color:var(--text);border-radius:14px;padding:12px;text-align:left}.project.active{border-color:var(--gold);background:#211634}.project strong{display:block}.project small{color:var(--muted)}.main{display:flex;flex-direction:column;min-width:0}.topbar{padding:16px 20px;border-bottom:1px solid rgba(238,197,91,.2);display:flex;justify-content:space-between;gap:12px;align-items:center}.messages{padding:20px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:12px}.bubble{max-width:82%;padding:14px 16px;border-radius:18px;line-height:1.55;white-space:pre-wrap}.bubble.user{align-self:flex-end;background:#313b8e;border:1px solid #5b72f4}.bubble.tay,.bubble.system{align-self:flex-start;background:#171126;border:1px solid #4c3c62}.composer{padding:16px;border-top:1px solid rgba(238,197,91,.2);display:flex;gap:10px}.composer textarea{resize:none;min-height:54px;max-height:180px}.composer button{width:auto;margin:0;min-width:90px}.empty{padding:30px;color:var(--muted)}.badge{color:var(--gold);font-size:.82rem}
+
+.workspace-nav{display:grid;gap:7px;margin:18px 0}.workspace-nav button{border:1px solid transparent;background:transparent;color:var(--muted);padding:10px 12px;border-radius:12px;text-align:left;font-weight:750}.workspace-nav button:hover{background:#130e20;color:var(--text)}.workspace-nav button.active{background:#211634;border-color:rgba(238,197,91,.5);color:var(--gold)}
+.project-switch{margin-top:18px;padding-top:14px;border-top:1px solid rgba(238,197,91,.18)}.project-switch .projects{max-height:220px;overflow:auto}.sidebar-actions{display:grid;gap:9px;margin-top:14px}
+.workspace{padding:20px;overflow:auto;flex:1}.view-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:18px}.view-head h2{margin:0 0 5px;font-size:1.55rem}.view-head p{margin:0;color:var(--muted)}
+.hq-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.metric,.panel,.agent-card,.task-card,.approval-card,.integration-card,.template-card{background:#100c1c;border:1px solid #443653;border-radius:16px}.metric{padding:15px}.metric strong{display:block;font-size:1.8rem;color:var(--gold)}.metric span{color:var(--muted);font-size:.86rem}
+.panel{padding:18px;margin-bottom:14px}.panel h3{margin:0 0 8px}.panel p{color:var(--muted);line-height:1.5}.panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}
+.lead-card{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}.avatar{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,var(--purple),#2f1f54);display:grid;place-items:center;color:var(--gold);font-weight:900;border:1px solid rgba(238,197,91,.4)}.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px}
+.quick-actions{display:flex;flex-wrap:wrap;gap:8px}.quick-actions .secondary{padding:10px 12px}.pill{display:inline-block;border:1px solid #4d4262;background:#181022;border-radius:999px;padding:5px 9px;color:var(--muted);font-size:.78rem}.pill.gold{border-color:rgba(238,197,91,.5);color:var(--gold)}.pill.ok{border-color:rgba(169,240,191,.45);color:var(--ok)}.pill.warn{border-color:rgba(255,159,159,.4);color:var(--danger)}
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(210px,1fr));gap:12px;overflow-x:auto;padding-bottom:8px}.kanban-col{min-width:210px}.kanban-col h4{margin:0 0 9px;color:var(--muted);font-size:.85rem;text-transform:uppercase;letter-spacing:.06em}.task-card{padding:12px;margin-bottom:9px}.task-card strong{display:block;margin-bottom:6px}.task-card p{margin:5px 0 10px;color:var(--muted);font-size:.88rem}.task-meta{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.task-card select{padding:8px;border-radius:10px;font-size:.82rem}
+.team-grid,.integration-grid,.template-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.agent-card,.integration-card,.template-card{padding:15px}.agent-card h3,.integration-card h3,.template-card h3{margin:0 0 6px}.agent-card p,.integration-card p,.template-card p{color:var(--muted);font-size:.9rem;line-height:1.45}.agent-actions{display:flex;gap:8px;margin-top:12px}
+.approval-list{display:grid;gap:10px}.approval-card{padding:15px}.approval-card h3{margin:0 0 6px}.approval-card p{color:var(--muted);line-height:1.45}.approval-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.inline-form{display:grid;gap:10px}.inline-form .row{align-items:end}.inline-form textarea{min-height:92px}.compact{padding:9px 11px!important;margin:0!important;width:auto!important}.danger-btn{border:1px solid rgba(255,159,159,.45);background:#2b111a;color:#ffd5d5;border-radius:12px;padding:9px 11px;font-weight:800}
+.empty-state{padding:24px;border:1px dashed #4d4262;border-radius:16px;color:var(--muted);text-align:center}.workspace-chat{display:flex;flex-direction:column;min-height:calc(100vh - 155px)}.workspace-chat .messages{padding:0 0 16px}.workspace-chat .composer{padding:12px 0 0;border-top:1px solid rgba(238,197,91,.18)}
+.integration-catalog{margin-top:18px}.integration-note{font-size:.86rem;color:var(--muted);margin-top:10px}.top-actions{display:flex;gap:8px;align-items:center}.top-actions button{white-space:nowrap}
+
+@media(max-width:760px){.app{padding:0}.auth,.auth.wide{margin:0;min-height:100vh;border-radius:0;padding:24px}.row{display:block}.shell{grid-template-columns:1fr;min-height:100vh;border-radius:0}.sidebar{border-right:0;border-bottom:1px solid rgba(238,197,91,.2);max-height:40vh;overflow:auto}.bubble{max-width:94%}.topbar{padding:12px}.messages{padding:12px}.composer{padding:10px}}
+.password-rules{margin:12px 0;color:var(--muted);font-size:.9rem}.password-rules ul{list-style:none;padding:0;margin:8px 0;display:grid;gap:5px}.password-rules [data-met="true"]{color:var(--ok)}.password-match{font-size:.9rem;color:var(--muted);margin:8px 0}
+@media(max-width:920px){.hq-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.team-grid,.integration-grid,.template-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.sidebar{max-height:none}.workspace-nav{grid-template-columns:repeat(4,minmax(0,1fr));overflow:auto}.workspace-nav button{text-align:center;font-size:.78rem;padding:9px 7px}.project-switch{display:none}.hq-grid,.team-grid,.integration-grid,.template-grid{grid-template-columns:1fr}.workspace{padding:14px}.view-head{display:block}.top-actions{margin-top:10px}.lead-card{grid-template-columns:auto 1fr}.lead-card>.pill{grid-column:1/-1}.kanban{grid-template-columns:repeat(5,230px)}}
+</style>
+</head>
+<body><div id="root" class="app"></div>
+<script>
+const SUPABASE_URL='https://efmbtmlfqeiaczcqovkb.supabase.co';
+const KEY='sb_publishable_A13pR37f9Rg_I2xb-S4LDw_ncmiXqci';
+const API=SUPABASE_URL+'/functions/v1/tay-api';
+const STORE='transcenlutions_tay_cloud_session_v4';
+const DRAFT='transcenlutions_tay_signup_draft_v1';
+let session=null,projects=[],activeProject=null,currentView='headquarters',headquarters=null,sessionProfile=null;
+let signup={account:{preferred_name:'',email:'',password:''},step:0,answers:null};
+const root=document.getElementById('root');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const defaults=()=>({
+  preferred_name:'',
+  primary_goal:'',
+  autonomy_level:'prepare',
+  approval_boundaries:{alwaysRequire:['spending','external_messages','publishing','deletion','permissions','contracts'],other:''},
+  memory_preferences:{remember:['decisions','projects','preferences','commitments'],neverRetain:''},
+  proactivity_preferences:{watchFor:['deadlines','risks','follow_ups','blocked_work','approvals']},
+  interruption_preferences:{notifyFor:['urgent_risk','deadline_slip','approval_block']},
+  communication_preferences:{style:'adaptive',challengeAssumptions:true,stateUncertainty:true},
+  decision_preferences:{optimizeFor:'quality'},
+  success_definition:'',
+  voice_preference:'ask_first',
+  voice_confirm_consequential:true,
+  complete:true
+});
+const spokenPrompts=[
+  'What should I help you make true first? Give me the outcome, not a job title or a vague interest.',
+  'How far should I move before I check with you?',
+  'What actions should always stop for your approval?',
+  'What should I remember between sessions, and what should I never retain?',
+  'What should I watch for proactively, and when is it worth interrupting you?',
+  'How should I communicate with you when work is moving normally?',
+  'When tradeoffs are unavoidable, what should I optimize for first?',
+  'What must be true before I am allowed to call something done?',
+  'When voice guidance is available, how should I guide this kind of setup?'
+];
+function loadSession(){try{session=JSON.parse(localStorage.getItem(STORE)||'null')}catch{session=null}}
+function saveSession(v){session=v;if(v)localStorage.setItem(STORE,JSON.stringify(v));else localStorage.removeItem(STORE)}
+function saveDraft(){localStorage.setItem(DRAFT,JSON.stringify({email:signup.account.email,preferred_name:signup.account.preferred_name,step:signup.step,answers:signup.answers}))}
+function loadDraft(){try{return JSON.parse(localStorage.getItem(DRAFT)||'null')}catch{return null}}
+function clearDraft(){localStorage.removeItem(DRAFT)}
+async function auth(path,body,method='POST',token=''){const h={apikey:KEY,'content-type':'application/json'};if(token)h.authorization='Bearer '+token;const r=await fetch(SUPABASE_URL+'/auth/v1/'+path,{method,headers:h,body:body?JSON.stringify(body):undefined});const d=await r.json().catch(()=>({}));if(!r.ok){const error=new Error(d.message||d.msg||d.error_description||d.error||d.code||'Authentication failed.');error.status=r.status;throw error}return d}
+async function refresh(){if(!session?.refresh_token)throw new Error('Session expired.');const d=await auth('token?grant_type=refresh_token',{refresh_token:session.refresh_token});saveSession(d);return d}
+async function api(path,{method='GET',body,retry=true}={}){if(!session?.access_token)throw new Error('Sign in to continue.');let r=await fetch(API+path,{method,headers:{apikey:KEY,authorization:'Bearer '+session.access_token,'content-type':'application/json'},body:body?JSON.stringify(body):undefined});if(r.status===401&&retry){await refresh();return api(path,{method,body,retry:false})}const d=await r.json().catch(()=>({}));if(!r.ok||d.ok===false)throw new Error(d.error||d.message||'Tay request failed.');return d}
+function wireEye(password,eye){eye.onclick=()=>{const show=password.type==='password';password.type=show?'text':'password';eye.textContent=show?'Hide':'Show';eye.setAttribute('aria-label',show?'Hide password':'Show password');password.focus();password.setSelectionRange(password.value.length,password.value.length)}}
+const passwordRules=[
+ {id:'length',label:'At least 12 characters',test:v=>Array.from(v).length>=12},
+ {id:'upper',label:'One uppercase letter (A–Z)',test:v=>/[A-Z]/.test(v)},
+ {id:'lower',label:'One lowercase letter (a–z)',test:v=>/[a-z]/.test(v)},
+ {id:'number',label:'One number (0–9)',test:v=>/[0-9]/.test(v)},
+ {id:'symbol',label:'One special symbol (such as !, @ or #)',test:v=>/[\p{P}\p{S}]/u.test(v)}
+];
+function passwordChecklist(){return '<div class="password-rules"><strong>Password requirements</strong><ul id="passwordRequirements">'+passwordRules.map(r=>'<li id="rule-'+r.id+'" data-met="false">○ Required — '+r.label+'</li>').join('')+'</ul><p id="passwordStatus" role="status" aria-live="polite" aria-atomic="true"></p></div>'}
+function wirePasswordChecklist(password,confirm){
+ password.setAttribute('aria-describedby','passwordRequirements');confirm.setAttribute('aria-describedby','passwordMatch');
+ const status=document.getElementById('passwordStatus'),match=document.getElementById('passwordMatch');
+ function missing(){return passwordRules.filter(r=>!r.test(password.value))}
+ function update(){
+  const unmet=missing();for(const rule of passwordRules){const met=rule.test(password.value),row=document.getElementById('rule-'+rule.id);row.dataset.met=String(met);row.textContent=(met?'✓ Met — ':'○ Required — ')+rule.label}
+  const summary=(passwordRules.length-unmet.length)+' of '+passwordRules.length+' password requirements met.';if(status.textContent!==summary)status.textContent=summary;
+  const matches=password.value.length>0&&password.value===confirm.value;
+  const confirmation=confirm.value?(matches?'✓ Passwords match.':'○ Passwords do not match.'):'Confirm your password below.';if(match.textContent!==confirmation)match.textContent=confirmation;
+  password.setCustomValidity(unmet.length?'Password still needs: '+unmet.map(r=>r.label).join('; ')+'.':'');
+  confirm.setCustomValidity(matches?'':'Passwords do not match.');
+ }
+ password.addEventListener('input',update);confirm.addEventListener('input',update);update();
+ return ()=>{update();const unmet=missing();return unmet.length?'Password still needs: '+unmet.map(r=>r.label).join('; ')+'.':password.value!==confirm.value?'Passwords do not match.':''};
+}
+function radio(name,value,label,detail,selected){return '<label class="choice"><input type="radio" name="'+name+'" value="'+value+'" '+(selected===value?'checked':'')+'><span><strong>'+label+'</strong>'+(detail?'<small>'+detail+'</small>':'')+'</span></label>'}
+function check(name,value,label,selected){return '<label class="choice"><input type="checkbox" name="'+name+'" value="'+value+'" '+(selected.includes(value)?'checked':'')+'><span>'+label+'</span></label>'}
+function values(name){return Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(x=>x.value)}
+function progress(){return Math.round(((signup.step+1)/spokenPrompts.length)*100)}
+function shellStep(title,help,body){return '<section class="auth wide glass" data-spoken-prompt="'+esc(spokenPrompts[signup.step])+'"><div class="brand">TRANSCENLUTIONS</div><div class="progress"><div style="width:'+progress()+'%"></div></div><div class="step-kicker">Tay setup · '+(signup.step+1)+' of '+spokenPrompts.length+'</div><h1 class="question">'+title+'</h1><p class="help">'+help+'</p><form id="intake">'+body+'<div id="notice" class="error"></div><div class="nav"><button id="back" class="secondary" type="button">Back</button><button class="primary" type="submit">'+(signup.step===spokenPrompts.length-1?'Create my Tay':'Continue')+'</button></div></form></section>'}
+function signInView(message='',email=''){
+ root.innerHTML='<section class="auth glass"><div class="brand">TRANSCENLUTIONS</div><h1>Sign in to Tay</h1><p class="muted">One cloud account across Tay web and Android. Your Mac does not need to be running.</p><form id="login"><div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="username" required value="'+esc(email)+'"></div><div class="field"><label for="password">Password</label><div class="input-wrap"><input id="password" type="password" autocomplete="current-password" minlength="6" required><button class="eye" id="eye" type="button" aria-label="Show password">Show</button></div></div><div id="notice" class="error">'+esc(message)+'</div><button class="primary" type="submit">Sign in</button><button class="secondary" id="signup" type="button" style="width:100%;margin-top:10px">New here? Set up Tay</button><button class="linkbtn" id="forgot" type="button">Forgot password? Send a reset email</button></form></section>';
+ const p=document.getElementById('password'),eye=document.getElementById('eye'),notice=document.getElementById('notice');wireEye(p,eye);
+ document.getElementById('signup').onclick=()=>signupAccountView();
+ document.getElementById('login').onsubmit=async e=>{e.preventDefault();notice.className='muted';notice.textContent='Signing in…';try{const d=await auth('token?grant_type=password',{email:document.getElementById('email').value.trim(),password:p.value});saveSession(d);await applyDraft();await boot()}catch(x){notice.className='error';notice.textContent=x.message}};
+ document.getElementById('forgot').onclick=async()=>{const v=document.getElementById('email').value.trim();if(!v){notice.className='error';notice.textContent='Enter your email first.';return}notice.className='muted';notice.textContent='Requesting a reset email…';try{await auth('recover?redirect_to='+encodeURIComponent(location.origin+location.pathname),{email:v});notice.className='success';notice.textContent='Reset email requested. Open the newest password-reset email on this device.'}catch(x){notice.className='error';notice.textContent=x.message}};
+}
+function signupAccountView(message=''){
+ const draft=loadDraft();signup.answers=(draft&&draft.answers)||signup.answers||defaults();signup.step=(draft&&Number.isInteger(draft.step))?Math.min(draft.step,spokenPrompts.length-1):0;
+ signup.account.preferred_name=(draft&&draft.preferred_name)||signup.account.preferred_name||'';signup.account.email=(draft&&draft.email)||signup.account.email||'';
+ root.innerHTML='<section class="auth glass"><div class="brand">TRANSCENLUTIONS</div><h1>Set up your Tay</h1><p class="muted">No demographic quiz. Tay asks only questions that change how it works for you.</p><form id="account"><div class="field"><label for="name">What should Tay call you?</label><input id="name" maxlength="120" autocomplete="name" required value="'+esc(signup.account.preferred_name)+'"></div><div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" required value="'+esc(signup.account.email)+'"></div><div class="field"><label for="password">Create a password</label><div class="input-wrap"><input id="password" type="password" autocomplete="new-password" minlength="12" required><button class="eye" id="eye" type="button">Show</button></div></div>'+passwordChecklist()+'<div class="field"><label for="confirm">Confirm password</label><input id="confirm" type="password" autocomplete="new-password" minlength="12" required></div><p id="passwordMatch" class="password-match" role="status" aria-live="polite" aria-atomic="true"></p><div id="notice" class="error">'+esc(message)+'</div><button class="primary" type="submit">Start Tay setup</button><button class="linkbtn" id="backToLogin" type="button">I already have an account</button></form></section>';
+ const p=document.getElementById('password'),c=document.getElementById('confirm'),notice=document.getElementById('notice');wireEye(p,document.getElementById('eye'));const validatePassword=wirePasswordChecklist(p,c);document.getElementById('backToLogin').onclick=()=>signInView('',document.getElementById('email').value.trim());
+ document.getElementById('account').onsubmit=e=>{e.preventDefault();const issue=validatePassword();if(issue){notice.textContent=issue;return}signup.account.preferred_name=document.getElementById('name').value.trim();signup.account.email=document.getElementById('email').value.trim();signup.account.password=p.value;signup.answers.preferred_name=signup.account.preferred_name;saveDraft();renderIntake()};
+}
+function renderIntake(){
+ let body='',title='',help='';const a=signup.answers;
+ if(signup.step===0){title='What should Tay help you make true first?';help='Describe a concrete outcome. This becomes the starting context for your command center.';body='<textarea id="primary_goal" maxlength="2000" required placeholder="Example: Keep my client work organized, catch follow-ups before I miss them, and help me ship proposals faster.">'+esc(a.primary_goal)+'</textarea>'}
+ if(signup.step===1){title='How far should Tay move before checking with you?';help='This is the default. Approval boundaries on the next step always override it.';body='<div class="choice-grid">'+radio('autonomy','advise','Think with me','Recommend and explain, but do not prepare actions.',a.autonomy_level)+radio('autonomy','prepare','Prepare it','Draft, organize, research, and queue work for review.',a.autonomy_level)+radio('autonomy','reversible','Handle reversible work','Take low-risk actions that are easy to undo, inside my rules.',a.autonomy_level)+radio('autonomy','bounded','Operate inside my rules','Act autonomously within the boundaries I explicitly set.',a.autonomy_level)+'</div>'}
+ if(signup.step===2){title='What should always require your approval?';help='These boundaries are hard stops even if you choose a high-autonomy mode.';const s=a.approval_boundaries.alwaysRequire;body='<div class="choice-grid">'+check('approval','spending','Spending money or changing paid plans',s)+check('approval','external_messages','Sending messages, emails, or replies as me',s)+check('approval','publishing','Publishing or posting publicly',s)+check('approval','deletion','Deleting data or making irreversible changes',s)+check('approval','permissions','Changing account access, roles, or permissions',s)+check('approval','contracts','Accepting contracts, legal terms, or financial commitments',s)+check('approval','other','Something else',s)+'</div><div class="field"><label for="approvalOther">Other hard boundary</label><textarea id="approvalOther" maxlength="1000" placeholder="Optional">'+esc(a.approval_boundaries.other||'')+'</textarea></div>'}
+ if(signup.step===3){title='What should Tay remember between sessions?';help='Choose what should persist. Also tell Tay what must never be retained.';const s=a.memory_preferences.remember;body='<div class="choice-grid">'+check('memory','decisions','Decisions and the reasons behind them',s)+check('memory','projects','Projects, goals, and current state',s)+check('memory','preferences','How I like work done and presented',s)+check('memory','people_context','Useful context about people and organizations I work with',s)+check('memory','commitments','Promises, commitments, and follow-ups',s)+'</div><div class="field"><label for="neverRetain">What should Tay never retain?</label><textarea id="neverRetain" maxlength="1500" placeholder="Optional. Be specific about information or contexts that should stay temporary.">'+esc(a.memory_preferences.neverRetain||'')+'</textarea></div>'}
+ if(signup.step===4){title='What should Tay watch for without being asked?';help='Proactivity and interruption are separate: Tay can watch quietly and only interrupt for the things you choose.';const p=a.proactivity_preferences.watchFor,n=a.interruption_preferences.notifyFor;body='<label><strong>Watch proactively</strong></label><div class="choice-grid">'+check('watch','deadlines','Deadlines and timing risks',p)+check('watch','risks','Risks, contradictions, or missing information',p)+check('watch','opportunities','High-value opportunities',p)+check('watch','follow_ups','Follow-ups I owe or am waiting on',p)+check('watch','blocked_work','Work that is stuck or going stale',p)+check('watch','approvals','Items waiting on my approval',p)+'</div><div class="field"><label><strong>Interrupt me for</strong></label><div class="choice-grid">'+check('notify','urgent_risk','Urgent risk or something likely to cause harm',n)+check('notify','deadline_slip','A deadline likely to slip',n)+check('notify','approval_block','My approval is blocking meaningful progress',n)+check('notify','high_value_opportunity','A time-sensitive high-value opportunity',n)+check('notify','follow_up','A promised follow-up is about to be missed',n)+check('notify','never','Never interrupt unless I ask',n)+'</div></div>'}
+ if(signup.step===5){title='How should Tay communicate with you?';help='This controls default response shape, not just tone.';const c=a.communication_preferences;body='<div class="choice-grid">'+radio('style','concise','Concise','Give me the answer and the next action.',c.style)+radio('style','detailed','Detailed','Show reasoning, context, and tradeoffs.',c.style)+radio('style','adaptive','Adaptive','Be brief by default; expand when the situation deserves it.',c.style)+'</div><div class="choice-grid">'+check('comm','challenge','Challenge weak assumptions instead of agreeing automatically',c.challengeAssumptions?['challenge']:[])+check('comm','uncertainty','Say uncertainty plainly instead of sounding more certain than the evidence',c.stateUncertainty?['uncertainty']:[])+'</div>'}
+ if(signup.step===6){title='When tradeoffs are unavoidable, what should Tay optimize for first?';help='This is a default priority, not a rule that overrides safety or your explicit instructions.';const d=a.decision_preferences.optimizeFor;body='<div class="choice-grid">'+radio('optimize','quality','Quality','Prefer the strongest result, even if it takes more work.',d)+radio('optimize','speed','Speed','Prefer momentum and quick usable results.',d)+radio('optimize','cost','Cost-effectiveness','Prefer the best value for the outcome, balancing quality, reliability, time, and total cost. Not simply the cheapest option.',d)+radio('optimize','privacy','Privacy','Prefer minimizing data exposure and external services.',d)+radio('optimize','certainty','Certainty','Prefer verification and confidence before acting.',d)+'</div>'}
+ if(signup.step===7){title='What must be true before Tay calls something done?';help='Define your finish line. This prevents “completed” from meaning “I started it” or “I drafted something.”';body='<textarea id="success_definition" maxlength="2000" required placeholder="Example: The result is verified, saved in the right place, any promised recipient has actually received it, and I know about anything still blocked.">'+esc(a.success_definition)+'</textarea>'}
+ if(signup.step===8){title='When voice guidance arrives, how should Tay guide setup?';help='The voice layer is not active in this alpha yet. This preference is saved now so the same intake can later be fully spoken and hands-free.';body='<div class="choice-grid">'+radio('voice','guide_aloud','Guide me aloud','Speak each question, listen for my answer, and move through the intake conversationally.',a.voice_preference)+radio('voice','ask_first','Ask before speaking','Offer voice guidance, but let me choose text or voice each time.',a.voice_preference)+radio('voice','text_only','Keep it text-only','Do not narrate setup unless I change this preference later.',a.voice_preference)+'</div><div class="choice-grid">'+check('voiceConfirm','confirm','Read back consequential answers and get confirmation before saving them',a.voice_confirm_consequential?['confirm']:[])+'</div><div class="voice-note">Voice-ready design: each intake step has a spoken prompt and a structured answer model, so Tay can later narrate, listen, confirm, and continue without creating a separate onboarding system.</div>'}
+ root.innerHTML=shellStep(title,help,body);
+ document.getElementById('back').onclick=()=>{if(signup.step===0)signupAccountView();else{signup.step--;saveDraft();renderIntake()}};
+ document.getElementById('intake').onsubmit=async e=>{e.preventDefault();const notice=document.getElementById('notice');try{
+   if(signup.step===0){a.primary_goal=document.getElementById('primary_goal').value.trim();if(!a.primary_goal)throw new Error('Tell Tay the outcome you want first.')}
+   if(signup.step===1){a.autonomy_level=document.querySelector('input[name="autonomy"]:checked')?.value||'prepare'}
+   if(signup.step===2){a.approval_boundaries={alwaysRequire:values('approval'),other:document.getElementById('approvalOther').value.trim()}}
+   if(signup.step===3){a.memory_preferences={remember:values('memory'),neverRetain:document.getElementById('neverRetain').value.trim()}}
+   if(signup.step===4){let notify=values('notify');if(notify.includes('never'))notify=['never'];a.proactivity_preferences={watchFor:values('watch')};a.interruption_preferences={notifyFor:notify}}
+   if(signup.step===5){const v=values('comm');a.communication_preferences={style:document.querySelector('input[name="style"]:checked')?.value||'adaptive',challengeAssumptions:v.includes('challenge'),stateUncertainty:v.includes('uncertainty')}}
+   if(signup.step===6){a.decision_preferences={optimizeFor:document.querySelector('input[name="optimize"]:checked')?.value||'quality'}}
+   if(signup.step===7){a.success_definition=document.getElementById('success_definition').value.trim();if(!a.success_definition)throw new Error('Define what done means for Tay.')}
+   if(signup.step===8){a.voice_preference=document.querySelector('input[name="voice"]:checked')?.value||'ask_first';a.voice_confirm_consequential=values('voiceConfirm').includes('confirm')}
+   saveDraft();
+   if(signup.step<spokenPrompts.length-1){signup.step++;saveDraft();renderIntake();return}
+   await createAccount();
+ }catch(x){notice.textContent=x.message}};
+}
+async function createAccount(){
+ const notice=document.getElementById('notice');notice.className='muted';notice.textContent='Creating your Tay account…';
+ try{
+   const data={preferred_name:signup.account.preferred_name,onboarding:Object.assign({},signup.answers,{complete:true})};
+   const res=await auth('signup',{email:signup.account.email,password:signup.account.password,data});
+   if(res.access_token&&res.refresh_token){saveSession(res);try{await api('/onboarding',{method:'POST',body:{answers:signup.answers,complete:true}})}catch{}clearDraft();await boot();return}
+   confirmationView(signup.account.email);
+ }catch(x){notice.className='error';notice.textContent=x.message}
+}
+function confirmationView(email){
+ root.innerHTML='<section class="auth glass"><div class="brand">TRANSCENLUTIONS</div><h1>Check your email</h1><p class="muted">Tay saved your setup. If email confirmation is required for this account, confirm <strong>'+esc(email)+'</strong>, then return here and sign in. If this email already belongs to a Tay account, use Sign in instead.</p><button id="signin" class="primary">Sign in after confirmation</button><button id="edit" class="linkbtn">Edit setup</button></section>';
+ document.getElementById('signin').onclick=()=>signInView('',email);document.getElementById('edit').onclick=()=>signupAccountView()
+}
+async function applyDraft(){const d=loadDraft();if(!d?.answers)return;try{await api('/onboarding',{method:'POST',body:{answers:d.answers,complete:true}});clearDraft()}catch{}}
+function recoveryView(tokens){
+ root.innerHTML='<section class="auth glass"><div class="brand">TRANSCENLUTIONS</div><h1>Set a new Tay password</h1><p class="muted">Choose a new password for your shared Transcenlutions cloud account.</p><form id="reset"><div class="field"><label for="newPassword">New password</label><div class="input-wrap"><input id="newPassword" type="password" autocomplete="new-password" minlength="12" required><button class="eye" id="eye" type="button" aria-label="Show password">Show</button></div></div>'+passwordChecklist()+'<div class="field"><label for="confirmPassword">Confirm password</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="12" required></div><p id="passwordMatch" class="password-match" role="status" aria-live="polite" aria-atomic="true"></p><div id="notice" class="error"></div><button class="primary" type="submit">Save new password</button><button id="resetSignIn" class="linkbtn" type="button">Return to sign in</button></form></section>';
+ const p=document.getElementById('newPassword'),c=document.getElementById('confirmPassword'),eye=document.getElementById('eye'),notice=document.getElementById('notice');wireEye(p,eye);const validatePassword=wirePasswordChecklist(p,c);
+ document.getElementById('resetSignIn').onclick=()=>signInView();
+ let saving=false,completed=false;const submit=document.getElementById('reset').querySelector('[type="submit"]');
+ document.getElementById('reset').onsubmit=async e=>{e.preventDefault();if(saving||completed)return;const issue=validatePassword();if(issue){notice.textContent=issue;return}saving=true;submit.disabled=true;notice.className='muted';notice.textContent='Updating password…';try{await auth('user',{password:p.value},'PUT',tokens.access_token);saveSession({access_token:tokens.access_token,refresh_token:tokens.refresh_token,expires_in:Number(tokens.expires_in||3600),token_type:'bearer'});completed=true;notice.className='success';notice.textContent='Password updated. Opening Tay…';setTimeout(()=>boot(),600)}catch(x){notice.className='error';notice.textContent=x.status===401||x.status===403?'This reset session has expired or is no longer valid. Return to sign in and request a new reset email.':x.message}finally{saving=false;if(!completed)submit.disabled=false}};
+}
+async function boot(){
+ root.innerHTML='<section class="auth glass"><div class="brand">TRANSCENLUTIONS</div><h1>Opening Tay…</h1></section>';
+ try{
+   await api('/session');
+   let onboarding=null;try{onboarding=(await api('/onboarding')).onboarding}catch{}
+   let d=await api('/projects');projects=Array.isArray(d.projects)?d.projects:[];
+   if(projects.length===0&&onboarding?.status==='completed'){const summary=String(onboarding.primary_goal||'Personal Tay workspace').slice(0,2000);const made=await api('/projects',{method:'POST',body:{name:'Tay Command Center',summary}});d=await api('/projects');projects=Array.isArray(d.projects)?d.projects:[];if(made.projectId)activeProject=made.projectId}
+   if(!activeProject&&projects[0])activeProject=projects[0].id;
+   await renderShell();
+ }catch(e){if(/sign in|session|jwt|token|invalid/i.test(e.message))saveSession(null);signInView(e.message)}
+}
+
+let headquartersRevision=0,headquartersError='';
+async function loadHeadquarters(){
+ const projectId=activeProject,revision=++headquartersRevision;headquarters=null;headquartersError='';
+ if(!projectId)return null;
+ try{const d=await api('/projects/'+projectId+'/headquarters',{retry:false});
+  if(revision!==headquartersRevision||activeProject!==projectId)return null;
+  if(!d?.ok||d.project?.id!==projectId||!Array.isArray(d.tasks)||d.tasks.some(t=>t.project_id!==projectId))throw Error('Unexpected project response.');
+  headquarters=d;return d;
+ }catch(e){if(revision===headquartersRevision&&activeProject===projectId){headquarters=null;headquartersError=e.message||'Cloud unavailable';}return null;}
+}
+function viewLabel(view){return ({headquarters:'Headquarters',chat:'Chat with Tay',tasks:'Tasks',team:'Team',approvals:'Approvals',integrations:'Integrations',plan:'Plan'})[view]||'Headquarters'}
+function activeProjectRecord(){return projects.find(p=>p.id===activeProject)||headquarters?.project||null}
+function renderProjectButtons(){
+ const list=document.getElementById('projects');
+ if(!list)return;
+ list.innerHTML=projects.length?projects.map(p=>'<button class="project '+(p.id===activeProject?'active':'')+'" data-id="'+esc(p.id)+'"><strong>'+esc(p.name)+'</strong><small>'+esc(p.summary||'')+'</small></button>').join(''):'<div class="muted">No projects yet.</div>';
+ list.querySelectorAll('.project').forEach(b=>b.onclick=async()=>{activeProject=b.dataset.id;currentView='headquarters';await renderShell()});
+}
+function renderWorkspaceNav(){
+ document.querySelectorAll('.workspace-nav button').forEach(b=>{b.classList.toggle('active',b.dataset.view===currentView);b.onclick=async()=>{currentView=b.dataset.view;renderWorkspaceNav();await renderCurrentView()}});
+}
+async function renderShell(){
+ const requestedProject=activeProject;if(activeProject)await loadHeadquarters();if(activeProject!==requestedProject)return;
+ const project=activeProjectRecord();
+ root.innerHTML='<div class="shell glass"><aside class="sidebar"><div class="brand">TRANSCENLUTIONS</div><div style="margin-top:10px"><strong>Tay Command</strong><div class="badge">Owner-directed AI team</div></div><nav class="workspace-nav" aria-label="Tay workspace"><button data-view="headquarters">Headquarters</button><button data-view="chat">Tay</button><button data-view="tasks">Tasks</button><button data-view="team">Team</button><button data-view="approvals">Approvals</button><button data-view="integrations">Integrations</button><button data-view="plan">Plan</button></nav><div class="project-switch"><div class="sidebar-head"><strong>Projects</strong><button id="newProject" class="secondary compact">New</button></div><div id="projects" class="projects"></div></div><div class="sidebar-actions"><button id="logout" class="secondary">Sign out</button></div></aside><main class="main"><header class="topbar"><div><strong id="projectTitle">'+esc(project?.name||'Tay Cloud')+'</strong><div class="badge">Tay · '+esc(viewLabel(currentView))+'</div></div><div class="top-actions"><button id="refresh" class="secondary compact">Refresh</button></div></header><section id="workspace" class="workspace"></section></main></div>';
+ renderProjectButtons();renderWorkspaceNav();
+ const newProject=document.getElementById('newProject');
+ if(newProject)newProject.onclick=async()=>{const name=prompt('Project name');if(!name)return;const summary=prompt('What should Tay help this project accomplish?')||'';try{const d=await api('/projects',{method:'POST',body:{name,summary}});activeProject=d.projectId;projects=(await api('/projects')).projects||[];currentView='headquarters';await renderShell()}catch(e){alert(e.message)}};
+ document.getElementById('logout').onclick=async()=>{try{await api('/session',{method:'DELETE'})}catch{}saveSession(null);signInView()};
+ document.getElementById('refresh').onclick=async()=>{projects=(await api('/projects')).projects||[];if(activeProject)await loadHeadquarters();renderProjectButtons();await renderCurrentView()};
+ await renderCurrentView();
+}
+async function renderCurrentView(){
+ const area=document.getElementById('workspace');if(!area)return;
+ if(!activeProject){area.innerHTML='<div class="empty-state">Create a project to open Tay Headquarters.</div>';return}
+ if(!headquarters&&!headquartersError)await loadHeadquarters();
+ if(!headquarters){area.innerHTML='<div class="error" role="alert">Saved workspace unavailable. '+esc(headquartersError||'Loading interrupted.')+'</div><button id="retryWorkspace" class="secondary">Reload saved workspace</button>';document.getElementById('retryWorkspace').onclick=async()=>{await loadHeadquarters();await renderCurrentView()};return;}
+ const title=document.getElementById('projectTitle');if(title)title.textContent=headquarters?.project?.name||'Tay project';
+ if(currentView==='chat')return renderChatView();
+ if(currentView==='tasks')return renderTasksView();
+ if(currentView==='team')return renderTeamView();
+ if(currentView==='approvals')return renderApprovalsView();
+ if(currentView==='integrations')return renderIntegrationsView();
+ if(currentView==='plan')return renderPlanView();
+ return renderHeadquartersView();
+}
+function renderHeadquartersView(){
+ const area=document.getElementById('workspace'),h=headquarters||{},tasks=h.tasks||[],approvals=h.approvals||[],agents=h.agents||[],project=h.project||{};
+ const pending=approvals.filter(a=>a.status==='pending').length;
+ const activeTasks=tasks.filter(t=>['pending','active','blocked','awaiting_approval'].includes(t.status)).length;
+ const done=tasks.filter(t=>t.status==='completed').length;
+ const activeAgents=agents.filter(a=>a.status==='active').length;
+ const recent=tasks.slice(0,4);
+ area.innerHTML='<div class="view-head"><div><h2>Headquarters</h2><p>One command center for Tay, the team, work, and approvals.</p></div><div class="quick-actions"><button class="secondary compact" data-go="chat">Ask Tay</button><button class="secondary compact" data-go="tasks">New task</button><button class="secondary compact" data-go="team">Add specialist</button></div></div>'+
+ '<div class="hq-grid"><div class="metric"><strong>'+activeTasks+'</strong><span>active tasks</span></div><div class="metric"><strong>'+pending+'</strong><span>awaiting approval</span></div><div class="metric"><strong>'+activeAgents+'</strong><span>active specialists</span></div><div class="metric"><strong>'+done+'</strong><span>completed tasks</span></div></div>'+
+ '<div class="panel lead-card"><div class="avatar">T</div><div><h3 style="margin:0">Tay · Team Lead</h3><p style="margin:5px 0">Primary interface, planner, delegator, reviewer, and owner-policy enforcer.</p><span class="small"><span class="status-dot"></span>Cloud connected</span></div><span class="pill gold">Lead</span></div>'+
+ '<div class="panel"><div class="panel-head"><h3>Plan</h3><button class="secondary compact" data-go="plan">Edit</button></div><p>'+esc(project.plan||project.summary||'Define what this project is trying to accomplish and Tay will use it as the operating objective.')+'</p></div>'+
+ '<div class="panel"><div class="panel-head"><h3>Work in motion</h3><button class="secondary compact" data-go="tasks">Open board</button></div>'+(recent.length?recent.map(t=>'<div class="task-card"><strong>'+esc(t.title)+'</strong><div class="task-meta"><span class="pill">'+esc(t.status.replaceAll('_',' '))+'</span><span class="pill">'+esc(t.priority||'normal')+'</span></div></div>').join(''):'<div class="empty-state">No team tasks yet. Give Tay a task or create one from the board.</div>')+'</div>';
+ area.querySelectorAll('[data-go]').forEach(b=>b.onclick=async()=>{currentView=b.dataset.go;renderWorkspaceNav();await renderCurrentView()});
+}
+async function renderChatView(){
+ const area=document.getElementById('workspace');
+ area.innerHTML='<div class="view-head"><div><h2>Chat with Tay</h2><p>Tay is the team lead. Specialists stay subordinate to your rules and approval boundaries.</p></div></div><div class="workspace-chat"><section id="messages" class="messages"><div class="empty">Loading conversation…</div></section><form id="composer" class="composer"><textarea id="message" placeholder="Tell Tay what outcome you want" required></textarea><button class="primary compact" type="submit">Send</button></form></div>';
+ const form=document.getElementById('composer'),box=document.getElementById('message');
+ form.onsubmit=async e=>{e.preventDefault();const t=box.value.trim();if(!t)return;box.disabled=true;try{await api('/projects/'+activeProject+'/messages',{method:'POST',body:{text:t}});box.value='';await loadProjectIntoChat()}catch(x){alert(x.message)}finally{box.disabled=false;box.focus()}};
+ await loadProjectIntoChat();
+}
+async function loadProjectIntoChat(){
+ try{const d=await api('/projects/'+activeProject);const messages=Array.isArray(d.messages)?d.messages:[];const area=document.getElementById('messages');if(!area)return;area.innerHTML=messages.length?messages.map(m=>'<div class="bubble '+esc(m.role)+'">'+esc(m.text)+'</div>').join(''):'<div class="empty-state">Start with an outcome. Tay will keep the conversation attached to this project.</div>';area.scrollTop=area.scrollHeight}catch(e){const area=document.getElementById('messages');if(area)area.innerHTML='<div class="error">'+esc(e.message)+'</div>'}
+}
+function taskAgentName(id){const a=(headquarters?.agents||[]).find(x=>x.id===id);return a?.name||'Unassigned'}
+function taskColumn(status,label,tasks){
+ return '<div class="kanban-col"><h4>'+label+' · '+tasks.length+'</h4>'+ (tasks.length?tasks.map(t=>'<div class="task-card"><strong>'+esc(t.title)+'</strong><p>'+esc(t.description||'')+'</p><div class="task-meta"><span class="pill">'+esc(t.priority||'normal')+'</span><span class="pill">'+esc(taskAgentName(t.assigned_agent_id))+'</span></div><select data-task-status="'+esc(t.id)+'"><option value="pending" '+(t.status==='pending'?'selected':'')+'>Queued</option><option value="active" '+(t.status==='active'?'selected':'')+'>In progress</option><option value="blocked" '+(t.status==='blocked'?'selected':'')+'>Blocked</option><option value="awaiting_approval" '+(t.status==='awaiting_approval'?'selected':'')+'>Review</option><option value="completed" '+(t.status==='completed'?'selected':'')+'>Done</option><option value="failed" '+(t.status==='failed'?'selected':'')+'>Failed</option><option value="cancelled" '+(t.status==='cancelled'?'selected':'')+'>Cancelled</option></select></div>').join(''):'<div class="empty-state">Empty</div>')+'</div>'
+}
+let taskSavePending=false;
+async function saveTaskChange(path,body){
+ if(taskSavePending)return;taskSavePending=true;const projectId=activeProject;
+ const area=document.getElementById('workspace');area.querySelectorAll('button,input,select,textarea').forEach(e=>e.disabled=true);
+ const notice=document.createElement('p');notice.setAttribute('role','status');notice.textContent='Saving task…';area.prepend(notice);
+ try{const result=await api(path,{method:'POST',body,retry:false});if(!result?.ok||result.task?.project_id!==projectId)throw Error('Save response not confirmed.');
+  if(activeProject===projectId){await loadHeadquarters();if(activeProject===projectId)await renderCurrentView();}
+ }catch(e){if(activeProject===projectId){notice.textContent='Save not confirmed. Reload before trying again. '+e.message;const button=document.createElement('button');button.textContent='Reload saved workspace';button.onclick=async()=>{await loadHeadquarters();await renderCurrentView()};notice.append(button);}}
+ finally{taskSavePending=false;}
+}
+function renderTasksView(){
+ const area=document.getElementById('workspace'),tasks=headquarters?.tasks||[],agents=headquarters?.agents||[];
+ area.innerHTML='<div class="view-head"><div><h2>Tasks</h2><p>Tay can organize and delegate work here. A task is not treated as executed until the runtime actually produces a result.</p></div></div>'+
+ '<div class="panel"><div class="panel-head"><h3>Create task</h3><span class="pill gold">Team board</span></div><form id="taskForm" class="inline-form"><div class="row"><div><label>Task</label><input id="taskTitle" maxlength="240" required placeholder="What needs to get done?"></div><div><label>Priority</label><select id="taskPriority"><option>normal</option><option>high</option><option>urgent</option><option>low</option></select></div></div><div><label>Context</label><textarea id="taskDescription" maxlength="4000" placeholder="What should Tay or the specialist know?"></textarea></div><div class="row"><div><label>Assign</label><select id="taskAgent"><option value="">Tay / unassigned</option>'+agents.filter(a=>a.status!=='retired').map(a=>'<option value="'+esc(a.id)+'">'+esc(a.name)+'</option>').join('')+'</select></div><label class="choice" style="margin-top:0"><input id="taskApproval" type="checkbox"><span><strong>Approval before execution</strong><small>Create a human gate before this task can proceed.</small></span></label></div><button class="primary compact" type="submit">Create task</button></form></div>'+
+ '<div class="kanban">'+taskColumn('pending','Queued',tasks.filter(t=>t.status==='pending'))+taskColumn('active','In progress',tasks.filter(t=>t.status==='active'))+taskColumn('blocked','Blocked',tasks.filter(t=>t.status==='blocked'))+taskColumn('awaiting_approval','Review',tasks.filter(t=>t.status==='awaiting_approval'))+taskColumn('completed','Done',tasks.filter(t=>t.status==='completed'))+taskColumn('failed','Failed',tasks.filter(t=>t.status==='failed'))+taskColumn('cancelled','Cancelled',tasks.filter(t=>t.status==='cancelled'))+'</div>';
+ document.getElementById('taskForm').onsubmit=async e=>{e.preventDefault();const title=document.getElementById('taskTitle').value.trim();if(!title)return;const payload={title,description:document.getElementById('taskDescription').value.trim(),priority:document.getElementById('taskPriority').value,assignedAgentId:document.getElementById('taskAgent').value||null,requiresApproval:document.getElementById('taskApproval').checked};await saveTaskChange('/projects/'+activeProject+'/tasks',payload)};
+ area.querySelectorAll('[data-task-status]').forEach(s=>s.onchange=async()=>{await saveTaskChange('/tasks/'+s.dataset.taskStatus,{status:s.value})});
+}
+const teamTemplates=[
+ {name:'Research',purpose:'Investigate markets, competitors, evidence, and source-backed questions.',instructions:'Research first. Separate verified facts from assumptions. Return sources and decision-relevant findings.'},
+ {name:'Builder',purpose:'Turn approved plans into implementation-ready product and technical work.',instructions:'Build in small verifiable increments. Preserve owner controls, existing architecture, and rollback paths.'},
+ {name:'Operations',purpose:'Track commitments, blockers, follow-ups, and recurring operating work.',instructions:'Keep work moving. Surface blockers early. Never mark work done without verification.'},
+ {name:'Growth',purpose:'Prepare positioning, outreach, content, offers, and customer-development work.',instructions:'Use the project voice. Keep external sending and spending behind owner approval.'}
+];
+function renderTeamView(){
+ const area=document.getElementById('workspace'),agents=headquarters?.agents||[],approvalRules=headquarters?.onboarding?.approval_boundaries?.alwaysRequire||[];
+ area.innerHTML='<div class="view-head"><div><h2>Team</h2><p>Tay stays the lead. Specialists are scoped roles, not independent owners.</p></div></div>'+
+ '<div class="team-grid"><div class="agent-card"><div class="avatar">T</div><h3 style="margin-top:10px">Tay</h3><span class="pill gold">Team Lead</span><p>Plans, delegates, reviews, communicates with you, and enforces your intake rules.</p></div>'+agents.map(a=>'<div class="agent-card"><div class="avatar">'+esc((a.name||'A').slice(0,1).toUpperCase())+'</div><h3 style="margin-top:10px">'+esc(a.name)+'</h3><div><span class="pill">'+esc(a.status)+'</span> <span class="pill">'+esc(a.model||'auto')+'</span></div><p>'+esc(a.purpose||'Specialist')+'</p><div class="agent-actions">'+(a.status==='active'?'<button class="secondary compact" data-agent="'+esc(a.id)+'" data-status="paused">Pause</button>':'<button class="secondary compact" data-agent="'+esc(a.id)+'" data-status="active">Activate</button>')+'</div></div>').join('')+'</div>'+
+ '<div class="panel" style="margin-top:16px"><div class="panel-head"><h3>Ready-made specialists</h3><span class="pill gold">Tay templates</span></div><div class="template-grid">'+teamTemplates.map((t,i)=>'<div class="template-card"><h3>'+esc(t.name)+'</h3><p>'+esc(t.purpose)+'</p><button class="secondary compact" data-template="'+i+'">Add to team</button></div>').join('')+'</div><p class="integration-note">These profiles organize delegation and policy. They do not claim autonomous background execution unless Tay has a verified runtime/tool path for the work.</p></div>'+
+ '<div class="panel"><div class="panel-head"><h3>Custom specialist</h3></div><form id="agentForm" class="inline-form"><div class="row"><div><label>Name</label><input id="agentName" maxlength="120" required placeholder="e.g. Finance reviewer"></div><div><label>Routing</label><select id="agentModel"><option value="auto">Auto · Tay runtime</option></select></div></div><div><label>Purpose</label><textarea id="agentPurpose" maxlength="1000" required placeholder="What should this specialist own?"></textarea></div><div><label>Instructions</label><textarea id="agentInstructions" maxlength="6000" placeholder="Rules, quality bar, or boundaries"></textarea></div><button class="primary compact" type="submit">Add specialist</button></form></div>';
+ area.querySelectorAll('[data-agent]').forEach(b=>b.onclick=async()=>{try{await api('/agents/'+b.dataset.agent,{method:'POST',body:{status:b.dataset.status}});await loadHeadquarters();renderTeamView()}catch(x){alert(x.message)}});
+ area.querySelectorAll('[data-template]').forEach(b=>b.onclick=async()=>{const t=teamTemplates[Number(b.dataset.template)];try{await api('/projects/'+activeProject+'/agents',{method:'POST',body:{name:t.name,purpose:t.purpose,instructions:t.instructions,model:'auto',approvalRequiredFor:approvalRules}});await loadHeadquarters();renderTeamView()}catch(x){alert(x.message)}});
+ document.getElementById('agentForm').onsubmit=async e=>{e.preventDefault();try{await api('/projects/'+activeProject+'/agents',{method:'POST',body:{name:document.getElementById('agentName').value.trim(),purpose:document.getElementById('agentPurpose').value.trim(),instructions:document.getElementById('agentInstructions').value.trim(),model:'auto',approvalRequiredFor:approvalRules}});await loadHeadquarters();renderTeamView()}catch(x){alert(x.message)}};
+}
+function renderApprovalsView(){
+ const area=document.getElementById('workspace'),items=headquarters?.approvals||[];
+ area.innerHTML='<div class="view-head"><div><h2>Approvals</h2><p>Consequential actions stay visible and owner-controlled.</p></div></div><div class="approval-list">'+(items.length?items.map(a=>'<div class="approval-card"><div class="panel-head"><div><h3>'+esc(a.title)+'</h3><span class="pill '+(a.status==='pending'?'gold':'')+'">'+esc(a.status)+'</span> <span class="pill">'+esc(a.risk||'low')+' risk</span></div></div><p>'+esc(a.summary||a.explanation||'')+'</p>'+(a.status==='pending'?'<div class="approval-actions"><button class="secondary compact" data-approval="'+esc(a.id)+'" data-decision="approved">Approve</button><button class="danger-btn" data-approval="'+esc(a.id)+'" data-decision="rejected">Reject</button><button class="secondary compact" data-approval="'+esc(a.id)+'" data-decision="review_later">Review later</button></div>':'')+'</div>').join(''):'<div class="empty-state">Nothing is waiting for your approval.</div>')+'</div>';
+ area.querySelectorAll('[data-approval]').forEach(b=>b.onclick=async()=>{try{await api('/approvals/'+b.dataset.approval,{method:'POST',body:{decision:b.dataset.decision}});await loadHeadquarters();renderApprovalsView()}catch(x){alert(x.message)}});
+}
+const connectorCatalog=[
+ ['GitHub','Repositories, pull requests, Actions, and code workflows'],
+ ['Gmail','Email search, drafting, replies, and owner-approved sending'],
+ ['Google Calendar','Schedule context, availability, and owner-approved events'],
+ ['Google Drive','Docs, Sheets, Slides, and project files'],
+ ['Slack','Team context, updates, and scoped collaboration'],
+ ['Notion','Specs, research, documentation, and implementation plans'],
+ ['Stripe','Products, payments, subscriptions, and payment links']
+];
+function renderIntegrationsView(){
+ const area=document.getElementById('workspace'),connected=headquarters?.integrations||[];
+ area.innerHTML='<div class="view-head"><div><h2>Integrations</h2><p>Connected infrastructure is separated from app connectors so Tay never implies access it does not have.</p></div></div>'+
+ '<div class="panel"><div class="panel-head"><h3>Verified platform connections</h3><span class="pill ok">Live</span></div><div class="integration-grid">'+connected.map(i=>'<div class="integration-card"><h3>'+esc(i.label)+'</h3><span class="pill ok">'+esc(i.status)+'</span><p>'+esc((i.capabilities||[]).join(' · '))+'</p></div>').join('')+'</div></div>'+
+ '<div class="panel integration-catalog"><div class="panel-head"><h3>Tay connector catalog</h3><span class="pill">Setup through Tay runtime</span></div><div class="integration-grid">'+connectorCatalog.map(i=>'<div class="integration-card"><h3>'+esc(i[0])+'</h3><span class="pill">Not claimed connected</span><p>'+esc(i[1])+'</p></div>').join('')+'</div><p class="integration-note">This web client does not store third-party passwords or OAuth secrets. A connector only becomes “connected” after Tay verifies the actual account/tool connection.</p></div>';
+}
+function renderPlanView(){
+ const area=document.getElementById('workspace'),project=headquarters?.project||{},onboarding=headquarters?.onboarding||{};
+ area.innerHTML='<div class="view-head"><div><h2>Plan</h2><p>The operating objective Tay uses to prioritize and delegate work.</p></div></div><div class="panel"><form id="planForm" class="inline-form"><div><label>Project objective</label><textarea id="planEditor" maxlength="6000" placeholder="What are we building, for whom, and what result matters?">'+esc(project.plan||project.summary||onboarding.primary_goal||'')+'</textarea></div><div class="row"><div><span class="small muted">Definition of done</span><p>'+esc(onboarding.success_definition||'Use your onboarding definition of done and project-specific instructions.')+'</p></div><div><span class="small muted">Default autonomy</span><p>'+esc(onboarding.autonomy_level||'prepare')+'</p></div></div><button class="primary compact" type="submit">Save plan</button><div id="planNotice" class="success"></div></form></div>';
+ document.getElementById('planForm').onsubmit=async e=>{e.preventDefault();const notice=document.getElementById('planNotice');notice.textContent='Saving…';try{await api('/projects/'+activeProject+'/plan',{method:'POST',body:{plan:document.getElementById('planEditor').value}});await loadHeadquarters();notice.textContent='Plan saved.'}catch(x){notice.className='error';notice.textContent=x.message}};
+}
+
+function openInitialView(){
+ const hash=new URLSearchParams(location.hash.replace(/^#/,'')),query=new URLSearchParams(location.search);
+ const authError=hash.has('error')||hash.has('error_code')||query.has('error')||query.has('error_code');
+ const recovery=hash.get('type')==='recovery',unsupportedCode=query.has('code');
+ // Keep recovery capabilities in memory, never in the address bar while typing.
+ if(authError||recovery||unsupportedCode){
+  for(const key of ['code','error','error_code','error_description'])query.delete(key);
+  const suffix=query.toString();history.replaceState(null,'',location.pathname+(suffix?'?'+suffix:''));
+  if(authError){signInView('This reset link has expired, was already used, or is invalid. Request a new reset email from Tay and open the newest message.');return}
+  if(unsupportedCode){signInView('This reset link uses a recovery flow this version of Tay cannot open. Request a new reset email from Tay.');return}
+  if(!hash.get('access_token')||!hash.get('refresh_token')){signInView('This password-reset link is incomplete. Request a new reset email from Tay.');return}
+  recoveryView({access_token:hash.get('access_token'),refresh_token:hash.get('refresh_token'),expires_in:hash.get('expires_in')});return;
+ }
+ loadSession();if(session?.access_token)boot();else if(query.get('signup')==='1')signupAccountView();else signInView();
+}
+openInitialView();
+</script></body></html>
+

@@ -14,9 +14,17 @@
     "test:identity": "tsc lib/platform-identity.ts scripts/check-platform-identity.ts --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .identity-test && node .identity-test/scripts/check-platform-identity.js && node -e \"require('fs').rmSync('.identity-test',{recursive:true,force:true})\"",
     "test:social": "tsc lib/request-security.ts lib/social-publisher/types.ts lib/social-publisher/config.ts lib/social-publisher/validate.ts scripts/check-social-publisher.ts --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .social-test && node .social-test/scripts/check-social-publisher.js && node -e \"require('fs').rmSync('.social-test',{recursive:true,force:true})\"",
     "test:workspace": "node scripts/check-workspace.mjs && node scripts/check-writing-blocks.mjs && node scripts/check-desktop-bridge.mjs && npm run test:social",
+    "test:platform-sync": "node scripts/check-platform-sync.mjs",
+    "test:tay": "node scripts/test-tay-workspace.mjs && npm run test:tay-owner && npm run test:tay-storage && npm run test:tay-password && npm run test:tay-setup",
+    "test:tay-owner": "node --test scripts/test-tay-owner-provisioning.mjs",
+    "test:tay-storage": "node scripts/test-tay-storage.mjs",
+    "test:tay-setup": "node --test scripts/test-tay-setup-navigation.mjs scripts/test-tay-recovery.mjs scripts/test-tay-cost-wording.mjs",
+    "test:tay-password": "node scripts/test-tay-password.mjs",
+    "provision:tay-owner": "node scripts/provision-tay-owner.mjs",
     "test:apex": "node --test scripts/test-apex-provider-probe.cjs products/funnel-checklist/test.cjs lib/test-apex-payments.cjs lib/test-apex-public-checkout.cjs lib/test-apex-workflows.cjs lib/test-apex-browser.cjs products/funnel-checklist/test-ui.cjs",
     "test:workflows": "npm run test:apex && python3 -m unittest discover -s tools/apex-flow -p \"test_*.py\" && python3 -m unittest discover -s integrations/tay-desktop/tests -v && npm run smoke",
     "probe:apex-providers": "node scripts/apex-provider-probe.cjs",
+    "check:archil": "node scripts/check-archil-persistence.mjs",
     "test:security": "node scripts/check-security.mjs",
     "test:arcade": "node products/arcade/test-engine.mjs && node products/arcade/test-ui.mjs && node products/arcade/test-offline.mjs",
     "build:arcade": "node products/arcade/build-offline.mjs",
@@ -26,8 +34,9 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "disk": "1.8.0",
     "lucide-react": "^0.454.0",
-    "next": "15.5.27",
+    "next": "15.5.28",
     "pg": "^8.13.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
@@ -40,7 +49,7 @@
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.0",
-    "eslint-config-next": "15.5.27",
+    "eslint-config-next": "15.5.28",
     "jsdom": "30.1.2",
     "postcss": "8.5.24",
     "tailwindcss": "^3.4.13",
@@ -50,7 +59,10 @@
     "next": {
       "postcss": "$postcss"
     },
-    "postcss-selector-parser": "7.1.6"
+    "postcss-selector-parser": "7.1.6",
+    "disk": {
+      "undici": "8.12.2"
+    }
   },
   "engines": {
     "node": ">=24.15.0 <25"

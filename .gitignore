@@ -21,3 +21,9 @@ tsconfig.tsbuildinfo
 __pycache__/
 *.py[cod]
 integrations/tay-desktop/runtime-state/
+
+# local agent tooling and reference checkouts (not part of the app)
+/.tools/
+/upstream/
+/.tay-data/
+/.workspace-data/

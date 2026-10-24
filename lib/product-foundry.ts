@@ -227,7 +227,10 @@ const economicsFields: readonly [keyof FoundryEconomicsInput, string][] = [
 
 export function calculateFoundryEconomics(input: FoundryEconomicsInput): FoundryEconomicsResult {
   const missing = economicsFields
-    .filter(([key]) => typeof input[key] !== "number" || !Number.isFinite(input[key]) || (input[key] as number) < 0)
+    .filter(([key]) => {
+      const value = input[key];
+      return typeof value !== "number" || !Number.isFinite(value) || value < 0;
+    })
     .map(([, label]) => label);
   if (input.retail !== null && input.retail <= 0 && !missing.includes("Retail price")) missing.push("Retail price");
   if (input.platformPercent !== null && input.platformPercent > 100 && !missing.includes("Platform fee percent")) missing.push("Platform fee percent");

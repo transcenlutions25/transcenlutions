@@ -141,6 +141,7 @@ export interface FoundryProvider {
 export const foundryProviders: readonly FoundryProvider[] = [
   { id: "dough", name: "Dough", purpose: "AI product concepts, possible catalog/custom manufacturing, supplier coordination and pre-order storefronts.", documentation: "https://www.dough.do/how-it-works", status: "not_connected" },
   { id: "printful", name: "Printful", purpose: "Print-on-demand apparel, merchandise, product sync and fulfillment via an authenticated API.", documentation: "https://developers.printful.com/docs/", status: "not_connected" },
+  { id: "printful-quick-stores", name: "Printful Quick Stores", purpose: "US-only optional cash-free pilot: no monthly fee or merchant fulfillment billing, but Printful processes checkout and issues monthly earnings payouts above its threshold. Limited domain and brand control; verify current terms.", documentation: "https://help.printful.com/hc/en-us/articles/50265789222801-How-is-Quick-Stores-billing-different-from-usual-Printful-billing-e-g-Shopify-billing", status: "not_connected" },
   { id: "lulu", name: "Lulu Print API", purpose: "Print-on-demand books and journals, print files, quotes and fulfillment.", documentation: "https://developers.lulu.com/", status: "not_connected" },
   { id: "botanical-supplier", name: "Botanical supplier (to verify)", purpose: "Food-grade herbs and intended-use appropriate essential oils with batch, labeling and certification evidence.", documentation: "", status: "not_connected" },
   { id: "toy-supplier", name: "Certified toy supplier (to verify)", purpose: "Age-graded toy production with relevant testing, Children's Product Certificates and tracking labels.", documentation: "https://www.cpsc.gov/Business--Manufacturing/Business-Education/Toy-Safety", status: "not_connected" },
@@ -183,6 +184,7 @@ export const sharedFoundryRequirements: readonly string[] = [
   "Validate customer demand and original product usefulness; do not invent buyers or forecasts.",
   "Compare supplier quotations and minimums, sample quality, delivery locations and lead times.",
   "Document full costs and suitable contribution margin before setting a launch price.",
+  "Verify who charges the customer, who pays the supplier, payout timing, chargeback responsibility and any cash float required before fulfillment.",
   "Review customer support, privacy, returns, delivery terms, tax and geographic fulfillment duties.",
   "Verify owner authority and external provider account access; use scoped server-side credentials only.",
   "Release supplier orders only after verified paid events, duplicate-safe order routing and explicit owner authorization.",

@@ -276,6 +276,7 @@ export function ProductFoundryWorkspace() {
               ))}
             </ol>
           </details>
+          <p className="pf-footnote">Important: No inventory does not always mean no cash required. Standard print-on-demand suppliers may bill the merchant before payout. Printful Quick Stores uses its own checkout and monthly payouts instead of a company-owned checkout; compare the ownership and timing tradeoffs before committing.</p>
           <p className="pf-final-note"><LockKeyhole size={18} aria-hidden="true" /> Live product publication, payment collection and supplier ordering remain disabled until server-verified owner authority, provider integrations, compliance evidence, fulfillment tests and approval are in place.</p>
         </section>
       </main>

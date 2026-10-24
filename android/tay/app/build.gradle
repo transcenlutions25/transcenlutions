@@ -1,0 +1,48 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.transcenlutions.tay'
+    compileSdk 36
+    buildToolsVersion '35.0.0'
+
+    defaultConfig {
+        applicationId 'com.transcenlutions.tay'
+        minSdk 26
+        targetSdk 36
+        versionCode 6
+        versionName '0.4.0-alpha'
+        buildConfigField 'String', 'SUPABASE_URL', '"https://efmbtmlfqeiaczcqovkb.supabase.co"'
+        buildConfigField 'String', 'SUPABASE_PUBLISHABLE_KEY', '"sb_publishable_A13pR37f9Rg_I2xb-S4LDw_ncmiXqci"'
+        buildConfigField 'String', 'TAY_API_BASE', '"https://efmbtmlfqeiaczcqovkb.supabase.co/functions/v1/tay-api"'
+        buildConfigField 'String', 'TAY_WEB_URL', '"https://transcenlutions25.github.io/transcenlutions/"'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-debug'
+        }
+        release {
+            debuggable false
+            minifyEnabled false
+            // Deliberately unsigned in CI. The owner signs the verified output.
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        abortOnError true
+        checkReleaseBuilds true
+        textReport true
+    }
+}

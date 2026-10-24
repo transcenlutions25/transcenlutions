@@ -9,3 +9,12 @@ condition = "AND"
 paths = ['''(^|/)\.env\.example$''']
 regexTarget = "secret"
 regexes = ['''^ANTHROPIC_API_KEY=$''']
+
+
+# Supabase publishable keys are intentionally client-visible credentials.
+# This pattern allows only the publishable-key prefix; secret/service-role
+# credentials remain covered by the default Gitleaks rules.
+[[allowlists]]
+description = "Supabase publishable client keys"
+regexTarget = "secret"
+regexes = ['''^sb_publishable_[A-Za-z0-9_-]+$''']

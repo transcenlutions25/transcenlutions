@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head>
+<head><meta name="referrer" content="no-referrer">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#080611">
@@ -115,12 +115,44 @@ function check(name,value,label,selected){return '<label class="choice"><input t
 function values(name){return Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(x=>x.value)}
 function progress(){return Math.round(((signup.step+1)/spokenPrompts.length)*100)}
 function shellStep(title,help,body){return '<section class="auth wide glass" data-spoken-prompt="'+esc(spokenPrompts[signup.step])+'"><div class="brand">TRANSCENLUTIONS</div><div class="progress"><div style="width:'+progress()+'%"></div></div><div class="step-kicker">Tay setup · '+(signup.step+1)+' of '+spokenPrompts.length+'</div><h1 class="question">'+title+'</h1><p class="help">'+help+'</p><form id="intake">'+body+'<div id="notice" class="error"></div><div class="nav"><button id="back" class="secondary" type="button">Back</button><button class="primary" type="submit">'+(signup.step===spokenPrompts.length-1?'Create my Tay':'Continue')+'</button></div></form></section>'}
+
+const OAUTH_CALLBACK='https://transcenlutions25.github.io/transcenlutions/';
+let oauthPromise;
+function cancelPendingOAuth(){try{sessionStorage.removeItem('tay_oauth_pkce_pending_v1')}catch{}}
+function hasPendingOAuth(){try{return Boolean(sessionStorage.getItem('tay_oauth_pkce_pending_v1'))}catch{return false}}
+function getOAuth(){
+ if(!oauthPromise)oauthPromise=import('./oauth-pkce.mjs').then(({createOAuthController})=>createOAuthController({
+  supabaseUrl:SUPABASE_URL,publicKey:KEY,redirectTo:OAUTH_CALLBACK,allowedRedirects:[OAUTH_CALLBACK],
+  storage:sessionStorage,crypto:globalThis.crypto,fetch:globalThis.fetch.bind(globalThis)
+ }));
+ return oauthPromise;
+}
+async function mountOAuth(){
+ const form=document.getElementById('login');if(!form)return;
+ const box=document.createElement('div');box.id='socialSignIn';box.setAttribute('aria-live','polite');form.after(box);
+ try{
+  const oauth=await getOAuth(),enabled=await oauth.providers();if(!box.isConnected||document.getElementById('login')!==form)return;
+  if(location.origin!==new URL(OAUTH_CALLBACK).origin){box.textContent='Social sign-in is available only on the approved Tay website.';box.className='muted small';return;}
+  const providers=['google','github'].filter(p=>enabled[p]);
+  if(!providers.length){box.textContent='Email sign-in is available. Google and GitHub sign-in are not configured yet.';box.className='muted small';return;}
+  const hint=document.createElement('p');hint.className='muted small';hint.textContent='Use the same verified email as your existing Tay account. A different email may open a separate account; it does not grant owner access.';box.append(hint);
+  let busy=false;
+  for(const provider of providers){const button=document.createElement('button');button.type='button';button.className='secondary';button.textContent='Continue with '+(provider==='google'?'Google':'GitHub');box.append(button);
+   button.onclick=async()=>{if(busy)return;busy=true;const controls=[...form.querySelectorAll('button'),...box.querySelectorAll('button')];controls.forEach(b=>b.disabled=true);const notice=document.getElementById('notice');notice.className='muted';notice.textContent='Opening secure provider sign-in…';
+    try{const url=await oauth.begin(provider);location.assign(url);}catch{notice.className='error';notice.textContent='Provider sign-in could not start. Cancel any pending attempt or use email.';busy=false;controls.forEach(b=>b.disabled=false);}
+   };
+  }
+  const cancel=document.createElement('button');cancel.type='button';cancel.className='linkbtn';cancel.textContent='Cancel pending social sign-in';cancel.onclick=()=>{if(busy)return;oauth.cancel();document.getElementById('notice').textContent='Pending social sign-in cleared. You can try again or use email.';};box.append(cancel);
+ }catch{if(box.isConnected){box.className='muted small';box.textContent='Social sign-in is unavailable. Email sign-in and password reset still work.';}}
+}
+
 function signInView(message='',email=''){
  root.innerHTML='<section class="auth glass"><div class="brand">TRANSCENLUTIONS</div><h1>Sign in to Tay</h1><p class="muted">One cloud account across Tay web and Android. Your Mac does not need to be running.</p><form id="login"><div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="username" required value="'+esc(email)+'"></div><div class="field"><label for="password">Password</label><div class="input-wrap"><input id="password" type="password" autocomplete="current-password" minlength="6" required><button class="eye" id="eye" type="button" aria-label="Show password">Show</button></div></div><div id="notice" class="error">'+esc(message)+'</div><button class="primary" type="submit">Sign in</button><button class="secondary" id="signup" type="button" style="width:100%;margin-top:10px">New here? Set up Tay</button><button class="linkbtn" id="forgot" type="button">Forgot password? Send a reset email</button></form></section>';
  const p=document.getElementById('password'),eye=document.getElementById('eye'),notice=document.getElementById('notice');wireEye(p,eye);
- document.getElementById('signup').onclick=()=>signupAccountView();
- document.getElementById('login').onsubmit=async e=>{e.preventDefault();notice.className='muted';notice.textContent='Signing in…';try{const d=await auth('token?grant_type=password',{email:document.getElementById('email').value.trim(),password:p.value});saveSession(d);await applyDraft();await boot()}catch(x){notice.className='error';notice.textContent=x.message}};
- document.getElementById('forgot').onclick=async()=>{const v=document.getElementById('email').value.trim();if(!v){notice.className='error';notice.textContent='Enter your email first.';return}notice.className='muted';notice.textContent='Requesting a reset email…';try{await auth('recover?redirect_to='+encodeURIComponent(location.origin+location.pathname),{email:v});notice.className='success';notice.textContent='Reset email requested. Open the newest password-reset email on this device.'}catch(x){notice.className='error';notice.textContent=x.message}};
+ mountOAuth();
+ document.getElementById('signup').onclick=()=>{cancelPendingOAuth();signupAccountView()};
+ document.getElementById('login').onsubmit=async e=>{e.preventDefault();notice.className='muted';notice.textContent='Signing in…';try{cancelPendingOAuth();const d=await auth('token?grant_type=password',{email:document.getElementById('email').value.trim(),password:p.value});saveSession(d);await applyDraft();await boot()}catch(x){notice.className='error';notice.textContent=x.message}};
+ document.getElementById('forgot').onclick=async()=>{cancelPendingOAuth();const v=document.getElementById('email').value.trim();if(!v){notice.className='error';notice.textContent='Enter your email first.';return}notice.className='muted';notice.textContent='Requesting a reset email…';try{await auth('recover?redirect_to='+encodeURIComponent(location.origin+location.pathname),{email:v});notice.className='success';notice.textContent='Reset email requested. Open the newest password-reset email on this device.'}catch(x){notice.className='error';notice.textContent=x.message}};
 }
 function signupAccountView(message=''){
  const draft=loadDraft();signup.answers=(draft&&draft.answers)||signup.answers||defaults();signup.step=(draft&&Number.isInteger(draft.step))?Math.min(draft.step,spokenPrompts.length-1):0;
@@ -218,7 +250,7 @@ async function renderShell(){
  renderProjectButtons();renderWorkspaceNav();
  const newProject=document.getElementById('newProject');
  if(newProject)newProject.onclick=async()=>{const name=prompt('Project name');if(!name)return;const summary=prompt('What should Tay help this project accomplish?')||'';try{const d=await api('/projects',{method:'POST',body:{name,summary}});activeProject=d.projectId;projects=(await api('/projects')).projects||[];currentView='headquarters';await renderShell()}catch(e){alert(e.message)}};
- document.getElementById('logout').onclick=async()=>{try{await api('/session',{method:'DELETE'})}catch{}saveSession(null);signInView()};
+ document.getElementById('logout').onclick=async()=>{cancelPendingOAuth();try{await api('/session',{method:'DELETE'})}catch{}saveSession(null);signInView()};
  document.getElementById('refresh').onclick=async()=>{projects=(await api('/projects')).projects||[];if(activeProject)await loadHeadquarters();renderProjectButtons();await renderCurrentView()};
  await renderCurrentView();
 }
@@ -324,10 +356,26 @@ function renderPlanView(){
  document.getElementById('planForm').onsubmit=async e=>{e.preventDefault();const notice=document.getElementById('planNotice');notice.textContent='Saving…';try{await api('/projects/'+activeProject+'/plan',{method:'POST',body:{plan:document.getElementById('planEditor').value}});await loadHeadquarters();notice.textContent='Plan saved.'}catch(x){notice.className='error';notice.textContent=x.message}};
 }
 
-function openInitialView(){
+async function openInitialView(){
  const hash=new URLSearchParams(location.hash.replace(/^#/,'')),query=new URLSearchParams(location.search);
  const authError=hash.has('error')||hash.has('error_code')||query.has('error')||query.has('error_code');
  const recovery=hash.get('type')==='recovery',unsupportedCode=query.has('code');
+ let pendingSocialError=false;
+ if(!recovery&&authError&&!query.has('code'))pendingSocialError=hasPendingOAuth();
+ if(!recovery&&(query.has('code')||pendingSocialError)){
+  const callbackUrl=location.href;
+  // Remove temporary authorization/error parameters before rendering or awaiting network.
+  for(const key of ['code','error','error_code','error_description'])query.delete(key);
+  const suffix=query.toString();history.replaceState(null,'',location.pathname+(suffix?'?'+suffix:''));
+  try{
+   const oauth=await getOAuth();
+   if(!oauth.hasPending())throw new Error('This sign-in link did not start in this browser. Start sign-in again here.');
+   root.textContent='Completing secure sign-in…';
+   const result=await oauth.consume(callbackUrl);saveSession(result.session);await boot();
+  }catch{signInView('Social sign-in could not be completed. Start again in this browser, or use your email and password.');}
+  return;
+ }
+
  // Keep recovery capabilities in memory, never in the address bar while typing.
  if(authError||recovery||unsupportedCode){
   for(const key of ['code','error','error_code','error_description'])query.delete(key);
@@ -335,10 +383,11 @@ function openInitialView(){
   if(authError){signInView('This reset link has expired, was already used, or is invalid. Request a new reset email from Tay and open the newest message.');return}
   if(unsupportedCode){signInView('This reset link uses a recovery flow this version of Tay cannot open. Request a new reset email from Tay.');return}
   if(!hash.get('access_token')||!hash.get('refresh_token')){signInView('This password-reset link is incomplete. Request a new reset email from Tay.');return}
-  recoveryView({access_token:hash.get('access_token'),refresh_token:hash.get('refresh_token'),expires_in:hash.get('expires_in')});return;
+  cancelPendingOAuth();recoveryView({access_token:hash.get('access_token'),refresh_token:hash.get('refresh_token'),expires_in:hash.get('expires_in')});return;
  }
  loadSession();if(session?.access_token)boot();else if(query.get('signup')==='1')signupAccountView();else signInView();
 }
+addEventListener('pageshow',event=>{if(event.persisted&&document.getElementById('login'))signInView('If social sign-in was interrupted, cancel the pending attempt before trying again.');});
 openInitialView();
 </script></body></html>
 

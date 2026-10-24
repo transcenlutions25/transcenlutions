@@ -59,7 +59,10 @@
     "next": {
       "postcss": "$postcss"
     },
-    "postcss-selector-parser": "7.1.6"
+    "postcss-selector-parser": "7.1.6",
+    "disk": {
+      "undici": "8.12.2"
+    }
   },
   "engines": {
     "node": ">=24.15.0 <25"

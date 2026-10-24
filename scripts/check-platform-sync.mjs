@@ -62,20 +62,27 @@ assert.ok(
 // second account/project implementation or an embedded WebView.
 assert.match(tayAndroidBuild, /applicationId 'com\.transcenlutions\.tay'/, "Tay Android must retain the canonical package id");
 assert.ok(!tayAndroidActivity.includes("WebView"), "Tay Android must remain a native client rather than embedding the web workspace");
-for (const endpoint of ["/api/tay/session", "/api/tay/projects", "/messages"]) {
+for (const endpoint of ["/session", "/projects", "/messages"]) {
   assert.ok(tayAndroidClient.includes(endpoint), `Tay Android must use canonical API endpoint ${endpoint}`);
 }
-assert.ok(tayAndroidClient.includes('"Cookie", cookie'), "Tay Android must send the server-issued session cookie");
+assert.ok(tayAndroidClient.includes('"Authorization", "Bearer " + accessToken'), "Tay Android must send the existing authenticated bearer token");
+assert.ok(tayAndroidClient.includes('BuildConfig.TAY_API_BASE + path'), "Tay Android must route requests through its configured shared API");
+const tayWeb = read("web/tay/index.html");
+const cloudOrigin = 'https://efmbtmlfqeiaczcqovkb.supabase.co';
+assert.ok(tayAndroidBuild.includes(cloudOrigin+'/functions/v1/tay-api'), "Native client must target the existing Tay cloud API");
+assert.ok(tayWeb.includes(cloudOrigin) && tayWeb.includes("/functions/v1/tay-api"), "Web client must target the same existing Tay cloud API");
+assert.ok(tayWeb.includes("authorization:'Bearer '+session.access_token"), "Web client must use its authenticated session");
+for (const endpoint of ["/session", "/projects", "/messages"]) assert.ok(tayWeb.includes(endpoint), "Web client missing shared endpoint "+endpoint);
 assert.ok(tayAndroidActivity.includes("SecureSessionStore"), "Tay Android must retain encrypted session storage");
 assert.ok(
-  tayAndroidWorkflow.includes("name: tay-android-${{ github.sha }}"),
+  tayAndroidWorkflow.includes("name: tay-cloud-android-${{ github.sha }}"),
   "Tay Android artifacts must identify the exact source commit",
 );
 assert.ok(
   tayAndroidWorkflow.includes("android/tay/build/release-artifacts/"),
   "Tay Android workflow must publish the verified artifact directory",
 );
-assert.ok(tayAndroidReadme.includes("not a Google Play production release"), "Tay Android release status must remain accurate");
+assert.ok((tayAndroidReadme.includes("not a Google Play production release") || (tayAndroidReadme.includes("private alpha use") && tayAndroidReadme.includes("Play release still requires owner-controlled stable signing"))), "Tay Android release status must remain accurate");
 
 // Hosted surfaces report their exact build commit for release comparison.
 assert.match(buildInfo, /commit:\s*process\.env\.NEXT_PUBLIC_TAY_BUILD_SHA/, "build-info must expose the deployed commit");

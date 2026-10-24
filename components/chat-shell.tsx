@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useRef, useState } from "react";
 import {
   Bot,
@@ -376,6 +378,26 @@ export function ChatShell({
       localStorage.setItem(key, input);
     } catch { setStorageError("Your draft remains in this tab. Browser storage is unavailable; copy it before closing."); }
   }, [hydrated, desktopEnabled, desktop.project, desktop.state, input]);
+
+  // Product Foundry deliberately hands off an editable draft, never auto-executes it.
+  // Reuse the current conversation and preserve any already-entered text.
+  useEffect(() => {
+    if (!hydrated || (desktopEnabled && !desktop.state)) return;
+    try {
+      const key = "tay:foundry:draft:v1";
+      const draft = sessionStorage.getItem(key);
+      if (!draft) return;
+      if (draft.length > 16000) {
+        setNotice("The Product Foundry draft is too long for automatic transfer. Please copy its text manually.");
+        return;
+      }
+      setInput(current => current.trim() ? current + "\n\n" + draft : draft);
+      sessionStorage.removeItem(key);
+      setNotice("Product Foundry command loaded as a draft. Review it, then send it to Tay when ready.");
+    } catch {
+      setNotice("Product Foundry draft could not be transferred; copy it from the Foundry page.");
+    }
+  }, [hydrated, desktopEnabled, desktop.state]);
 
   function openPanel(key: string) { setSidecarKey(key); setSidecarOpen(true); }
 
@@ -881,6 +903,7 @@ export function ChatShell({
       <details className="tay-nav-group"><summary>Pinned</summary>{pinned.length ? (desktopEnabled ? desktop.state?.sessions.filter(session => pinned.includes(session.id)).map(session => <button disabled={desktop.busy} key={session.id} onClick={() => desktop.switchSession(session.id)}>Conversation · {new Date(session.created * 1000).toLocaleDateString()}</button>) : [snapshot, ...savedThreads.filter(item => item.id !== threadId)].filter(item => pinned.includes(item.id)).map(item => <button disabled={existingBusy} key={item.id} onClick={() => { threadCache.current = [snapshot, ...threadCache.current.filter(entry => entry.id !== threadId)]; setSavedThreads(threadCache.current); restoreConversation(item); }}>{item.title}</button>)) : <p>Pin a conversation using the star above.</p>}</details>
       <details className="tay-nav-group"><summary>Projects</summary>{desktopEnabled ? desktop.projects.map(path => <button disabled={desktop.busy} key={path} aria-current={path === desktop.project ? "true" : undefined} onClick={() => { desktop.switchProject(path); setDependency(""); }}>{path.split("/").at(-1)}</button>) : projects.map(project => <button key={project.id} disabled={existingBusy} aria-current={project.id === selectedProject ? "true" : undefined} onClick={() => { if (project.id !== selectedProject) { newConversation(); setSelectedProject(project.id); } }}>{project.name}</button>)}<button onClick={() => openPanel("projects")}>Manage projects</button></details>
       {[["scheduled", "Scheduled"], ["plugins", "Plugins"], ["explore", "Explore"], ["assets", "Workspace Library"]].map(([key, label]) => <button key={key} className="tay-nav-link" onClick={() => openPanel(key)}>{label}<span aria-hidden="true">›</span></button>)}
+      <Link className="tay-nav-link" href="/product-foundry">Product Foundry <span aria-hidden="true">›</span></Link>
       <details className="tay-nav-group"><summary>Recent</summary>{desktopEnabled ? desktop.state?.sessions.map(session => <button key={session.id} disabled={desktop.busy} aria-current={session.id === desktop.state?.session_id ? "true" : undefined} onClick={() => { desktop.switchSession(session.id); setDependency(""); }}>Conversation · {new Date(session.created * 1000).toLocaleString()}</button>) : [snapshot, ...savedThreads.filter(item => item.id !== threadId)].map(item => <button key={item.id} disabled={existingBusy} aria-current={item.id === threadId ? "true" : undefined} onClick={() => { if (item.id === threadId) return; threadCache.current = [snapshot, ...threadCache.current.filter(entry => entry.id !== threadId)]; setSavedThreads(threadCache.current); restoreConversation(item); }}>{item.title}</button>)}</details>
     </>}
     railFooter={<><span>{desktopEnabled ? "● On your Mac" : "● Test workspace"}</span><button className="tay-nav-link" onClick={() => openPanel("settings")}>Settings</button></>}

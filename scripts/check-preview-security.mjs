@@ -15,6 +15,19 @@ for (let attempt = 0; attempt < 40; attempt++) {
   await wait(3000);
 }
 assert.ok(ready, 'Preview did not serve the expected commit');
+// Verify that the new planning-only route is actually served by this exact preview.
+// This is a read-only smoke check, not permission to enable commerce or edit provider accounts.
+const foundryPage = await get('/product-foundry');
+assert.equal(foundryPage.status, 200, 'Product Foundry planning route must load');
+const foundryHtml = await foundryPage.text();
+for (const marker of ['Product Foundry', 'Crowne Legacy', 'Organic Herbs', 'Gaming Gear', 'Rooted Light']) {
+  assert.ok(foundryHtml.includes(marker), `Product Foundry preview is missing ${marker}`);
+}
+const tayHome = await get('/');
+assert.equal(tayHome.status, 200, 'Tay home must remain available after the Foundry change');
+const homeHtml = await tayHome.text();
+assert.ok(homeHtml.includes('/product-foundry'), 'Tay must offer a discoverable Foundry entry');
+
 async function post(path, body, expected) {
   const response = await fetch(base + path, { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });

@@ -44,6 +44,18 @@ Proposed adapters to evaluate:
 5. **Toy manufacturer or distributor:** not selected. Require product-specific safety test reports, CPC or applicable exemption, age grading, material and design compliance, import responsibility, shipping and injury/recall escalation.
 6. **Electronic gaming supplier:** not selected. Require documented equipment authorization, battery/electrical and radio compliance, imports, warranties, manufacturer support and truthful specification matching.
 
+## Important cash-flow and checkout-ownership distinction (verified 2026-10-24)
+
+**Inventory-free does not automatically mean cash-free.** In a normal merchant-controlled Printful integration, the customer pays the merchant's storefront, while Printful charges the merchant's Wallet or saved payment method for manufacturing and shipping. Supplier charges may occur before payment-processor funds are paid out, so model the order-financing gap and refund reserve before activating live sales.
+
+**Printful Quick Stores** currently advertises no monthly/setup fee and no required billing method. Buyers pay Printful at checkout; Printful pays the merchant's earnings monthly after deliveries, subject to a USD 25 minimum. This option requires a U.S.-resident merchant with U.S. tax residence, ships only to U.S. buyer addresses, and does not support a custom domain or extensive marketing analytics. It reduces working-capital requirements at the expense of checkout/customer control and faster payouts; it is *not* equivalent to an owned Transcenlutions Stripe store. Confirm eligibility and every term before account creation or publication. No Quick Store has been created.
+
+Sources:
+- https://help.printful.com/hc/en-us/articles/50265789222801-How-is-Quick-Stores-billing-different-from-usual-Printful-billing-e-g-Shopify-billing
+- https://help.printful.com/hc/en-us/articles/50265763155217-How-much-does-using-Quick-Stores-cost
+- https://help.printful.com/hc/en-us/articles/50265737247889-Is-Quick-Stores-available-in-my-area
+- https://help.printful.com/hc/en-us/articles/50265713299857-How-is-Quick-Stores-different-from-ecommerce-platform-integrations
+
 Start with provider-free research, product concepts and a non-paid interest list. Provider connection, subscription, upfront sample payment, public offers, price commitments, paid pre-orders, supplier orders, advertising and returns require the appropriate authenticated approval and economic checks.
 
 ## Product-specific launch gates

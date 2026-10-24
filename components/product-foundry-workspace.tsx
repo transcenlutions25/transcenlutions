@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useMemo, useState } from "react";
 import {
   ArrowLeft, ArrowRight, Check, Clipboard, Coins, ExternalLink,
@@ -94,7 +96,7 @@ export function ProductFoundryWorkspace() {
   return (
     <div className="pf-shell">
       <header className="pf-topbar">
-        <a className="pf-back" href="/"><ArrowLeft size={17} aria-hidden="true" /> Tay Command</a>
+        <Link className="pf-back" href="/"><ArrowLeft size={17} aria-hidden="true" /> Tay Command</Link>
         <span className="pf-identity">TRANSCENLUTIONS <span>/</span> PRODUCT FOUNDRY</span>
         <span className="pf-state"><LockKeyhole size={14} aria-hidden="true" /> Planning only</span>
       </header>

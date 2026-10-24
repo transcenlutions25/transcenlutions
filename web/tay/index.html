@@ -362,7 +362,7 @@ async function openInitialView(){
  const recovery=hash.get('type')==='recovery',unsupportedCode=query.has('code');
  let pendingSocialError=false;
  if(!recovery&&authError&&!query.has('code'))pendingSocialError=hasPendingOAuth();
- if(!recovery&&(query.has('code')||pendingSocialError)){
+ if(!recovery&&((query.has('code')&&hasPendingOAuth())||pendingSocialError)){
   const callbackUrl=location.href;
   // Remove temporary authorization/error parameters before rendering or awaiting network.
   for(const key of ['code','error','error_code','error_description'])query.delete(key);

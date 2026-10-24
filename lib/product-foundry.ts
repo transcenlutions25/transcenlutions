@@ -71,7 +71,7 @@ export const foundryLines: readonly FoundryLine[] = [
     organization: "Transcenlutions · Botanicals (working collection name)",
     introduction: "A proposed culinary-herb and botanical line. Organic, ingredient, safety, intended-use and supplier claims must be verified product by product.",
     products: [
-      { id: "herb-culinary", title: "Certified-organic culinary herb collection", summary: "Dried seasoning herbs in supplier-sealed, traceable food-safe packaging; organic claim unverified.", fulfillment: "verified-dropship", risk: ["organic-claim", "food"] },
+      { id: "herb-culinary", title: "Organic culinary herb collection (certification pending)", summary: "Dried seasoning herbs in supplier-sealed, traceable food-safe packaging; organic claim unverified.", fulfillment: "verified-dropship", risk: ["organic-claim", "food"] },
       { id: "herb-garden", title: "Kitchen herb growing kit", summary: "A grow-at-home culinary herb gift, with seed, plant-health and package requirements reviewed before listing.", fulfillment: "verified-dropship", risk: ["organic-claim"] },
       { id: "botanical-aroma", title: "Botanical essential-oil fragrance collection", summary: "Non-therapeutic fragrance positioning; ingredient, skin-contact, shipping and hazard requirements depend on intended use.", fulfillment: "verified-dropship", risk: ["organic-claim", "essential-oil"] },
     ],

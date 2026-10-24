@@ -10,6 +10,7 @@ import {
   foundryProviders, productRequirements, type FoundryEconomicsInput,
   type FoundryLineId,
 } from "../../lib/product-foundry";
+import { foundryWorkflow } from "../../lib/product-foundry-adapters";
 
 const emptyEconomics: FoundryEconomicsInput = {
   retail: null, manufacturing: null, shipping: null, packaging: null,
@@ -261,6 +262,18 @@ export function ProductFoundryWorkspace() {
               </article>
             ))}
           </div>
+          <details className="pf-workflow">
+            <summary>See the complete idea-to-delivery workflow</summary>
+            <ol>
+              {foundryWorkflow.map((step, index) => (
+                <li key={step.stage}>
+                  <span className="pf-workflow-index">{String(index + 1).padStart(2, "0")}</span>
+                  <div><strong>{step.stage.replaceAll("-", " ")}</strong><p>{step.reason}</p></div>
+                  <small>{step.status.replaceAll("_", " ")}</small>
+                </li>
+              ))}
+            </ol>
+          </details>
           <p className="pf-final-note"><LockKeyhole size={18} aria-hidden="true" /> Live product publication, payment collection and supplier ordering remain disabled until server-verified owner authority, provider integrations, compliance evidence, fulfillment tests and approval are in place.</p>
         </section>
       </main>

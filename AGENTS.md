@@ -24,6 +24,19 @@ Read [Transcenlutions Product & Offer Language Canon](docs/canon/TRANSCENLUTIONS
 
 The original Cobalt Current build instructions are preserved verbatim in `docs/canon/COBALT_CURRENT_MODULE_BUILD_INSTRUCTIONS.md`. Apply their module boundaries, no-send Stage 1 rules, do-not-contact exclusions and audit requirements when building Cobalt Current. Their former root-level single-module mission does not narrow the founder-authorized platform consolidation.
 
+## Consolidated workspace module
+
+`app/workspace` and `lib/tay/**` implement the consolidated Tay workspace. Keep
+all authority decisions in `lib/tay/registry.ts` and all identity decisions in
+`lib/tay/accounts.ts`; routes must never trust a client-supplied role, agent id
+or approval flag. Changes that touch project files or business records go
+through `lib/tay/approvals.ts`, which is the only place a proposed change is
+applied. Never describe an unconfigured provider, payment link or messaging
+channel as connected. Run `npm run test:tay` with the Launch gate checks; it
+covers identity, project isolation, authority, the approval lifecycle, the
+conversation-to-artifact flow and business records. Report new capabilities in
+[docs/tay-consolidated-workspace.md](docs/tay-consolidated-workspace.md).
+
 ## Engineering and release
 
 Use the checked-in dependency lock, Node 24.15.0 or later in the Node 24 line, strict TypeScript and existing conventions. Keep server authorization and credentials on the server. Maintain keyboard access, visible focus, mobile touch targets, empty/error states and reduced-motion support.

@@ -20,6 +20,8 @@ test('actual route renders procedures and truthful unavailable states', () => {
   const dom = new JSDOM(renderToStaticMarkup(React.createElement(Page)));
   const document = dom.window.document;
   assert.equal(document.querySelectorAll('main').length, 1);
+  assert.match(document.body.textContent, /existing Hallway Leads database/);
+  assert.match(document.body.textContent, /do not create a replacement CRM or duplicate jobs and vendor storage/);
   assert.equal(document.querySelectorAll('details').length, catalog.templates.length);
   assert.match(document.body.textContent, /not a connected private operator dashboard/);
   assert.match(document.body.textContent, /Live job records and checklist submissions are not connected/);

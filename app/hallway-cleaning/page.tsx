@@ -10,7 +10,7 @@ export const metadata = {
 const readiness = [
   ["Operating procedures", "Available for review", "Read the versioned service checklists, required evidence and responsible roles below. Owner review remains pending."],
   ["Customer intake", "Separate customer site", "Use the public Hallway Cleaning site for customer-facing information. Its deployment and intake delivery are not verified by this workspace."],
-  ["Existing Tay records", "Hallway connector not connected", "Reuse Tay’s existing customer, delivery and task records; do not create a replacement CRM. A verified Hallway project mapping and authorized connectors are still needed before this page can read those records."],
+  ["Existing Tay records", "Hallway connector not connected", "Reuse Tay’s existing customer, delivery and task records together with the existing Hallway Leads database; do not create a replacement CRM or duplicate jobs and vendor storage. Schema mapping and authorized connectors are still needed before this page can read those records."],
   ["Scheduling and completion", "Not connected", "No reservation, assignment or checklist submission is created here. Recorded scope, capacity and reviewed completion evidence must come from the operational system."],
   ["Outreach and payments", "Inactive", "No messages, invoices, charges, transfers or vendor payouts are executed by this page."],
 ] as const;

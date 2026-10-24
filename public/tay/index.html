@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080611">
+<title>Tay · Transcenlutions</title>
+<style>
+:root{color-scheme:dark;--bg:#080611;--panel:#171126;--text:#f7f2ff;--muted:#bfb4d2;--gold:#eec55b;--blue:#3657dd;--purple:#7043c2;--danger:#ff9f9f;--ok:#a9f0bf}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#25134b 0,transparent 35%),linear-gradient(145deg,#07050d,#0c1128);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+button,input,textarea,select{font:inherit}button{cursor:pointer}.app{max-width:1080px;margin:0 auto;min-height:100vh;padding:20px}.brand{letter-spacing:.18em;color:var(--gold);font-weight:800;font-size:.93rem}
+.glass{background:rgba(23,17,38,.92);border:1px solid rgba(238,197,91,.35);box-shadow:0 18px 60px rgba(0,0,0,.35);border-radius:22px}.auth{max-width:580px;margin:6vh auto;padding:28px}.auth.wide{max-width:720px}
+.muted{color:var(--muted);line-height:1.55}.small{font-size:.88rem}.field{margin-top:16px}.field label{display:block;margin-bottom:7px;font-size:.9rem;font-weight:700}.input-wrap{position:relative}
+input,textarea,select{width:100%;border:1px solid #4d4262;background:#0d0a16;color:var(--text);border-radius:14px;padding:14px;outline:none}textarea{min-height:120px;resize:vertical}
+input:focus,textarea:focus,select:focus,button:focus-visible{border-color:var(--gold);box-shadow:0 0 0 3px rgba(238,197,91,.2)}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--gold);min-width:52px;min-height:46px;border-radius:12px}
+.primary,.secondary,.linkbtn{border:0;border-radius:14px;padding:13px 16px;color:#fff;font-weight:800}.primary{background:linear-gradient(100deg,var(--blue),var(--purple));width:100%;margin-top:18px}.secondary{background:#21172f;border:1px solid rgba(238,197,91,.5)}.linkbtn{background:transparent;color:var(--gold);padding:12px 0;width:100%}
+.error{color:var(--danger);margin-top:12px;white-space:pre-wrap}.success{color:var(--ok);margin-top:12px;white-space:pre-wrap}.row{display:flex;gap:10px}.row>*{flex:1}.progress{height:7px;background:#0d0a16;border-radius:999px;overflow:hidden;margin:18px 0}.progress>div{height:100%;background:linear-gradient(90deg,var(--gold),var(--purple));transition:width .2s ease}
+.step-kicker{color:var(--gold);font-size:.84rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.question{font-size:1.55rem;line-height:1.2;margin:.5rem 0}.help{color:var(--muted);line-height:1.5;margin:0 0 14px}
+.choice-grid{display:grid;gap:10px;margin-top:14px}.choice{display:flex;align-items:flex-start;gap:11px;padding:13px;border:1px solid #4d4262;background:#100c1c;border-radius:14px}.choice:hover{border-color:#8167a0}.choice input{width:auto;margin-top:3px}.choice span{line-height:1.35}.choice small{display:block;color:var(--muted);margin-top:3px}
+.nav{display:flex;gap:10px;margin-top:20px}.nav button{flex:1}.nav .primary{margin:0}.voice-note{margin-top:16px;padding:12px 14px;border:1px solid rgba(238,197,91,.28);border-radius:14px;background:#100c1c;color:var(--muted)}
+.shell{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 40px);overflow:hidden}.sidebar{padding:18px;border-right:1px solid rgba(238,197,91,.2)}.sidebar-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:14px 0}.projects{display:grid;gap:9px}.project{border:1px solid #4a3b62;background:#100c1c;color:var(--text);border-radius:14px;padding:12px;text-align:left}.project.active{border-color:var(--gold);background:#211634}.project strong{display:block}.project small{color:var(--muted)}.main{display:flex;flex-direction:column;min-width:0}.topbar{padding:16px 20px;border-bottom:1px solid rgba(238,197,91,.2);display:flex;justify-content:space-between;gap:12px;align-items:center}.messages{padding:20px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:12px}.bubble{max-width:82%;padding:14px 16px;border-radius:18px;line-height:1.55;white-space:pre-wrap}.bubble.user{align-self:flex-end;background:#313b8e;border:1px solid #5b72f4}.bubble.tay,.bubble.system{align-self:flex-start;background:#171126;border:1px solid #4c3c62}.composer{padding:16px;border-top:1px solid rgba(238,197,91,.2);display:flex;gap:10px}.composer textarea{resize:none;min-height:54px;max-height:180px}.composer button{width:auto;margin:0;min-width:90px}.empty{padding:30px;color:var(--muted)}.badge{color:var(--gold);font-size:.82rem}
+@media(max-width:760px){.app{padding:0}.auth,.auth.wide{margin:0;min-height:100vh;border-radius:0;padding:24px}.row{display:block}.shell{grid-template-columns:1fr;min-height:100vh;border-radius:0}.sidebar{border-right:0;border-bottom:1px solid rgba(238,197,91,.2);max-height:40vh;overflow:auto}.bubble{max-width:94%}.topbar{padding:12px}.messages{padding:12px}.composer{padding:10px}}
+.password-rules{margin:12px 0;color:var(--muted);font-size:.9rem}.password-rules ul{list-style:none;padding:0;margin:8px 0;display:grid;gap:5px}.password-rules [data-met="true"]{color:var(--ok)}.password-match{font-size:.9rem;color:var(--muted);margin:8px 0}
+</style>
+<link rel="stylesheet" href="workspace-parity.css">
+</head>
+<body><div id="root" class="app"></div>
+<script src="portrait-presence.js"></script>
+<script src="proposal-review.js"></script>
+<script src="conversation-tools.js"></script>
+<script src="workspace-parity.js"></script>
+<script>
+const SUPABASE_URL='https://efmbtmlfqeiaczcqovkb.supabase.co';
+const KEY='sb_publishable_A13pR37f9Rg_I2xb-S4LDw_ncmiXqci';
+const API=SUPABASE_URL+'/functions/v1/tay-api';
+const STORE='transcenlutions_tay_cloud_session_v4';
+const DRAFT='transcenlutions_tay_signup_draft_v1';
+let session=null,projects=[],activeProject=null;
+let signup={account:{preferred_name:'',email:'',password:''},step:0,answers:null};
+const root=document.getElementById('root');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const defaults=()=>({
+  preferred_name:'',
+  primary_goal:'',
+  autonomy_level:'prepare',
+  approval_boundaries:{alwaysRequire:['spending','external_messages','publishing','deletion','permissions','contracts'],other:''},
+  memory_preferences:{remember:['decisions','projects','preferences','commitments'],neverRetain:''},
+  proactivity_preferences:{watchFor:['deadlines','risks','follow_ups','blocked_work','approvals']},
+  interruption_preferences:{notifyFor:['urgent_risk','deadline_slip','approval_block']},
+  communication_preferences:{style:'adaptive',challengeAssumptions:true,stateUncertainty:true},
+  decision_preferences:{optimizeFor:'quality'},
+  success_definition:'',
+  voice_preference:'ask_first',
+  voice_confirm_consequential:true,
+  complete:true
+});
+const spokenPrompts=[
+  'What should I help you make true first? Give me the outcome, not a job title or a vague interest.',
+  'How far should I move before I check with you?',
+  'What actions should always stop for your approval?',
+  'What should I remember between sessions, and what should I never retain?',
+  'What should I watch for proactively, and when is it worth interrupting you?',
+  'How should I communicate with you when work is moving normally?',
+  'When tradeoffs are unavoidable, what should I optimize for first?',
+  'What must be true before I am allowed to call something done?',
+  'When voice guidance is available, how should I guide this kind of setup?'
+];
+function loadSession(){try{session=JSON.parse(localStorage.getItem(STORE)||'null')}catch{session=null}}
+function saveSession(v){session=v;if(v)localStorage.setItem(STORE,JSON.stringify(v));else localStorage.removeItem(STORE)}
+function saveDraft(){localStorage.setItem(DRAFT,JSON.stringify({email:signup.account.email,preferred_name:signup.account.preferred_name,step:signup.step,answers:signup.answers}))}
+function loadDraft(){try{return JSON.parse(localStorage.getItem(DRAFT)||'null')}catch{return null}}
+function clearDraft(){localStorage.removeItem(DRAFT)}
+async function auth(path,body,method='POST',token=''){const h={apikey:KEY,'content-type':'application/json'};if(token)h.authorization='Bearer '+token;const r=await fetch(SUPABASE_URL+'/auth/v1/'+path,{method,headers:h,body:body?JSON.stringify(body):undefined});const d=await r.json().catch(()=>({}));if(!r.ok){const error=new Error(d.message||d.msg||d.error_description||d.error||d.code||'Authentication failed.');error.status=r.status;throw error}return d}
+async function refresh(){if(!session?.refresh_token)throw new Error('Session expired.');const d=await auth('token?grant_type=refresh_token',{refresh_token:session.refresh_token});saveSession(d);return d}
+async function api(path,{method='GET',body,retry=true}={}){if(!session?.access_token)throw new Error('Sign in to continue.');let r=await fetch(API+path,{method,headers:{apikey:KEY,authorization:'Bearer '+session.access_token,'content-type':'application/json'},body:body?JSON.stringify(body):undefined});if(r.status===401&&retry){await refresh();return api(path,{method,body,retry:false})}const d=await r.json().catch(()=>({}));if(!r.ok||d.ok===false)throw new Error(d.error||d.message||'Tay request failed.');return d}
+function wireEye(password,eye){eye.onclick=()=>{const show=password.type==='password';password.type=show?'text':'password';eye.textContent=show?'Hide':'Show';eye.setAttribute('aria-label',show?'Hide password':'Show password');password.focus();password.setSelectionRange(password.value.length,password.value.length)}}
+const passwordRules=[
+ {id:'length',label:'At least 12 characters',test:v=>Array.from(v).length>=12},
+ {id:'upper',label:'One uppercase letter (A–Z)',test:v=>/[A-Z]/.test(v)},
+ {id:'lower',label:'One lowercase letter (a–z)',test:v=>/[a-z]/.test(v)},
+ {id:'number',label:'One number (0–9)',test:v=>/[0-9]/.test(v)},
+ {id:'symbol',label:'One special symbol (such as !, @ or #)',test:v=>/[\p{P}\p{S}]/u.test(v)}
+];
+function passwordChecklist(){return '<div class="password-rules"><strong>Password requirements</strong><ul id="passwordRequirements">'+passwordRules.map(r=>'<li id="rule-'+r.id+'" data-met="false">○ Required — '+r.label+'</li>').join('')+'</ul><p id="passwordStatus" role="status" aria-live="polite" aria-atomic="true"></p></div>'}
+function wirePasswordChecklist(password,confirm){
+ password.setAttribute('aria-describedby','passwordRequirements');confirm.setAttribute('aria-describedby','passwordMatch');
+ const status=document.getElementById('passwordStatus'),match=document.getElementById('passwordMatch');
+ function missing(){return passwordRules.filter(r=>!r.test(password.value))}
+ function update(){
+  const unmet=missing();for(const rule of passwordRules){const met=rule.test(password.value),row=document.getElementById('rule-'+rule.id);row.dataset.met=String(met);row.textContent=(met?'✓ Met — ':'○ Required — ')+rule.label}
+  const summary=(passwordRules.length-unmet.length)+' of '+passwordRules.length+' password requirements met.';if(status.textContent!==summary)status.textContent=summary;
+  const matches=password.value.length>0&&password.value===confirm.value;
+  const confirmation=confirm.value?(matches?'✓ Passwords match.':'○ Passwords do not match.'):'Confirm your password below.';if(match.textContent!==confirmation)match.textContent=confirmation;
+  password.setCustomValidity(unmet.length?'Password still needs: '+unmet.map(r=>r.label).join('; ')+'.':'');
+  confirm.setCustomValidity(matches?'':'Passwords do not match.');
+ }
+ password.addEventListener('input',update);confirm.addEventListener('input',update);update();
+ return ()=>{update();const unmet=missing();return unmet.length?'Password still needs: '+unmet.map(r=>r.label).join('; ')+'.':password.value!==confirm.value?'Passwords do not match.':''};
+}
+function radio(name,value,label,detail,selected){return '<label class="choice"><input type="radio" name="'+name+'" value="'+value+'" '+(selected===value?'checked':'')+'><span><strong>'+label+'</strong>'+(detail?'<small>'+detail+'</small>':'')+'</span></label>'}
+function check(name,value,label,selected){return '<label class="choice"><input type="checkbox" name="'+name+'" value="'+value+'" '+(selected.includes(value)?'checked':'')+'><span>'+label+'</span></label>'}
+function values(name){return Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(x=>x.value)}
+function progress(){return Math.round(((signup.step+1)/spokenPrompts.length)*100)}
+function shellStep(title,help,body){return '<section class="auth wide glass" data-spoken-prompt="'+esc(spokenPrompts[signup.step])+'"><div class="brand">TRANSCENLUTIONS</div><div class="progress"><div style="width:'+progress()+'%"></div></div><div class="step-kicker">Tay setup · '+(signup.step+1)+' of '+spokenPrompts.length+'</div><h1 class="question">'+title+'</h1><p class="help">'+help+'</p><form id="intake">'+body+'<div id="notice" class="error"></div><div class="nav"><button id="back" class="secondary" type="button">Back</button><button class="primary" type="submit">'+(signup.step===spokenPrompts.length-1?'Create my Tay':'Continue')+'</button></div></form></section>'}
+function signInView(message='',email=''){
+ root.innerHTML='<section class="auth glass"><div class="brand">TRANSCENLUTIONS</div><h1>Sign in to Tay</h1><p class="muted">One cloud account across Tay web and Android. Your Mac does not need to be running.</p><form id="login"><div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="username" required value="'+esc(email)+'"></div><div class="field"><label for="password">Password</label><div class="input-wrap"><input id="password" type="password" autocomplete="current-password" minlength="6" required><button class="eye" id="eye" type="button" aria-label="Show password">Show</button></div></div><div id="notice" class="error">'+esc(message)+'</div><button class="primary" type="submit">Sign in</button><button class="secondary" id="signup" type="button" style="width:100%;margin-top:10px">New here? Set up Tay</button><button class="linkbtn" id="forgot" type="button">Forgot password? Send a reset email</button></form></section>';
+ const p=document.getElementById('password'),eye=document.getElementById('eye'),notice=document.getElementById('notice');wireEye(p,eye);
+ document.getElementById('signup').onclick=()=>signupAccountView();
+ document.getElementById('login').onsubmit=async e=>{e.preventDefault();notice.className='muted';notice.textContent='Signing in…';try{const d=await auth('token?grant_type=password',{email:document.getElementById('email').value.trim(),password:p.value});saveSession(d);await applyDraft();await boot()}catch(x){notice.className='error';notice.textContent=x.message}};
+ document.getElementById('forgot').onclick=async()=>{const v=document.getElementById('email').value.trim();if(!v){notice.className='error';notice.textContent='Enter your email first.';return}notice.className='muted';notice.textContent='Requesting a reset email…';try{await auth('recover?redirect_to='+encodeURIComponent(location.origin+location.pathname),{email:v});notice.className='success';notice.textContent='Reset email requested. Open the newest password-reset email on this device.'}catch(x){notice.className='error';notice.textContent=x.message}};
+}
+function signupAccountView(message=''){
+ const draft=loadDraft();signup.answers=(draft&&draft.answers)||signup.answers||defaults();signup.step=(draft&&Number.isInteger(draft.step))?Math.min(draft.step,spokenPrompts.length-1):0;
+ signup.account.preferred_name=(draft&&draft.preferred_name)||signup.account.preferred_name||'';signup.account.email=(draft&&draft.email)||signup.account.email||'';
+ root.innerHTML='<section class="auth glass"><div class="brand">TRANSCENLUTIONS</div><h1>Set up your Tay</h1><p class="muted">No demographic quiz. Tay asks only questions that change how it works for you.</p><form id="account"><div class="field"><label for="name">What should Tay call you?</label><input id="name" maxlength="120" autocomplete="name" required value="'+esc(signup.account.preferred_name)+'"></div><div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" required value="'+esc(signup.account.email)+'"></div><div class="field"><label for="password">Create a password</label><div class="input-wrap"><input id="password" type="password" autocomplete="new-password" minlength="12" required><button class="eye" id="eye" type="button">Show</button></div></div>'+passwordChecklist()+'<div class="field"><label for="confirm">Confirm password</label><input id="confirm" type="password" autocomplete="new-password" minlength="12" required></div><p id="passwordMatch" class="password-match" role="status" aria-live="polite" aria-atomic="true"></p><div id="notice" class="error">'+esc(message)+'</div><button class="primary" type="submit">Start Tay setup</button><button class="linkbtn" id="backToLogin" type="button">I already have an account</button></form></section>';
+ const p=document.getElementById('password'),c=document.getElementById('confirm'),notice=document.getElementById('notice');wireEye(p,document.getElementById('eye'));const validatePassword=wirePasswordChecklist(p,c);document.getElementById('backToLogin').onclick=()=>signInView('',document.getElementById('email').value.trim());
+ document.getElementById('account').onsubmit=e=>{e.preventDefault();const issue=validatePassword();if(issue){notice.textContent=issue;return}signup.account.preferred_name=document.getElementById('name').value.trim();signup.account.email=document.getElementById('email').value.trim();signup.account.password=p.value;signup.answers.preferred_name=signup.account.preferred_name;saveDraft();renderIntake()};
+}
+function renderIntake(){
+ let body='',title='',help='';const a=signup.answers;
+ if(signup.step===0){title='What should Tay help you make true first?';help='Describe a concrete outcome. This becomes the starting context for your command center.';body='<textarea id="primary_goal" maxlength="2000" required placeholder="Example: Keep my client work organized, catch follow-ups before I miss them, and help me ship proposals faster.">'+esc(a.primary_goal)+'</textarea>'}
+ if(signup.step===1){title='How far should Tay move before checking with you?';help='This is the default. Approval boundaries on the next step always override it.';body='<div class="choice-grid">'+radio('autonomy','advise','Think with me','Recommend and explain, but do not prepare actions.',a.autonomy_level)+radio('autonomy','prepare','Prepare it','Draft, organize, research, and queue work for review.',a.autonomy_level)+radio('autonomy','reversible','Handle reversible work','Take low-risk actions that are easy to undo, inside my rules.',a.autonomy_level)+radio('autonomy','bounded','Operate inside my rules','Act autonomously within the boundaries I explicitly set.',a.autonomy_level)+'</div>'}
+ if(signup.step===2){title='What should always require your approval?';help='These boundaries are hard stops even if you choose a high-autonomy mode.';const s=a.approval_boundaries.alwaysRequire;body='<div class="choice-grid">'+check('approval','spending','Spending money or changing paid plans',s)+check('approval','external_messages','Sending messages, emails, or replies as me',s)+check('approval','publishing','Publishing or posting publicly',s)+check('approval','deletion','Deleting data or making irreversible changes',s)+check('approval','permissions','Changing account access, roles, or permissions',s)+check('approval','contracts','Accepting contracts, legal terms, or financial commitments',s)+check('approval','other','Something else',s)+'</div><div class="field"><label for="approvalOther">Other hard boundary</label><textarea id="approvalOther" maxlength="1000" placeholder="Optional">'+esc(a.approval_boundaries.other||'')+'</textarea></div>'}
+ if(signup.step===3){title='What should Tay remember between sessions?';help='Choose what should persist. Also tell Tay what must never be retained.';const s=a.memory_preferences.remember;body='<div class="choice-grid">'+check('memory','decisions','Decisions and the reasons behind them',s)+check('memory','projects','Projects, goals, and current state',s)+check('memory','preferences','How I like work done and presented',s)+check('memory','people_context','Useful context about people and organizations I work with',s)+check('memory','commitments','Promises, commitments, and follow-ups',s)+'</div><div class="field"><label for="neverRetain">What should Tay never retain?</label><textarea id="neverRetain" maxlength="1500" placeholder="Optional. Be specific about information or contexts that should stay temporary.">'+esc(a.memory_preferences.neverRetain||'')+'</textarea></div>'}
+ if(signup.step===4){title='What should Tay watch for without being asked?';help='Proactivity and interruption are separate: Tay can watch quietly and only interrupt for the things you choose.';const p=a.proactivity_preferences.watchFor,n=a.interruption_preferences.notifyFor;body='<label><strong>Watch proactively</strong></label><div class="choice-grid">'+check('watch','deadlines','Deadlines and timing risks',p)+check('watch','risks','Risks, contradictions, or missing information',p)+check('watch','opportunities','High-value opportunities',p)+check('watch','follow_ups','Follow-ups I owe or am waiting on',p)+check('watch','blocked_work','Work that is stuck or going stale',p)+check('watch','approvals','Items waiting on my approval',p)+'</div><div class="field"><label><strong>Interrupt me for</strong></label><div class="choice-grid">'+check('notify','urgent_risk','Urgent risk or something likely to cause harm',n)+check('notify','deadline_slip','A deadline likely to slip',n)+check('notify','approval_block','My approval is blocking meaningful progress',n)+check('notify','high_value_opportunity','A time-sensitive high-value opportunity',n)+check('notify','follow_up','A promised follow-up is about to be missed',n)+check('notify','never','Never interrupt unless I ask',n)+'</div></div>'}
+ if(signup.step===5){title='How should Tay communicate with you?';help='This controls default response shape, not just tone.';const c=a.communication_preferences;body='<div class="choice-grid">'+radio('style','concise','Concise','Give me the answer and the next action.',c.style)+radio('style','detailed','Detailed','Show reasoning, context, and tradeoffs.',c.style)+radio('style','adaptive','Adaptive','Be brief by default; expand when the situation deserves it.',c.style)+'</div><div class="choice-grid">'+check('comm','challenge','Challenge weak assumptions instead of agreeing automatically',c.challengeAssumptions?['challenge']:[])+check('comm','uncertainty','Say uncertainty plainly instead of sounding more certain than the evidence',c.stateUncertainty?['uncertainty']:[])+'</div>'}
+ if(signup.step===6){title='When tradeoffs are unavoidable, what should Tay optimize for first?';help='This is a default priority, not a rule that overrides safety or your explicit instructions.';const d=a.decision_preferences.optimizeFor;body='<div class="choice-grid">'+radio('optimize','quality','Quality','Prefer the strongest result, even if it takes more work.',d)+radio('optimize','speed','Speed','Prefer momentum and quick usable results.',d)+radio('optimize','cost','Cost-effectiveness','Prefer the best value for the outcome, balancing quality, reliability, time, and total cost. Not simply the cheapest option.',d)+radio('optimize','privacy','Privacy','Prefer minimizing data exposure and external services.',d)+radio('optimize','certainty','Certainty','Prefer verification and confidence before acting.',d)+'</div>'}
+ if(signup.step===7){title='What must be true before Tay calls something done?';help='Define your finish line. This prevents “completed” from meaning “I started it” or “I drafted something.”';body='<textarea id="success_definition" maxlength="2000" required placeholder="Example: The result is verified, saved in the right place, any promised recipient has actually received it, and I know about anything still blocked.">'+esc(a.success_definition)+'</textarea>'}
+ if(signup.step===8){title='When voice guidance arrives, how should Tay guide setup?';help='The voice layer is not active in this alpha yet. This preference is saved now so the same intake can later be fully spoken and hands-free.';body='<div class="choice-grid">'+radio('voice','guide_aloud','Guide me aloud','Speak each question, listen for my answer, and move through the intake conversationally.',a.voice_preference)+radio('voice','ask_first','Ask before speaking','Offer voice guidance, but let me choose text or voice each time.',a.voice_preference)+radio('voice','text_only','Keep it text-only','Do not narrate setup unless I change this preference later.',a.voice_preference)+'</div><div class="choice-grid">'+check('voiceConfirm','confirm','Read back consequential answers and get confirmation before saving them',a.voice_confirm_consequential?['confirm']:[])+'</div><div class="voice-note">Voice-ready design: each intake step has a spoken prompt and a structured answer model, so Tay can later narrate, listen, confirm, and continue without creating a separate onboarding system.</div>'}
+ root.innerHTML=shellStep(title,help,body);
+ document.getElementById('back').onclick=()=>{if(signup.step===0)signupAccountView();else{signup.step--;saveDraft();renderIntake()}};
+ document.getElementById('intake').onsubmit=async e=>{e.preventDefault();const notice=document.getElementById('notice');try{
+   if(signup.step===0){a.primary_goal=document.getElementById('primary_goal').value.trim();if(!a.primary_goal)throw new Error('Tell Tay the outcome you want first.')}
+   if(signup.step===1){a.autonomy_level=document.querySelector('input[name="autonomy"]:checked')?.value||'prepare'}
+   if(signup.step===2){a.approval_boundaries={alwaysRequire:values('approval'),other:document.getElementById('approvalOther').value.trim()}}
+   if(signup.step===3){a.memory_preferences={remember:values('memory'),neverRetain:document.getElementById('neverRetain').value.trim()}}
+   if(signup.step===4){let notify=values('notify');if(notify.includes('never'))notify=['never'];a.proactivity_preferences={watchFor:values('watch')};a.interruption_preferences={notifyFor:notify}}
+   if(signup.step===5){const v=values('comm');a.communication_preferences={style:document.querySelector('input[name="style"]:checked')?.value||'adaptive',challengeAssumptions:v.includes('challenge'),stateUncertainty:v.includes('uncertainty')}}
+   if(signup.step===6){a.decision_preferences={optimizeFor:document.querySelector('input[name="optimize"]:checked')?.value||'quality'}}
+   if(signup.step===7){a.success_definition=document.getElementById('success_definition').value.trim();if(!a.success_definition)throw new Error('Define what done means for Tay.')}
+   if(signup.step===8){a.voice_preference=document.querySelector('input[name="voice"]:checked')?.value||'ask_first';a.voice_confirm_consequential=values('voiceConfirm').includes('confirm')}
+   saveDraft();
+   if(signup.step<spokenPrompts.length-1){signup.step++;saveDraft();renderIntake();return}
+   await createAccount();
+ }catch(x){notice.textContent=x.message}};
+}
+async function createAccount(){
+ const notice=document.getElementById('notice');notice.className='muted';notice.textContent='Creating your Tay account…';
+ try{
+   const data={preferred_name:signup.account.preferred_name,onboarding:Object.assign({},signup.answers,{complete:true})};
+   const res=await auth('signup',{email:signup.account.email,password:signup.account.password,data});
+   if(res.access_token&&res.refresh_token){saveSession(res);try{await api('/onboarding',{method:'POST',body:{answers:signup.answers,complete:true}})}catch{}clearDraft();await boot();return}
+   confirmationView(signup.account.email);
+ }catch(x){notice.className='error';notice.textContent=x.message}
+}
+function confirmationView(email){
+ root.innerHTML='<section class="auth glass"><div class="brand">TRANSCENLUTIONS</div><h1>Check your email</h1><p class="muted">Tay saved your setup. If email confirmation is required for this account, confirm <strong>'+esc(email)+'</strong>, then return here and sign in. If this email already belongs to a Tay account, use Sign in instead.</p><button id="signin" class="primary">Sign in after confirmation</button><button id="edit" class="linkbtn">Edit setup</button></section>';
+ document.getElementById('signin').onclick=()=>signInView('',email);document.getElementById('edit').onclick=()=>signupAccountView()
+}
+async function applyDraft(){const d=loadDraft();if(!d?.answers)return;try{await api('/onboarding',{method:'POST',body:{answers:d.answers,complete:true}});clearDraft()}catch{}}
+function recoveryView(tokens){
+ root.innerHTML='<section class="auth glass"><div class="brand">TRANSCENLUTIONS</div><h1>Set a new Tay password</h1><p class="muted">Choose a new password for your shared Transcenlutions cloud account.</p><form id="reset"><div class="field"><label for="newPassword">New password</label><div class="input-wrap"><input id="newPassword" type="password" autocomplete="new-password" minlength="12" required><button class="eye" id="eye" type="button" aria-label="Show password">Show</button></div></div>'+passwordChecklist()+'<div class="field"><label for="confirmPassword">Confirm password</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="12" required></div><p id="passwordMatch" class="password-match" role="status" aria-live="polite" aria-atomic="true"></p><div id="notice" class="error"></div><button class="primary" type="submit">Save new password</button><button id="resetSignIn" class="linkbtn" type="button">Return to sign in</button></form></section>';
+ const p=document.getElementById('newPassword'),c=document.getElementById('confirmPassword'),eye=document.getElementById('eye'),notice=document.getElementById('notice');wireEye(p,eye);const validatePassword=wirePasswordChecklist(p,c);
+ document.getElementById('resetSignIn').onclick=()=>signInView();
+ let saving=false,completed=false;const submit=document.getElementById('reset').querySelector('[type="submit"]');
+ document.getElementById('reset').onsubmit=async e=>{e.preventDefault();if(saving||completed)return;const issue=validatePassword();if(issue){notice.textContent=issue;return}saving=true;submit.disabled=true;notice.className='muted';notice.textContent='Updating password…';try{await auth('user',{password:p.value},'PUT',tokens.access_token);saveSession({access_token:tokens.access_token,refresh_token:tokens.refresh_token,expires_in:Number(tokens.expires_in||3600),token_type:'bearer'});completed=true;notice.className='success';notice.textContent='Password updated. Opening Tay…';setTimeout(()=>boot(),600)}catch(x){notice.className='error';notice.textContent=x.status===401||x.status===403?'This reset session has expired or is no longer valid. Return to sign in and request a new reset email.':x.message}finally{saving=false;if(!completed)submit.disabled=false}};
+}
+async function boot(){
+ root.innerHTML='<section class="auth glass"><div class="brand">TRANSCENLUTIONS</div><h1>Opening Tay…</h1></section>';
+ try{
+   await api('/session');
+   let onboarding=null;try{onboarding=(await api('/onboarding')).onboarding}catch{}
+   let d=await api('/projects');projects=Array.isArray(d.projects)?d.projects:[];
+   if(projects.length===0&&onboarding?.status==='completed'){const summary=String(onboarding.primary_goal||'Personal Tay workspace').slice(0,2000);const made=await api('/projects',{method:'POST',body:{name:'Tay Command Center',summary}});d=await api('/projects');projects=Array.isArray(d.projects)?d.projects:[];if(made.projectId)activeProject=made.projectId}
+   if(!activeProject&&projects[0])activeProject=projects[0].id;
+   await renderShell();
+ }catch(e){if(/sign in|session|jwt|token|invalid/i.test(e.message))saveSession(null);signInView(e.message)}
+}
+async function renderShell(){root.innerHTML='<div class="shell glass"><aside class="sidebar"><div class="brand">TRANSCENLUTIONS</div><div class="sidebar-head"><strong>Projects</strong><button id="newProject" class="secondary">New</button></div><div id="projects" class="projects"></div><button id="logout" class="secondary" style="margin-top:16px;width:100%">Sign out</button></aside><main class="main"><header class="topbar"><div><strong id="projectTitle">Tay Cloud</strong><div class="badge">Cloud connected</div></div><button id="refresh" class="secondary">Refresh</button></header><section id="messages" class="messages"><div class="empty">Choose or create a project.</div></section><form id="composer" class="composer"><textarea id="message" placeholder="Message Tay" required></textarea><button class="primary" type="submit">Send</button></form></main></div>';
+ window.TayWorkspacePresentation?.mount(root, activeProject);
+ const list=document.getElementById('projects');list.innerHTML=projects.length?projects.map(p=>'<button class="project '+(p.id===activeProject?'active':'')+'" aria-current="'+(p.id===activeProject?'true':'false')+'" data-id="'+esc(p.id)+'"><strong>'+esc(p.name)+'</strong><small>'+esc(p.summary||'')+'</small></button>').join(''):'<div class="muted">No projects yet.</div>';list.querySelectorAll('.project').forEach(b=>b.onclick=async()=>{activeProject=b.dataset.id;await renderShell()});document.getElementById('newProject').onclick=async()=>{const name=prompt('Project name');if(!name)return;const summary=prompt('What are you building?')||'';try{const d=await api('/projects',{method:'POST',body:{name,summary}});activeProject=d.projectId;projects=(await api('/projects')).projects||[];await renderShell()}catch(e){alert(e.message)}};document.getElementById('logout').onclick=async()=>{try{await api('/session',{method:'DELETE'})}catch{}saveSession(null);signInView()};document.getElementById('refresh').onclick=async()=>{projects=(await api('/projects')).projects||[];await renderShell()};document.getElementById('composer').onsubmit=async e=>{e.preventDefault();if(!activeProject)return;const box=document.getElementById('message');const t=box.value.trim();if(!t)return;box.disabled=true;try{await api('/projects/'+activeProject+'/messages',{method:'POST',body:{text:t}});box.value='';window.TayWorkspacePresentation?.didSend(box,t);await loadProject()}catch(x){alert(x.message)}finally{box.disabled=false;box.focus()}};if(activeProject)await loadProject()}
+async function loadProject(){const requestedProject=activeProject;try{const d=await api('/projects/'+requestedProject);if(activeProject!==requestedProject)return;const p=d.project||{};document.getElementById('projectTitle').textContent=p.name||'Tay project';const messages=Array.isArray(d.messages)?d.messages:[];const area=document.getElementById('messages');area.innerHTML=messages.length?messages.map(m=>'<div class="bubble '+esc(m.role)+'">'+esc(m.text)+'</div>').join(''):'<div class="empty">Start the conversation with Tay.</div>';window.TayConversationTools?.decorate(requestedProject);area.scrollTop=area.scrollHeight}catch(e){if(activeProject!==requestedProject)return;document.getElementById('messages').innerHTML='<div class="error">'+esc(e.message)+'</div>'}}
+function openInitialView(){
+ const hash=new URLSearchParams(location.hash.replace(/^#/,'')),query=new URLSearchParams(location.search);
+ const authError=hash.has('error')||hash.has('error_code')||query.has('error')||query.has('error_code');
+ const recovery=hash.get('type')==='recovery',unsupportedCode=query.has('code');
+ // Keep recovery capabilities in memory, never in the address bar while typing.
+ if(authError||recovery||unsupportedCode){
+  for(const key of ['code','error','error_code','error_description'])query.delete(key);
+  const suffix=query.toString();history.replaceState(null,'',location.pathname+(suffix?'?'+suffix:''));
+  if(authError){signInView('This reset link has expired, was already used, or is invalid. Request a new reset email from Tay and open the newest message.');return}
+  if(unsupportedCode){signInView('This reset link uses a recovery flow this version of Tay cannot open. Request a new reset email from Tay.');return}
+  if(!hash.get('access_token')||!hash.get('refresh_token')){signInView('This password-reset link is incomplete. Request a new reset email from Tay.');return}
+  recoveryView({access_token:hash.get('access_token'),refresh_token:hash.get('refresh_token'),expires_in:hash.get('expires_in')});return;
+ }
+ loadSession();if(session?.access_token)boot();else if(query.get('signup')==='1')signupAccountView();else signInView();
+}
+openInitialView();
+</script><script type="module" src="./character-chat.mjs"></script>
+</body></html>

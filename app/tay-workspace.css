@@ -336,3 +336,66 @@
   .tay-app .tay-mode-switch button, .tay-app .tay-search summary,
   .tay-app .tay-queue-strip button, .tay-app .tay-voice-drawer > summary { min-height: 44px; }
 }
+
+
+/* Quiet completion cards: appear after verified completion and dissolve unless opened. */
+.tay-app .tay-completion-region:empty { display: none; }
+.tay-app .tay-completion-region {
+  flex: 0 0 auto;
+  max-height: min(46dvh, 460px);
+  overflow: auto;
+  padding: 0 clamp(14px, 3.5vw, 50px) 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #654374 transparent;
+}
+.tay-app .tay-completion-list {
+  display: grid;
+  gap: 7px;
+  max-width: 530px;
+  margin-left: auto;
+}
+.tay-app .tay-completion-card {
+  min-width: 0;
+  border: 1px solid rgba(226, 191, 119, .49);
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(145deg, rgba(27, 34, 39, .98), rgba(25, 16, 39, .98));
+  box-shadow: 0 4px 20px #0006, inset 0 1px #ffffff16;
+  transition: opacity 240ms ease, transform 240ms ease;
+}
+.tay-app .tay-completion-card--leaving {
+  opacity: 0;
+  transform: translateY(7px);
+  pointer-events: none;
+}
+.tay-app button.tay-completion-toggle {
+  display: flex;
+  width: 100%;
+  min-height: 58px;
+  gap: 12px;
+  align-items: center;
+  text-align: left;
+  padding: 11px 13px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #f5eee4;
+}
+.tay-app button.tay-completion-toggle:hover:not(:disabled) { background: rgba(234, 205, 148, .08); }
+.tay-app .tay-completion-check { flex: 0 0 auto; color: #9bdebb; }
+.tay-app .tay-completion-label { display: grid; flex: 1; min-width: 0; gap: 3px; }
+.tay-app .tay-completion-label strong { color: #a8eac7; font-size: 12px; letter-spacing: .045em; }
+.tay-app .tay-completion-label span { color: #f1eaf5; font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; }
+.tay-app .tay-completion-detail { display: grid; gap: 10px; padding: 0 14px 14px 47px; }
+.tay-app .tay-completion-detail p { margin: 0; color: #ded3e6; font-size: 13px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tay-app .tay-completion-detail strong { color: #f1d49c; }
+.tay-app .tay-completion-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+.tay-app .tay-completion-actions button { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; font-size: 12px; }
+@media (max-width: 900px) {
+  .tay-app .tay-completion-region { padding: 0 10px 4px; }
+  .tay-app .tay-completion-list { max-width: 100%; }
+  .tay-app .tay-completion-detail { padding-left: 14px; }
+  .tay-app .tay-completion-actions button { min-height: 44px; }
+}
+

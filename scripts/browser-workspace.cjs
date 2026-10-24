@@ -27,7 +27,17 @@ async function checkHosted(browser) {
   await page.locator('.tay-sidecar-header').getByRole('button', { name: /Close/ }).click();
   await page.locator('.action-card').getByRole('button', { name: 'Execute', exact: true }).click();
   await page.locator('.result-box').waitFor();
+  const completionNotice = page.locator('.tay-completion-card').first();
+  await completionNotice.waitFor({ state: 'visible' });
+  await completionNotice.getByRole('button', { name: /Show completion details:/ }).click();
+  await completionNotice.locator('.tay-completion-detail').waitFor();
+  assert((await completionNotice.innerText()).includes('Next step:'), 'click reveals actual recorded result details');
+  await page.waitForTimeout(8200);
+  assert.equal(await completionNotice.count(), 1, 'expanded completion remains visible rather than dissolving');
+  await completionNotice.getByRole('button', { name: /Hide completion details:/ }).click();
+  await completionNotice.waitFor({ state: 'detached', timeout: 10000 });
   await page.reload(); await page.locator('.result-box').waitFor();
+  assert.equal(await page.locator('.tay-completion-card').count(), 0, 'reload must not replay an old completed task');
   assert.equal(await page.locator('.action-card').getByRole('button', { name: 'Execute', exact: true }).count(), 0, 'reload cannot execute completed work again');
   await page.locator('.tay-queue-strip button').click();
   await page.getByLabel('Workspace tool', { exact: true }).selectOption('momentum');
@@ -88,3 +98,4 @@ async function checkDesktop(browser) {
   try { await checkHosted(browser); await checkDesktop(browser); }
   finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });
+

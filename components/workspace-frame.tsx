@@ -19,6 +19,7 @@ export interface WorkspaceFrameProps {
   header?: ReactNode;
   composer: ReactNode;
   children: ReactNode;
+  completionNotices?: ReactNode;
   sidecar?: ReactNode;
   sidecarTitle?: string;
   sidecarToolbar?: ReactNode;
@@ -51,6 +52,7 @@ export function WorkspaceFrame({
   header,
   composer,
   children,
+  completionNotices,
   sidecar,
   sidecarTitle = "Workspace",
   sidecarToolbar,
@@ -253,6 +255,7 @@ export function WorkspaceFrame({
             {header && <div className="tay-command-tools">{header}</div>}
           </header>
           <div id={conversationId} className="tay-conversation" tabIndex={-1}>{children}</div>
+          {completionNotices && <div className="tay-completion-region">{completionNotices}</div>}
           <div className="tay-composer-dock">{composer}</div>
         </section>
         {sidecar && <>
@@ -267,3 +270,4 @@ export function WorkspaceFrame({
     </div>
   );
 }
+

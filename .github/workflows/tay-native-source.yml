@@ -1,0 +1,41 @@
+# Source verification only. No deployment, signing, artifact retention or tool installation.
+name: Verify Tay Android source
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'android/tay/**'
+      - 'scripts/check-tay-native.mjs'
+      - 'public/assets/tay-command-v1.png'
+      - '.github/workflows/tay-native-source.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    if: >-
+      github.repository == 'transcenlutions25/transcenlutions' &&
+      github.event.repository.private == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out exact proposed source commit
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Verify source and build unsigned APK with preinstalled tools
+        shell: bash
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          : "${JAVA_HOME_17_X64:?Preinstalled JDK 17 is missing}"
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+          export PATH="$JAVA_HOME/bin:$PATH"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          printf 'Commit: %s\nImage: %s\n' "$EXPECTED_HEAD" "${ImageVersion:-unknown}"
+          node scripts/check-tay-native.mjs
+          bash android/tay/scripts/build-sdk.sh "$RUNNER_TEMP/tay-sdk-build"

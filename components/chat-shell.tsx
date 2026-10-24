@@ -391,7 +391,7 @@ export function ChatShell({
         setNotice("The Product Foundry draft is too long for automatic transfer. Please copy its text manually.");
         return;
       }
-      setInput(current => current.trim() ? current + "\\n\\n" + draft : draft);
+      setInput(current => current.trim() ? current + "\n\n" + draft : draft);
       sessionStorage.removeItem(key);
       setNotice("Product Foundry command loaded as a draft. Review it, then send it to Tay when ready.");
     } catch {

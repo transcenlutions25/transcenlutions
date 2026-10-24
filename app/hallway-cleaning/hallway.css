@@ -1,0 +1,19 @@
+/* Scoped to the additive business route; existing Tay and Foundry remain untouched. */
+.hallway-workspace { min-height: 100dvh; padding: clamp(18px, 4vw, 48px); color: #f1eaf5; background: #0a0710; }
+.hallway-workspace * { box-sizing: border-box; }
+.hallway-content { max-width: 1060px; margin: auto; }
+.hallway-workspace header { margin: 30px 0; }
+.hallway-workspace h1 { font-size: clamp(30px, 5vw, 48px); line-height: 1.15; }
+.hallway-workspace p { line-height: 1.65; color: #d8cfe0; }
+.hallway-kicker { color: #dfbd72 !important; letter-spacing: .08em; font-size: 12px; text-transform: uppercase; }
+.hallway-back, .hallway-site { color: #dfbd72; display: inline-flex; align-items: center; min-height: 44px; }
+.hallway-site { border: 1px solid #dfbd7259; border-radius: 12px; padding: 10px 16px; background: #17101f; }
+.hallway-boundary { border-left: 3px solid #dfbd72; padding-left: 16px; }
+.hallway-readiness { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 14px; }
+.hallway-readiness article { min-width: 0; background: #17101f; border: 1px solid #dfbd7259; border-radius: 12px; padding: 18px; }
+.hallway-readiness h3 { margin-top: 0; }
+.hallway-readiness strong { color: #dfbd72; }
+.hallway-workspace summary { min-height: 44px; padding: 10px 0; }
+.hallway-workspace :focus-visible { outline: 2px solid #f4d792; outline-offset: 4px; }
+.hallway-workspace a, .hallway-workspace li { overflow-wrap: anywhere; }
+@media (forced-colors: active) { .hallway-readiness article, .hallway-site { border-color: CanvasText; } }

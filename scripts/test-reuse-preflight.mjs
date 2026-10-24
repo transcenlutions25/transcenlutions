@@ -1,0 +1,12 @@
+import test from 'node:test';import assert from 'node:assert/strict';import{assessHallwayReuse,EXISTING_CRM}from'../lib/build-preflight/reuse.mjs';
+test('unwired existing CRM is reused, not replaced',()=>{const r=assessHallwayReuse();assert.equal(r.decision,'reuse-existing');assert.deepEqual(r.reusable,['customers','deliveries','tasks']);assert.equal(r.replacementAuthorized,false);assert.equal(r.operational,false);});
+test('unknown load does not justify replacement',()=>{assert.equal(assessHallwayReuse({capacityEvidence:{limitExceeded:true}}).decision,'reuse-existing');});
+test('verified capacity failure requires optimization before replacement',()=>{const r=assessHallwayReuse({capacityEvidence:{measured:true,source:'synthetic-capacity-fixture',limitExceeded:true}});assert.equal(r.decision,'optimize-existing-first');assert.equal(r.replacementAuthorized,false);});
+test('missing inventory requires discovery, not new CRM',()=>{const r=assessHallwayReuse({inventory:{}});assert.equal(r.decision,'verify-existing-inventory');assert.equal(r.replacementAuthorized,false);});
+test('existing identity relationships preserved',()=>{assert.deepEqual(EXISTING_CRM.deliveries.identity,['id','project_id','customer_id']);});
+test('mapping alone cannot claim operational writes',()=>{const r=assessHallwayReuse({mappingVerified:true,connectorVerified:true});assert.equal(r.operational,false);assert.equal(r.writeAuthorized,false);});
+test('proven contract remains planning only and cannot authorize writes',()=>{const r=assessHallwayReuse({mappingVerified:true,connectorVerified:true,required:[]});assert.equal(r.operational,true);assert.equal(r.writeAuthorized,false);});
+import{assessCapabilityReuse}from'../lib/build-preflight/reuse.mjs';
+for(const capability of ['CRM','runtime','queue','UI','hosting','approval'])test(capability+' uses global reuse-first gate',()=>{const r=assessCapabilityReuse({capability,existing:[{id:'existing-'+capability,verified:true,supports:['needed']}],requirements:['needed']});assert.equal(r.decision,'reuse-existing');assert.equal(r.newSystemAuthorized,false);});
+test('partial capability extends existing rather than duplicate platform',()=>{const r=assessCapabilityReuse({capability:'jobs',existing:[{id:'Tay',verified:true,supports:['customers']}],requirements:['customers','SOP']});assert.equal(r.decision,'extend-existing');assert.deepEqual(r.uncovered,['SOP']);});
+test('no verified inventory blocks speculative rebuilding',()=>{assert.equal(assessCapabilityReuse({capability:'hosting'}).decision,'inventory-before-build');});

@@ -1,0 +1,919 @@
+{
+  "schema_version": "1.0",
+  "template_version": "1.0.0",
+  "created_at": "2026-10-23",
+  "status": "pending_owner_review",
+  "live_activation": false,
+  "sources": [
+    {
+      "id": "osha-cleaning",
+      "title": "OSHA Cleaning Industry Hazards and Solutions",
+      "url": "https://www.osha.gov/cleaning-industry/hazards-solutions"
+    },
+    {
+      "id": "osha-chemicals",
+      "title": "OSHA NIOSH Protecting Workers Who Use Cleaning Chemicals",
+      "url": "https://www.osha.gov/sites/default/files/publications/OSHA3512.pdf",
+      "access_note": "Search-index text reviewed; direct PDF fetch returned 403."
+    },
+    {
+      "id": "epa",
+      "title": "EPA Cleaning sanitizing and disinfecting surfaces",
+      "url": "https://www.epa.gov/coronavirus-and-disinfectants/whats-difference-between-products-disinfect-sanitize-and-clean"
+    },
+    {
+      "id": "cdc-pressure",
+      "title": "CDC Pressure Washer Safety",
+      "url": "https://www.cdc.gov/natural-disasters/safety/pressure-washer-safety.html"
+    }
+  ],
+  "templates": [
+    {
+      "id": "vendor_review",
+      "version": "1.0.0",
+      "title": "Vendor onboarding and eligibility",
+      "phase": "vendor_review",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "owner",
+      "steps": [
+        {
+          "id": "identity",
+          "text": "Confirm vendor business identity, authorized contact, service area, skills and availability.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "coverage",
+          "text": "Record insurer or broker verification of applicable insurance, policy dates and relevant exclusions. A certificate alone is not a coverage guarantee.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "eligibility",
+          "text": "Confirm required licenses, worker classification review and site-specific qualifications before assignment. Unverified items block assignment.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "training",
+          "text": "Record acknowledgement of this exact SOP version and the job-specific safety instructions.",
+          "role": "vendor",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "terms",
+          "text": "Confirm approved vendor terms and payment rules are on record; do not infer agreement from an application.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "scope_review",
+      "version": "1.0.0",
+      "title": "Client qualification and written scope",
+      "phase": "scope_review",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "owner",
+      "steps": [
+        {
+          "id": "authority",
+          "text": "Confirm requester authority, property type, permitted areas, occupancy and service needs.",
+          "role": "dispatcher",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "scope",
+          "text": "List included rooms/tasks, excluded work, surface sensitivities, access windows and measurable acceptance criteria.",
+          "role": "dispatcher",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "hazards",
+          "text": "Ask about known hazards, pets, sharps, bodily fluids, pests, damaged utilities and restricted equipment; route specialist work for review.",
+          "role": "dispatcher",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "quote",
+          "text": "Record the client-approved scope, price, materials treatment, cancellation terms and revision before scheduling. No implied acceptance.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "schedule",
+      "version": "1.0.0",
+      "title": "Matching and scheduling",
+      "phase": "scheduled",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "owner",
+      "steps": [
+        {
+          "id": "match",
+          "text": "Match only verified vendors by service skill, coverage, service area and actual availability.",
+          "role": "dispatcher",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "confirm",
+          "text": "Confirm client and vendor acceptance of date, time zone, duration, scope and contact method.",
+          "role": "dispatcher",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "access",
+          "text": "Arrange access through restricted delivery. Do not put keys, lock codes or alarm codes in general notes or public links.",
+          "role": "dispatcher",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "contingency",
+          "text": "Assign escalation contact and review late arrival, unsafe conditions and access failure handling.",
+          "role": "dispatcher",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "arrival",
+      "version": "1.0.0",
+      "title": "Arrival and preexisting condition check",
+      "phase": "arrival",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "crew_lead",
+      "steps": [
+        {
+          "id": "arrival",
+          "text": "Record actual arrival and confirm correct site and authorized access.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "walkthrough",
+          "text": "Inspect assigned work areas with the client or authorized representative where possible. Record preexisting damage without declaring fault.",
+          "role": "crew_lead",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "privacy",
+          "text": "Capture only necessary, authorized condition photos. Avoid people, documents, valuables and access codes; use restricted job storage.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "safe",
+          "text": "Check utilities, ventilation, trip/slip risks, equipment and required protective gear. Stop affected work when unsafe.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "change",
+          "text": "Escalate scope or condition differences before extra work; obtain an approved scope revision.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "service_common",
+      "version": "1.0.0",
+      "title": "Safe service execution",
+      "phase": "service",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "crew_lead",
+      "steps": [
+        {
+          "id": "product",
+          "text": "Read product labels and available safety data sheets; use only compatible products, protective equipment and ventilation specified for the task.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "mixing",
+          "text": "Never improvise chemical mixtures. Keep containers labelled and use products only as directed.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "zones",
+          "text": "Separate restroom tools from kitchen and general-area tools. Keep clean supplies separate from soiled materials.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "sequence",
+          "text": "Work through the agreed area checklist; protect furnishings and manage wet floors with barriers or warnings.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "disinfect",
+          "text": "If disinfection is in scope, use a suitable registered product and follow its surface, preparation and wet-contact-time directions. Do not promise sterilization.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "stop",
+          "text": "Stop for unknown chemicals, sharps, suspected hazardous material, significant mold or unsafe equipment; isolate the area and contact the supervisor.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "service_airbnb",
+      "version": "1.0.0",
+      "title": "Short term rental turnover",
+      "phase": "service",
+      "service": "airbnb",
+      "status": "pending_owner_review",
+      "signoff_role": "crew_lead",
+      "steps": [
+        {
+          "id": "linen",
+          "text": "Replace approved linen and towels; separate soiled laundry and verify laundry scope.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "inventory",
+          "text": "Check agreed consumables and inventory; report missing or damaged items without charging anyone.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "guest_ready",
+          "text": "Check kitchen, bathroom, bedrooms and guest-touch surfaces against the approved list; report maintenance issues.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "handover",
+          "text": "Confirm readiness against the next check-in deadline; do not mark available while safety or essential cleaning defects remain.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "service_apartment",
+      "version": "1.0.0",
+      "title": "Apartment turnover",
+      "phase": "service",
+      "service": "apartment",
+      "status": "pending_owner_review",
+      "signoff_role": "crew_lead",
+      "steps": [
+        {
+          "id": "vacancy",
+          "text": "Confirm lawful access and vacancy status; never remove tenant belongings without documented authorization.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "rooms",
+          "text": "Complete scoped kitchen, bath, floors, fixtures and appliance surfaces using compatible methods.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "utilities",
+          "text": "Report leaks, electrical defects, pests and other maintenance issues separately; do not attempt unqualified repairs.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "return",
+          "text": "Confirm final area checklist and return access items through the approved custody process.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "service_office",
+      "version": "1.0.0",
+      "title": "Commercial office cleaning",
+      "phase": "service",
+      "service": "office",
+      "status": "pending_owner_review",
+      "signoff_role": "crew_lead",
+      "steps": [
+        {
+          "id": "secure",
+          "text": "Respect occupied work areas, confidentiality and restricted rooms; do not open drawers or view documents.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "touch",
+          "text": "Clean agreed touch points and shared facilities without damaging electronics.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "waste",
+          "text": "Handle agreed ordinary waste only; report sharps, medical waste or unknown substances.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "lockup",
+          "text": "Check agreed closing tasks and lockup with authorized personnel; record exceptions without recording codes.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "service_warehouse",
+      "version": "1.0.0",
+      "title": "Warehouse cleaning",
+      "phase": "service",
+      "service": "warehouse",
+      "status": "pending_owner_review",
+      "signoff_role": "crew_lead",
+      "steps": [
+        {
+          "id": "traffic",
+          "text": "Agree a safe work zone and traffic separation with site management; stop if moving equipment enters the area.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "equipment",
+          "text": "Do not operate forklifts, production machinery or isolate energized equipment unless separately qualified and authorized.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "floor",
+          "text": "Use methods compatible with the floor and approved contaminants; do not clean unidentified spills.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "release",
+          "text": "Have the site representative review barriers and safe reopening of completed areas.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "service_estate",
+      "version": "1.0.0",
+      "title": "Estate property cleaning",
+      "phase": "service",
+      "service": "estate",
+      "status": "pending_owner_review",
+      "signoff_role": "crew_lead",
+      "steps": [
+        {
+          "id": "inventory",
+          "text": "Confirm written keep, move and dispose instructions; no independent disposal or appraisal of valuables.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "condition",
+          "text": "Record delicate surfaces and existing damage; obtain permission before moving fragile objects.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "privacy",
+          "text": "Protect personal records, photographs and belongings; do not publish before-and-after images.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "handover",
+          "text": "Reconcile moved items and exceptions with the authorized representative.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "service_hotel",
+      "version": "1.0.0",
+      "title": "Hotel cleaning",
+      "phase": "service",
+      "service": "hotel",
+      "status": "pending_owner_review",
+      "signoff_role": "crew_lead",
+      "steps": [
+        {
+          "id": "entry",
+          "text": "Follow the hotel room-status and entry procedure; respect do-not-disturb and guest privacy.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "linen",
+          "text": "Use hotel-approved linen separation, replacement and lost-property procedures.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "checklist",
+          "text": "Complete property-specific room and bathroom quality checks; do not substitute this generic checklist for brand requirements.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "status",
+          "text": "Release room status only through the authorized supervisor after inspection.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "service_pressure_wash",
+      "version": "1.0.0",
+      "title": "Pressure washing",
+      "phase": "service",
+      "service": "pressure_wash",
+      "status": "pending_owner_review",
+      "signoff_role": "crew_lead",
+      "steps": [
+        {
+          "id": "survey",
+          "text": "Confirm trained operator, surface suitability, equipment condition, pedestrian exclusion and runoff plan before starting.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "engine",
+          "text": "Never operate gasoline-powered equipment indoors or in enclosed spaces; keep exhaust away from doors, windows and air intakes.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "jet",
+          "text": "Keep the spray away from people, animals and electrical equipment; do not inspect a leak with a hand.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "injury",
+          "text": "Stop for injury or suspected injection wound and obtain urgent medical help; do not judge severity by skin appearance.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "finish",
+          "text": "Review surface damage, debris and drainage; remove barriers only when the area is safe.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "quality",
+      "version": "1.0.0",
+      "title": "Quality inspection and rework",
+      "phase": "quality_review",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "quality_reviewer",
+      "steps": [
+        {
+          "id": "inspect",
+          "text": "Inspect each scoped area against its acceptance criteria; record defects and exceptions.",
+          "role": "quality_reviewer",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "rework",
+          "text": "Assign in-scope rework with an owner, due time and retest. Obtain approval for added scope rather than silently charging.",
+          "role": "quality_reviewer",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "safety",
+          "text": "Confirm site safety, dry or clearly controlled floors, secure storage and removal of supplies.",
+          "role": "quality_reviewer",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "release",
+          "text": "Close defects only after verification. Unresolved defects remain visible at handover.",
+          "role": "quality_reviewer",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "completion",
+      "version": "1.0.0",
+      "title": "Client handover and completion review",
+      "phase": "completion_review",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "owner",
+      "steps": [
+        {
+          "id": "evidence",
+          "text": "Record completed work, time, checklist version, deviations and restricted evidence references.",
+          "role": "crew_lead",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "acceptance",
+          "text": "Request the authorized client representative\u2019s explicit acceptance or list of issues; silence does not equal acceptance in this proposal.",
+          "role": "dispatcher",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "review",
+          "text": "Owner reviews completion and open incidents against approved terms. Crew checkbox alone does not authorize payment release.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "payment",
+      "version": "1.0.0",
+      "title": "Payment reconciliation review",
+      "phase": "payment_review",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "owner",
+      "steps": [
+        {
+          "id": "terms",
+          "text": "Confirm approved split, fees, tax, materials and tips treatment for this job revision. Unknown terms block a payout plan.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "funds",
+          "text": "Reconcile verified provider events, settled or available funds, refunds, disputes and prior payment references.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "release",
+          "text": "Check approved completion and dispute rules, then review a single idempotent payment plan. This SOP does not initiate a charge or transfer.",
+          "role": "owner",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "receipt",
+          "text": "Record actual payment and payout outcomes separately; a transfer to a provider balance is not proof of bank receipt.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "nonpayment",
+      "version": "1.0.0",
+      "title": "Late or missing payment",
+      "phase": "payment_review",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "owner",
+      "steps": [
+        {
+          "id": "verify",
+          "text": "Check the agreed due date and actual provider status, including partial, failed or pending payment.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "reminder",
+          "text": "Prepare a factual reminder with invoice reference and approved payment route; review recipient and amount before sending.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "dispute",
+          "text": "Separate a disputed charge or disputed service from ordinary lateness; record the client response.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "escalate",
+          "text": "Review next service, payment plan or escalation under approved terms. Do not invent late fees, auto-debit, seize funds or initiate collections.",
+          "role": "owner",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "incident",
+      "version": "1.0.0",
+      "title": "Damage or liability incident",
+      "phase": "incident_review",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "owner",
+      "steps": [
+        {
+          "id": "protect",
+          "text": "Stop affected work; protect people and prevent further damage only within safe training. For immediate danger call emergency services.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "record",
+          "text": "Record time, job, location, observations, parties and necessary evidence. Label allegations separately from verified facts.",
+          "role": "crew_lead",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "notify",
+          "text": "Escalate promptly to the owner; prepare factual client and vendor communications for review, without admitting liability.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "preserve",
+          "text": "Preserve original evidence with restricted access and audit history; do not delete or edit originals to hide a defect.",
+          "role": "owner",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "review",
+          "text": "Obtain vendor response, repair estimate and applicable insurer or broker guidance. Coverage, fault and deductions are not automatic.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "resolve",
+          "text": "Record approved resolution, responsible party, deadlines and verification; money actions require their separate authorization.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "cancellation",
+      "version": "1.0.0",
+      "title": "Cancellation no show or access failure",
+      "phase": "cancellation_review",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "owner",
+      "steps": [
+        {
+          "id": "facts",
+          "text": "Record who reported the issue, scheduled time, contact attempt and actual access facts.",
+          "role": "dispatcher",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "options",
+          "text": "Offer only approved rescheduling or cancellation options; do not promise compensation or charge an unapproved fee.",
+          "role": "dispatcher",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "approval",
+          "text": "Owner reviews contract terms, client notice and vendor commitments before a financial adjustment.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "privacy",
+      "version": "1.0.0",
+      "title": "Evidence and access data handling",
+      "phase": "completion_review",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "owner",
+      "steps": [
+        {
+          "id": "minimum",
+          "text": "Store minimum necessary job evidence in restricted records, not public pages, message templates or source code.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "access_return",
+          "text": "Record return or approved disposal of temporary access material without copying its secret value into audit text.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "retention",
+          "text": "Follow an owner-approved retention schedule and legal preservation instructions; do not delete evidence while a hold applies.",
+          "role": "owner",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "scope_change",
+      "version": "1.0.0",
+      "title": "Scope change control",
+      "phase": "scope_review",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "owner",
+      "steps": [
+        {
+          "id": "request",
+          "text": "Record the requested change, reason, affected tasks and schedule impact without overwriting the accepted scope.",
+          "role": "dispatcher",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "approval",
+          "text": "Obtain the owner and client acceptance of the revised scope and price before added work. Preserve both versions.",
+          "role": "owner",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "brief",
+          "text": "Confirm the assigned crew received the new checklist and can perform it safely.",
+          "role": "dispatcher",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "backup_crew",
+      "version": "1.0.0",
+      "title": "Backup crew and interrupted work",
+      "phase": "scheduled",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "owner",
+      "steps": [
+        {
+          "id": "trigger",
+          "text": "Record the delay, absence or interruption and notify the dispatcher through the approved route.",
+          "role": "crew_lead",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "replacement",
+          "text": "Verify replacement crew skills, current eligibility and availability; do not bypass vetting to meet a deadline.",
+          "role": "dispatcher",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "consent",
+          "text": "Confirm revised timing and any crew change with the client and replacement vendor.",
+          "role": "dispatcher",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "handoff",
+          "text": "Transfer only necessary job scope, completed steps and restricted access through approved channels. Preserve the original audit history.",
+          "role": "dispatcher",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "availability",
+      "version": "1.0.0",
+      "title": "Availability and location consent",
+      "phase": "vendor_review",
+      "service": "all",
+      "status": "pending_owner_review",
+      "signoff_role": "owner",
+      "steps": [
+        {
+          "id": "choice",
+          "text": "Explain what location precision is used and who can see it. Availability is an explicit vendor choice, not an inference from location.",
+          "role": "owner",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "consent",
+          "text": "Record the vendor choice and policy version before any location-enabled discovery. Do not activate actual location collection through this checklist.",
+          "role": "vendor",
+          "evidence": "record_reference",
+          "required": true
+        },
+        {
+          "id": "withdraw",
+          "text": "Provide an easy unavailable or revoke control; hide unavailable, stale or revoked entries from customer discovery.",
+          "role": "owner",
+          "evidence": "attestation",
+          "required": true
+        },
+        {
+          "id": "privacy",
+          "text": "Show only approved approximate discovery location publicly. Do not expose precise coordinates or retain a movement history by default.",
+          "role": "owner",
+          "evidence": "attestation",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "review_required": [
+    "Owner and vendor split and fee responsibility",
+    "Completion acceptance and dispute windows",
+    "Cancellation and nonpayment terms",
+    "Insurance requirements and verified coverage",
+    "Worker classification and jurisdiction review",
+    "Retention schedule and authorized evidence access"
+  ]
+}
